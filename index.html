@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucas Haines</title>
+  <meta name="view-transition" content="same-origin">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Cinzel:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      font-family: sans-serif;
+    }
+
+    /* ===== SPLIT PANELS ===== */
+    .panel {
+      position: relative;
+      width: 50%;
+      height: 100vh;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    /* On hover, expand the hovered panel */
+    body:has(.panel-photo:hover) .panel-photo { width: 55%; }
+    body:has(.panel-photo:hover) .panel-writing { width: 45%; }
+    body:has(.panel-writing:hover) .panel-writing { width: 55%; }
+    body:has(.panel-writing:hover) .panel-photo { width: 45%; }
+
+    /* ===== PHOTOGRAPHY PANEL — dark artsy ===== */
+    .panel-photo {
+      background: #050505;
+      color: #f0ede8;
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+    }
+
+    /* Film grain overlay */
+    .panel-photo::before {
+      content: '';
+      position: absolute;
+      inset: -100%;
+      width: 300%;
+      height: 300%;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(10) infinite;
+    }
+
+    @keyframes grain {
+      0%, 100% { transform: translate(0,0); }
+      10% { transform: translate(-5%,-10%); }
+      30% { transform: translate(7%,-25%); }
+      50% { transform: translate(-15%,10%); }
+      70% { transform: translate(0%,15%); }
+      90% { transform: translate(-10%,10%); }
+    }
+
+    /* Background photo grid */
+    .photo-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+      opacity: 0.25;
+      transition: opacity 0.8s ease;
+      z-index: 1;
+    }
+    .panel-photo:hover .photo-grid {
+      opacity: 0.45;
+    }
+    .photo-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.5) saturate(0.7) contrast(1.1);
+      transition: filter 0.6s;
+    }
+    .panel-photo:hover .photo-grid img {
+      filter: brightness(0.65) saturate(0.8) contrast(1.05);
+    }
+
+    .panel-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      text-align: center;
+    }
+
+    .panel-label {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 100%;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .panel-title {
+      line-height: 1;
+    }
+
+    .panel-below {
+      position: absolute;
+      left: 0; right: 0;
+      top: 100%;
+      margin-top: 28px;
+      text-align: center;
+    }
+
+    .panel-photo .panel-content {
+      z-index: 4;
+    }
+
+    .panel-photo .panel-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .panel-photo .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 800;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #f0ede8;
+    }
+
+    .panel-photo .panel-arrow {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #555;
+      transition: color 0.4s, transform 0.4s;
+    }
+    .panel-photo .panel-underline {
+      width: 0;
+      height: 3px;
+      background: #fff;
+      margin: 8px auto 0;
+      transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .panel-photo:hover .panel-arrow {
+      color: #f0ede8;
+      transform: translateY(-2px);
+    }
+    .panel-photo:hover .panel-underline {
+      width: 100%;
+    }
+
+    /* ===== WRITING PANEL — white & gold regal ===== */
+    .panel-writing {
+      background: #faf8f4;
+      color: #2a2420;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      border-left: 1px solid rgba(184, 149, 42, 0.2);
+    }
+
+    /* Gold ornamental corners */
+    .panel-writing::before,
+    .panel-writing::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-color: rgba(184, 149, 42, 0.25);
+      border-style: solid;
+      z-index: 2;
+      pointer-events: none;
+      transition: border-color 0.4s;
+    }
+    .panel-writing::before {
+      top: 40px; left: 40px;
+      border-width: 1px 0 0 1px;
+    }
+    .panel-writing::after {
+      bottom: 40px; right: 40px;
+      border-width: 0 1px 1px 0;
+    }
+    .panel-writing:hover::before,
+    .panel-writing:hover::after {
+      border-color: rgba(184, 149, 42, 0.5);
+    }
+
+    .panel-writing .panel-content {
+      z-index: 3;
+    }
+
+    .panel-writing .panel-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #8a6d1b;
+    }
+
+    .panel-writing .panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #2a2420;
+    }
+
+    .panel-writing .panel-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 1.8vw, 1.4rem);
+      font-weight: 300;
+      font-style: italic;
+      color: #6b5e52;
+      margin-top: 16px;
+      letter-spacing: 2px;
+    }
+
+    .panel-writing .panel-divider {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #b8952a, transparent);
+      margin: 20px auto 0;
+      opacity: 0.5;
+      transition: width 0.4s, opacity 0.4s;
+    }
+    .panel-writing:hover .panel-divider {
+      width: 80px;
+      opacity: 0.8;
+    }
+
+    .panel-writing .panel-arrow {
+      display: inline-block;
+      margin-top: 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(138, 109, 27, 0.5);
+      transition: color 0.4s, transform 0.4s;
+    }
+    .panel-writing:hover .panel-arrow {
+      color: #8a6d1b;
+      transform: translateY(-2px);
+    }
+
+    /* ===== CENTER NAME ===== */
+    .center-name {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      pointer-events: none;
+      text-align: center;
+      padding-top: 14vh;
+      opacity: 0;
+      animation: nameReveal 1s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      mix-blend-mode: difference;
+    }
+    .center-name h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.5rem, 5.5vw, 5rem);
+      font-weight: 700;
+      letter-spacing: 14px;
+      text-transform: uppercase;
+      color: #fff;
+      display: flex;
+    }
+    .center-name .first-name {
+      width: 50%;
+      text-align: right;
+      padding-right: 14px;
+    }
+    .center-name .last-name {
+      width: 50%;
+      text-align: left;
+      padding-left: 14px;
+    }
+
+    @keyframes nameReveal {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== DIVIDER LINE ===== */
+    .center-line {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      width: 1px;
+      height: 100vh;
+      z-index: 5;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255,255,255,0.15) 20%,
+        rgba(184, 149, 42, 0.3) 50%,
+        rgba(255,255,255,0.15) 80%,
+        transparent 100%
+      );
+      transition: left 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    body:has(.panel-photo:hover) .center-line { left: 55%; }
+    body:has(.panel-writing:hover) .center-line { left: 45%; }
+
+    /* ===== CIRCLE IRIS PAGE TRANSITION ===== */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      pointer-events: none;
+    }
+    .transition-ring,
+    .transition-fill {
+      position: absolute;
+      inset: 0;
+      will-change: clip-path;
+      clip-path: circle(0px at 50% 50%);
+      -webkit-clip-path: circle(0px at 50% 50%);
+    }
+    .transition-fill { background: #050505; }
+    .transition-ring { background: #b8952a; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .panel { width: 100% !important; height: 50vh; }
+      .center-line {
+        top: 50%;
+        left: 0;
+        width: 100vw;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          transparent 0%,
+          rgba(255,255,255,0.15) 20%,
+          rgba(184, 149, 42, 0.3) 50%,
+          rgba(255,255,255,0.15) 80%,
+          transparent 100%
+        );
+      }
+      .panel-writing { border-left: none; border-top: 1px solid rgba(184, 149, 42, 0.2); }
+      .panel-writing::before { top: 24px; left: 24px; width: 40px; height: 40px; }
+      .panel-writing::after { bottom: 24px; right: 24px; width: 40px; height: 40px; }
+      .center-name { padding-top: 5vh; }
+      .center-name h1 { font-size: 1.8rem; letter-spacing: 8px; display: block; }
+      .center-name .first-name,
+      .center-name .last-name { width: auto; text-align: center; padding: 0; display: inline; }
+      .panel-photo .panel-content,
+      .panel-writing .panel-content { padding: 0 24px; }
+    }
+    @media (max-width: 480px) {
+      .panel-photo .panel-title,
+      .panel-writing .panel-title { font-size: 2rem; }
+      .center-name h1 { font-size: 1.2rem; letter-spacing: 5px; display: block; }
+      .center-name .first-name,
+      .center-name .last-name { width: auto; text-align: center; padding: 0; display: inline; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Circle Iris Page Transition -->
+  <div class="page-transition" id="pageTransition">
+    <div class="transition-ring" id="transRing"></div>
+    <div class="transition-fill" id="transFill"></div>
+  </div>
+
+  <!-- Center name overlay -->
+  <div class="center-name">
+    <h1><span class="first-name">Lucas</span><span class="last-name">Haines</span></h1>
+  </div>
+
+  <!-- Center divider -->
+  <div class="center-line"></div>
+
+  <!-- Photography Half -->
+  <a href="photography.html" class="panel panel-photo" data-dest="photo">
+    <div class="photo-grid">
+      <img src="thumbs/IMG_0743.jpg" alt="" loading="lazy">
+      <img src="thumbs/IMG_0469.jpg" alt="" loading="lazy">
+      <img src="thumbs/IMG_1861.jpg" alt="" loading="lazy">
+      <img src="thumbs/IMG_0555.jpg" alt="" loading="lazy">
+      <img src="thumbs/IMG_2141.jpg" alt="" loading="lazy">
+      <img src="thumbs/IMG_0914.jpg" alt="" loading="lazy">
+    </div>
+    <div class="panel-content">
+      <div class="panel-label">Gallery</div>
+      <div class="panel-title">Photo</div>
+      <div class="panel-below">
+        <span class="panel-arrow">
+          View gallery &rarr;
+          <div class="panel-underline"></div>
+        </span>
+      </div>
+    </div>
+  </a>
+
+  <!-- Writing Half -->
+  <a href="writing.html" class="panel panel-writing" data-dest="writing">
+    <div class="panel-content">
+      <div class="panel-label">Book</div>
+      <div class="panel-title">Writing</div>
+      <div class="panel-below">
+        <div class="panel-subtitle">Decoding Human Nature</div>
+        <div class="panel-divider"></div>
+        <span class="panel-arrow">Read chapters &rarr;</span>
+      </div>
+    </div>
+  </a>
+
+  <script>
+    // ===== CIRCLE IRIS PAGE TRANSITION =====
+    (function() {
+      'use strict';
+      var FILL_DUR = 600, RING_DUR = 550, RING_DELAY = 50, NAV_DELAY = 680;
+      var EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+      var EASE_IN  = 'cubic-bezier(0.7, 0, 0.84, 0)';
+      var ring = document.getElementById('transRing');
+      var fill = document.getElementById('transFill');
+      var navigating = false;
+
+      function maxR(x, y) {
+        var w = window.innerWidth, h = window.innerHeight;
+        return Math.ceil(Math.hypot(Math.max(x, w - x), Math.max(y, h - y)));
+      }
+
+      function setClip(el, val) {
+        el.style.clipPath = val;
+        el.style.webkitClipPath = val;
+      }
+
+      function exitTransition(href, cx, cy) {
+        if (navigating) return;
+        navigating = true;
+        var r = maxR(cx, cy);
+        var o = cx + 'px ' + cy + 'px';
+        var start = 'circle(0px at ' + o + ')';
+        var end = 'circle(' + r + 'px at ' + o + ')';
+
+        try { sessionStorage.setItem('iris_x', cx); sessionStorage.setItem('iris_y', cy); } catch(e) {}
+
+        ring.style.transition = 'none'; fill.style.transition = 'none';
+        setClip(ring, start); setClip(fill, start);
+        void ring.offsetHeight;
+
+        ring.style.transition = 'clip-path ' + RING_DUR + 'ms ' + EASE_IN + ', -webkit-clip-path ' + RING_DUR + 'ms ' + EASE_IN;
+        fill.style.transition = 'clip-path ' + FILL_DUR + 'ms ' + EASE_IN + ' ' + RING_DELAY + 'ms, -webkit-clip-path ' + FILL_DUR + 'ms ' + EASE_IN + ' ' + RING_DELAY + 'ms';
+        setClip(ring, end); setClip(fill, end);
+        ring.parentElement.style.pointerEvents = 'all';
+
+        setTimeout(function() { window.location.href = href; }, NAV_DELAY);
+      }
+
+      function enterTransition() {
+        var cx, cy;
+        try { cx = parseFloat(sessionStorage.getItem('iris_x')); cy = parseFloat(sessionStorage.getItem('iris_y')); sessionStorage.removeItem('iris_x'); sessionStorage.removeItem('iris_y'); } catch(e) {}
+        if (isNaN(cx) || isNaN(cy)) { cx = window.innerWidth / 2; cy = window.innerHeight / 2; }
+
+        var r = maxR(cx, cy);
+        var o = cx + 'px ' + cy + 'px';
+        var full = 'circle(' + r + 'px at ' + o + ')';
+        var zero = 'circle(0px at ' + o + ')';
+
+        ring.style.transition = 'none'; fill.style.transition = 'none';
+        setClip(ring, full); setClip(fill, full);
+        void ring.offsetHeight;
+
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+          fill.style.transition = 'clip-path ' + FILL_DUR + 'ms ' + EASE_OUT + ', -webkit-clip-path ' + FILL_DUR + 'ms ' + EASE_OUT;
+          ring.style.transition = 'clip-path ' + RING_DUR + 'ms ' + EASE_OUT + ' ' + RING_DELAY + 'ms, -webkit-clip-path ' + RING_DUR + 'ms ' + EASE_OUT + ' ' + RING_DELAY + 'ms';
+          setClip(fill, zero); setClip(ring, zero);
+
+          setTimeout(function() {
+            ring.style.transition = 'none'; fill.style.transition = 'none';
+            ring.parentElement.style.pointerEvents = '';
+            navigating = false;
+          }, Math.max(FILL_DUR, RING_DUR + RING_DELAY) + 100);
+        }); });
+      }
+
+      document.querySelectorAll('a[href]').forEach(function(link) {
+        var href = link.getAttribute('href');
+        if (href && href.endsWith('.html') && !href.startsWith('http') && !href.startsWith('mailto')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var rect = link.getBoundingClientRect();
+            var x = e.clientX || (rect.left + rect.width / 2);
+            var y = e.clientY || (rect.top + rect.height / 2);
+            exitTransition(href, x, y);
+          });
+        }
+      });
+
+      window.addEventListener('pageshow', function(e) { if (e.persisted) { navigating = false; enterTransition(); } });
+      enterTransition();
+    })();
+  </script>
+</body>
+</html>
