@@ -155,15 +155,20 @@
       background: var(--cream);
       border: 1px solid var(--gold-border);
       color: var(--gold);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+      padding: 10px 18px;
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       cursor: pointer;
       transition: all 0.3s;
       box-shadow: 0 2px 12px rgba(138, 109, 27, 0.08);
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
     .toc-toggle:hover {
       background: var(--gold);
@@ -171,8 +176,8 @@
       box-shadow: 0 4px 20px rgba(184, 149, 42, 0.2);
     }
     .toc-toggle svg {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       fill: currentColor;
     }
 
@@ -471,7 +476,7 @@
       cursor: pointer;
       padding: 16px;
       color: var(--gold);
-      opacity: 0.4;
+      opacity: 0.7;
       transition: opacity 0.3s, transform 0.3s;
     }
     .side-arrow:hover {
@@ -532,6 +537,27 @@
     /* ===== FADE TRANSITION ===== */
     .chapter-section {
       animation: fadeIn 0.5s ease;
+    }
+    .section-next-btn {
+      display: block;
+      margin: 60px auto 20px;
+      padding: 14px 36px;
+      background: none;
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all 0.3s;
+    }
+    .section-next-btn:hover {
+      background: var(--gold);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(184, 149, 42, 0.2);
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(12px); }
@@ -602,7 +628,7 @@
         font-size: 2.8em;
       }
       .side-arrow { padding: 10px; }
-      .side-arrow svg { width: 28px; height: 28px; }
+      .side-arrow svg { width: 36px; height: 36px; }
     }
     /* ===== HAMBURGER MENU ===== */
     .nav-hamburger {
@@ -706,6 +732,7 @@
   <!-- TOC Toggle Button -->
   <button class="toc-toggle" id="tocToggle" aria-label="Open table of contents">
     <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    Chapters
   </button>
 
   <!-- TOC Overlay -->
@@ -4339,12 +4366,12 @@ is now, because we are not promised later. This book exists because of that less
 
   <!-- Side Navigation Arrows -->
   <button class="side-arrow side-arrow-prev" id="prevChapter" aria-label="Previous section">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="15 18 9 12 15 6"></polyline>
     </svg>
   </button>
   <button class="side-arrow side-arrow-next" id="nextChapter" aria-label="Next section">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="9 6 15 12 9 18"></polyline>
     </svg>
   </button>
@@ -4447,6 +4474,17 @@ is now, because we are not promised later. This book exists because of that less
     });
     nextBtn.addEventListener('click', () => {
       if (currentIdx < sectionIds.length - 1) showSection(sectionIds[currentIdx + 1]);
+    });
+
+    // Inject "Next" button at bottom of each section (except last)
+    sections.forEach((section, i) => {
+      if (i < sections.length - 1) {
+        const btn = document.createElement('button');
+        btn.className = 'section-next-btn';
+        btn.textContent = 'Next \u203A';
+        btn.addEventListener('click', () => showSection(sectionIds[i + 1]));
+        section.appendChild(btn);
+      }
     });
 
     // TOC toggle
