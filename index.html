@@ -307,25 +307,38 @@
 
     /* The Book */
     .band-book {
-      background: linear-gradient(135deg, #1a120a 0%, #2a1f14 100%);
-      color: #e8d8c4;
+      background: radial-gradient(ellipse at center, #f5ead0 0%, #e8d9b8 100%);
+      color: #1a0e08;
     }
-    .band-book .band-bg {
-      background:
-        radial-gradient(ellipse at 80% 50%, rgba(180,140,90,0.15) 0%, transparent 60%),
-        repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px);
-    }
+    .band-book .band-bg { background: transparent; }
+    .band-book .band-num,
+    .band-book .band-meta { color: #5a3e1e; }
+    .band-book .band-arrow { color: #2a1810; }
     .band-book .band-name {
       font-family: 'Playfair Display', serif;
       font-weight: 700;
       font-size: clamp(1.6rem, 3.2vw, 2.6rem);
-      letter-spacing: -0.01em;
+      letter-spacing: 0.005em;
+      color: #1a0e08;
     }
     .band-book .band-name em {
       font-style: italic;
       font-weight: 400;
-      color: #d4b896;
+      color: #5a3e1e;
     }
+    .band-book::before,
+    .band-book::after {
+      content: '';
+      position: absolute;
+      left: clamp(20px, 6vw, 80px);
+      right: clamp(20px, 6vw, 80px);
+      height: 1px;
+      background: #2a1810;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .band-book::before { top: 18px; }
+    .band-book::after  { bottom: 18px; }
 
     .selector-bands {
       flex: 1;
