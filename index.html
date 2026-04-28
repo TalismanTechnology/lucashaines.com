@@ -4,517 +4,2628 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lucas Haines</title>
-  <meta name="view-transition" content="same-origin">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500;1,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Cinzel:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
-
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
+    :root {
+      --bg: #050505;
+      --text: #f0ede8;
+      --muted: #555;
     }
 
+    html { scrollbar-width: thin; scrollbar-color: #222 transparent; }
     body {
-      display: flex;
-      font-family: sans-serif;
-    }
-
-    /* ===== SPLIT PANELS ===== */
-    .panel {
-      position: relative;
-      width: 50%;
-      height: 100vh;
-      overflow: hidden;
-      cursor: pointer;
-      text-decoration: none;
-      transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-
-    /* On hover, expand the hovered panel */
-    body:has(.panel-photo:hover) .panel-photo { width: 55%; }
-    body:has(.panel-photo:hover) .panel-writing { width: 45%; }
-    body:has(.panel-writing:hover) .panel-writing { width: 55%; }
-    body:has(.panel-writing:hover) .panel-photo { width: 45%; }
-
-    /* ===== PHOTOGRAPHY PANEL — dark artsy ===== */
-    .panel-photo {
-      background: #050505;
-      color: #f0ede8;
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Space Grotesk', -apple-system, sans-serif;
+      overflow-x: hidden;
     }
 
-    /* Film grain overlay */
-    .panel-photo::before {
-      content: '';
-      position: absolute;
-      inset: -100%;
-      width: 300%;
-      height: 300%;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0.025;
+    /* ===== GRAIN ===== */
+    .grain {
+      position: fixed; inset: 0;
+      z-index: 9998; pointer-events: none; opacity: 0.025;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      animation: grain 0.5s steps(10) infinite;
+    }
+    /* Static grain — animation removed for performance */
+
+    /* ===== SELECTOR (landing) — six stacked full-width bands ===== */
+    .selector {
+      position: fixed; inset: 0;
+      z-index: 100;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+      overflow: hidden;
+    }
+    .selector.hidden {
+      opacity: 0; visibility: hidden;
+      pointer-events: none;
     }
 
-    @keyframes grain {
-      0%, 100% { transform: translate(0,0); }
-      10% { transform: translate(-5%,-10%); }
-      30% { transform: translate(7%,-25%); }
-      50% { transform: translate(-15%,10%); }
-      70% { transform: translate(0%,15%); }
-      90% { transform: translate(-10%,10%); }
+    /* Fixed corner identity */
+    .selector-id {
+      position: absolute;
+      top: 22px; left: 32px;
+      z-index: 5;
+      mix-blend-mode: difference;
+      pointer-events: none;
+    }
+    .selector-id .id-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+      text-shadow: 0 2px 18px rgba(0,0,0,0.6);
+    }
+    .selector-id .id-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #fff;
+      opacity: 0.75;
+      margin-top: 12px;
     }
 
-    /* Background photo grid */
-    .photo-grid {
+    .selector-corner-r {
+      position: absolute;
+      top: 22px; right: 32px;
+      z-index: 5;
+      mix-blend-mode: difference;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #fff;
+      opacity: 0.55;
+      text-align: right;
+      pointer-events: none;
+    }
+
+    /* Six bands stacked vertically — flex-grow accordion */
+    .band {
+      flex: 1 1 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: flex-grow 0.5s cubic-bezier(0.4,0,0.2,1);
+      opacity: 0;
+      animation: bandIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
+      will-change: flex-grow;
+    }
+    .band:last-child { border-bottom: none; }
+    @keyframes bandIn { to { opacity: 1; } }
+
+    /* Hover: chosen band grows, others dim & shrink slightly */
+    .selector-bands:hover .band:not(:hover) { flex-grow: 0.6; }
+    .selector-bands:hover .band:not(:hover) .band-content { opacity: 0.45; }
+    .band:hover { flex-grow: 2.4; }
+    .band:hover .band-name { transform: translateX(16px); letter-spacing: var(--hover-spacing, inherit); }
+    .band:hover .band-num { color: rgba(255,255,255,0.5); }
+    .band:hover .band-meta { opacity: 1; transform: translateX(0); }
+    .band:hover .band-arrow { transform: translateX(0); opacity: 1; }
+
+    /* Background visual layer */
+    .band-bg {
       position: absolute;
       inset: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 3px;
-      opacity: 0.25;
-      transition: opacity 0.8s ease;
+      z-index: 0;
+    }
+    .band-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.55) 100%);
       z-index: 1;
     }
-    .panel-photo:hover .photo-grid {
-      opacity: 0.45;
-    }
-    .photo-grid img {
+
+    .band-content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 80px 1fr auto auto;
+      align-items: center;
+      gap: clamp(16px, 3vw, 48px);
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.5) saturate(0.7) contrast(1.1);
-      transition: filter 0.6s;
-    }
-    .panel-photo:hover .photo-grid img {
-      filter: brightness(0.65) saturate(0.8) contrast(1.05);
+      padding: 0 clamp(28px, 5vw, 80px);
+      transition: opacity 0.5s;
     }
 
-    .panel-content {
+    .band-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.04em;
+      transition: color 0.5s, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .band-name {
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), letter-spacing 0.6s;
+      will-change: transform;
+    }
+    .band-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.5s, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .band-arrow {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: rgba(255,255,255,0.7);
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* === Per-band styling === */
+    /* About */
+    .band-about {
+      background: linear-gradient(90deg, #0a0a0a 0%, #141414 100%);
+      color: #f0ede8;
+    }
+    .band-about .band-bg {
+      background:
+        radial-gradient(ellipse at 70% 50%, rgba(200,180,140,0.08) 0%, transparent 60%);
+    }
+    .band-about .band-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+      letter-spacing: 0.01em;
+      color: #c8b89a;
+    }
+
+    /* Essays */
+    .band-essays { background: #1a1814; color: #f0ede4; }
+    .band-essays .band-bg {
+      background:
+        linear-gradient(120deg, transparent 0%, rgba(0,0,0,0.4) 100%),
+        repeating-linear-gradient(0deg, rgba(255,250,235,0.04) 0px, rgba(255,250,235,0.04) 1px, transparent 1px, transparent 28px);
+    }
+    .band-essays .band-name {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+      letter-spacing: 0.005em;
+    }
+
+    /* Poems */
+    .band-poems {
+      background: linear-gradient(135deg, #0c0a18 0%, #1a142a 100%);
+      color: #e8e0d0;
+    }
+    .band-poems .band-bg {
+      background:
+        radial-gradient(ellipse at 70% 50%, rgba(180,150,200,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 50%, rgba(160,120,90,0.08) 0%, transparent 50%);
+    }
+    .band-poems .band-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: clamp(1.9rem, 3.8vw, 3.2rem);
+      letter-spacing: 0.005em;
+    }
+
+    /* Short Stories */
+    .band-stories { background: #ece7da; color: #1a1a1a; }
+    .band-stories .band-bg {
+      background:
+        repeating-linear-gradient(0deg, transparent 0px, transparent 27px, rgba(60,40,20,0.06) 27px, rgba(60,40,20,0.06) 28px),
+        linear-gradient(180deg, #f0ebde 0%, #e2dccd 100%);
+    }
+    .band-stories .band-bg-overlay {
+      background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 100%);
+    }
+    .band-stories .band-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      color: #1a1a1a;
+    }
+    .band-stories .band-name { position: relative; }
+    .band-stories .band-name::before {
+      content: '>';
+      color: #6b6;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 4;
+      right: 100%;
+      margin-right: 0.6em;
+    }
+    .band-stories .band-name::after {
+      content: '_'; margin-left: 4px; color: #6b6;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .band-stories .band-num,
+    .band-stories .band-meta { color: rgba(0,0,0,0.45); }
+    .band-stories:hover .band-num { color: rgba(0,0,0,0.7); }
+    .band-stories .band-arrow { color: rgba(0,0,0,0.7); }
+
+    /* Murals — uses Recognition image */
+    .band-murals { background: #0a0608; color: #f4e4d4; }
+    .band-murals .band-bg {
+      background-image: url("works/recognition-thumb.jpg");
+      background-size: cover;
+      background-position: center 40%;
+      filter: brightness(0.55) saturate(0.95);
+    }
+    .band-murals .band-bg-overlay {
+      background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.7) 100%);
+    }
+    .band-murals .band-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+      letter-spacing: 0.04em;
+      line-height: 0.9;
+      background: linear-gradient(135deg, #f0c8a0 0%, #e8a878 50%, #c47d7d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Photography */
+    .band-photography { background: #050505; color: #f0ede8; }
+    .band-photography .band-bg {
+      background-image: url("photos/IMG_0997.png");
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.6) grayscale(0.2);
+    }
+    .band-photography .band-bg-overlay {
+      background: linear-gradient(90deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.65) 100%);
+    }
+    .band-photography .band-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      --hover-spacing: 14px;
+    }
+
+    /* The Book */
+    .band-book {
+      background: linear-gradient(135deg, #1a120a 0%, #2a1f14 100%);
+      color: #e8d8c4;
+    }
+    .band-book .band-bg {
+      background:
+        radial-gradient(ellipse at 80% 50%, rgba(180,140,90,0.15) 0%, transparent 60%),
+        repeating-linear-gradient(45deg, transparent 0px, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px);
+    }
+    .band-book .band-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+      letter-spacing: -0.01em;
+    }
+    .band-book .band-name em {
+      font-style: italic;
+      font-weight: 400;
+      color: #d4b896;
+    }
+
+    .selector-bands {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding-top: 80px;
+    }
+
+    @media (max-width: 768px) {
+      .band-content { grid-template-columns: 40px 1fr auto; gap: 14px; padding: 0 16px; }
+      .band-meta { display: none; }
+      .selector-bands { padding-top: 56px; }
+      .selector-id { top: 12px; left: 14px; }
+      .selector-corner-r { top: 12px; right: 14px; }
+      .band-essays .band-name,
+      .band-poems .band-name { font-size: 1.4rem; }
+      .band-stories .band-name,
+      .band-photography .band-name { font-size: 0.85rem; letter-spacing: 4px; }
+      .band-murals .band-name { font-size: 1.6rem; }
+      .band-book .band-name { font-size: 1.2rem; }
+    }
+
+    /* ===== IMMERSIVE PAGES (genre views) ===== */
+    .immersion {
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 50;
+    }
+    .immersion.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 28px; left: 36px;
+      background: none;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.3s;
+      z-index: 200;
+      mix-blend-mode: difference;
+    }
+    .back-btn:hover { color: var(--text); }
+    .back-btn span {
+      display: inline-block;
+      margin-right: 12px;
+      transition: transform 0.3s;
+    }
+    .back-btn:hover span { transform: translateX(-6px); }
+
+    @media (max-width: 768px) {
+      .back-btn { top: 14px; left: 16px; cursor: pointer; font-size: 0.7rem; letter-spacing: 4px; }
+    }
+
+    /* ----- ABOUT view ----- */
+    .view-about {
+      background: #0a0a0a;
+      color: #e8e3d4;
+    }
+    .about-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 140px clamp(20px, 6vw, 60px) 140px;
+    }
+    .about-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #555;
       text-align: center;
+      margin-bottom: 30px;
     }
+    .about-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .about-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+      line-height: 1.8;
+      color: #e8e3d4;
+      letter-spacing: 0.005em;
+    }
+    .about-body p { margin-bottom: 1.4em; }
+    .about-body p:first-of-type {
+      font-style: italic;
+      font-size: 1.15em;
+      color: #c8b89a;
+      border-left: 2px solid #3a3020;
+      padding-left: 28px;
+      margin-bottom: 2em;
+    }
+    .about-meta {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid #2a2a2a;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px 50px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: #888;
+    }
+    .about-meta dt {
+      font-size: 0.6rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .about-meta dd {
+      color: #d8d3c8;
+    }
+    .about-meta dd a {
+      color: #d8d3c8;
+      text-decoration: none;
+      border-bottom: 1px solid #444;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .about-meta dd a:hover { color: #fff; border-bottom-color: #fff; }
 
-    .panel-label {
-      position: absolute;
-      left: 0; right: 0;
-      bottom: 100%;
+    /* ----- ESSAYS view ----- */
+    .view-essays {
+      background: #f4f1ea;
+      color: #1a1a1a;
+    }
+    .view-essays .back-btn { color: #888; }
+    .view-essays .back-btn:hover { color: #1a1a1a; }
+    .essays-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 140px clamp(20px, 6vw, 60px) 140px;
+    }
+    .essay-kicker {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #999;
       margin-bottom: 20px;
       text-align: center;
     }
+    .essay-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4.6vw, 3.4rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .essay-rule {
+      width: 60px; height: 1px;
+      background: #999;
+      margin: 0 auto 60px;
+    }
+    .essay-body {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: #1a1a1a;
+    }
+    .essay-body p { margin-bottom: 1.4em; text-indent: 2em; }
+    .essay-body p:first-of-type { text-indent: 0; }
+    .essay-body p:first-of-type::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 4em;
+      float: left;
+      line-height: 0.85;
+      margin: 0.05em 0.12em 0 -0.04em;
+    }
+    .essay-body em, .essay-body i { font-style: italic; }
 
-    .panel-title {
+    .essay-index {
+      max-width: 540px;
+      margin: 0 auto 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .essay-index a {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      text-decoration: none;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid #d8d2c4;
+      transition: padding-left 0.3s, color 0.3s;
+    }
+    .essay-index a:hover {
+      padding-left: 14px;
+      color: #4a3a2a;
+    }
+    .essay-index a span.essay-num {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 700;
+      color: #999;
+      flex-shrink: 0;
+      width: 30px;
+    }
+
+    .essay-piece {
+      margin-bottom: 80px;
+      scroll-margin-top: 40px;
+    }
+    .essay-piece-num {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: #999;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .essay-piece-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.005em;
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .essay-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a3a2a;
+      max-width: 380px;
+      margin: 0 auto 50px;
+      padding: 30px 40px;
+      border-left: 2px solid #c4b69e;
+      text-align: left;
+    }
+
+    /* ----- POEMS view ----- */
+    .view-poems {
+      background: #07070a;
+      color: #f0ede8;
+    }
+    .poems-inner {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 140px clamp(20px, 6vw, 80px) 100px;
+      text-align: center;
+    }
+    .poem-kicker {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 50px;
+    }
+    .poem-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      letter-spacing: 0.005em;
+      margin-bottom: 70px;
       line-height: 1;
     }
+    .poem-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+      line-height: 2.1;
+      letter-spacing: 0.01em;
+      color: #e8e3d4;
+      max-width: 720px;
+      white-space: pre-line;
+    }
+    .poem-stanza-break { height: 1.4em; }
 
-    .panel-below {
-      position: absolute;
-      left: 0; right: 0;
-      top: 100%;
-      margin-top: 28px;
+    /* ----- SHORT STORIES view ----- */
+    .view-stories {
+      background: #f6f3ed;
+      color: #2a2a2a;
+    }
+    .view-stories .back-btn { color: #888; font-family: 'IBM Plex Mono', monospace; }
+    .view-stories .back-btn:hover { color: #2a2a2a; }
+    .stories-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 140px clamp(20px, 6vw, 60px) 140px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .story-kicker {
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 24px;
+    }
+    .story-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 50px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 30px;
+    }
+    .story-body {
+      font-size: 0.96rem;
+      line-height: 1.8;
+      color: #2a2a2a;
+    }
+    .story-body p { margin-bottom: 1.4em; }
+
+    /* ----- MURALS view ----- */
+    .view-murals {
+      background: #0c0c0c;
+      color: var(--text);
+    }
+    .murals-inner {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px clamp(20px, 4vw, 60px) 100px;
+    }
+    .mural-frame {
+      max-width: 1100px;
+      width: 100%;
+      position: relative;
+    }
+    .mural-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.7);
+      border-radius: 1px;
+    }
+    .mural-label {
+      margin-top: 40px;
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 40px;
+      flex-wrap: wrap;
+      padding: 24px 0;
+      border-top: 1px solid #2a2a2a;
+    }
+    .mural-label-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .mural-label-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #888;
+      text-align: right;
+    }
+
+    /* ----- PHOTOGRAPHY view ----- */
+    .view-photography { background: var(--bg); }
+    .photography-header {
+      padding: 140px clamp(24px, 4vw, 60px) 60px;
       text-align: center;
     }
-
-    .panel-photo .panel-content {
-      z-index: 4;
-    }
-
-    .panel-photo .panel-label {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 6px;
+    .photography-kicker {
+      font-size: 0.6rem;
+      letter-spacing: 8px;
       text-transform: uppercase;
-      color: #555;
+      color: #444;
+      margin-bottom: 20px;
     }
-
-    .panel-photo .panel-title {
+    .photography-title {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(2.5rem, 5vw, 5rem);
       font-weight: 800;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: #f0ede8;
-    }
-
-    .panel-photo .panel-arrow {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      letter-spacing: -0.02em;
+      position: relative;
       display: inline-block;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: #555;
-      transition: color 0.4s, transform 0.4s;
+      padding: 0 30px;
     }
-    .panel-photo .panel-underline {
-      width: 0;
-      height: 3px;
-      background: #fff;
-      margin: 8px auto 0;
-      transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    .panel-photo:hover .panel-arrow {
-      color: #f0ede8;
-      transform: translateY(-2px);
-    }
-    .panel-photo:hover .panel-underline {
-      width: 100%;
-    }
-
-    /* ===== WRITING PANEL — white & gold regal ===== */
-    .panel-writing {
-      background: #faf8f4;
-      color: #2a2420;
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-      border-left: 1px solid rgba(184, 149, 42, 0.2);
-    }
-
-    /* Gold ornamental corners */
-    .panel-writing::before,
-    .panel-writing::after {
+    .photography-title::before, .photography-title::after {
       content: '';
       position: absolute;
-      width: 60px;
-      height: 60px;
-      border-color: rgba(184, 149, 42, 0.25);
-      border-style: solid;
-      z-index: 2;
-      pointer-events: none;
-      transition: border-color 0.4s;
+      width: 16px; height: 16px;
+      border: 2px solid var(--text);
     }
-    .panel-writing::before {
-      top: 40px; left: 40px;
-      border-width: 1px 0 0 1px;
-    }
-    .panel-writing::after {
-      bottom: 40px; right: 40px;
-      border-width: 0 1px 1px 0;
-    }
-    .panel-writing:hover::before,
-    .panel-writing:hover::after {
-      border-color: rgba(184, 149, 42, 0.5);
-    }
+    .photography-title::before { top: -8px; left: 0; border-right: none; border-bottom: none; }
+    .photography-title::after { bottom: -8px; right: 0; border-left: none; border-top: none; }
 
-    .panel-writing .panel-content {
-      z-index: 3;
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      padding: 40px clamp(24px, 4vw, 60px) 100px;
+      align-items: start;
     }
-
-    .panel-writing .panel-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: #8a6d1b;
-    }
-
-    .panel-writing .panel-title {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(2.5rem, 5vw, 5rem);
-      font-weight: 700;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: #2a2420;
-    }
-
-    .panel-writing .panel-subtitle {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1rem, 1.8vw, 1.4rem);
-      font-weight: 300;
-      font-style: italic;
-      color: #6b5e52;
-      margin-top: 16px;
-      letter-spacing: 2px;
-    }
-
-    .panel-writing .panel-divider {
-      width: 48px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #b8952a, transparent);
-      margin: 20px auto 0;
-      opacity: 0.5;
-      transition: width 0.4s, opacity 0.4s;
-    }
-    .panel-writing:hover .panel-divider {
-      width: 80px;
-      opacity: 0.8;
-    }
-
-    .panel-writing .panel-arrow {
-      display: inline-block;
-      margin-top: 20px;
-      font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      font-weight: 500;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: rgba(138, 109, 27, 0.5);
-      transition: color 0.4s, transform 0.4s;
-    }
-    .panel-writing:hover .panel-arrow {
-      color: #8a6d1b;
-      transform: translateY(-2px);
-    }
-
-    /* ===== CENTER NAME ===== */
-    .center-name {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 10;
-      pointer-events: none;
-      text-align: center;
-      padding-top: 14vh;
+    .photo-item {
+      position: relative;
+      overflow: visible;
+      border-radius: 3px;
       opacity: 0;
-      animation: nameReveal 1s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      mix-blend-mode: difference;
+      filter: blur(8px);
+      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.8s cubic-bezier(0.16,1,0.3,1),
+                  filter 1.2s cubic-bezier(0.16,1,0.3,1);
+      perspective: 600px;
     }
-    .center-name h1 {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(2.5rem, 5.5vw, 5rem);
-      font-weight: 700;
-      letter-spacing: 14px;
-      text-transform: uppercase;
-      color: #fff;
-      display: flex;
+    .photo-item.visible { opacity: 1; filter: blur(0); }
+    .photo-item img {
+      width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      display: block;
+      border-radius: 3px;
+      filter: brightness(0.88) saturate(0.92);
+      transition: transform 0.4s cubic-bezier(0.25,0.1,0.25,1), filter 0.5s, box-shadow 0.4s;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
-    .center-name .first-name {
-      width: 50%;
-      text-align: right;
-      padding-right: 14px;
+    .photo-item:hover img {
+      filter: brightness(1) saturate(1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     }
-    .center-name .last-name {
-      width: 50%;
-      text-align: left;
-      padding-left: 14px;
-    }
-
-    @keyframes nameReveal {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== DIVIDER LINE ===== */
-    .center-line {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      width: 1px;
-      height: 100vh;
-      z-index: 5;
-      pointer-events: none;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(255,255,255,0.15) 20%,
-        rgba(184, 149, 42, 0.3) 50%,
-        rgba(255,255,255,0.15) 80%,
-        transparent 100%
-      );
-      transition: left 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    body:has(.panel-photo:hover) .center-line { left: 55%; }
-    body:has(.panel-writing:hover) .center-line { left: 45%; }
-
-    /* ===== CIRCLE IRIS PAGE TRANSITION ===== */
-    .page-transition {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      pointer-events: none;
-    }
-    .transition-ring,
-    .transition-fill {
+    .photo-item .caption {
       position: absolute;
-      inset: 0;
-      will-change: clip-path;
-      clip-path: circle(0px at 50% 50%);
-      -webkit-clip-path: circle(0px at 50% 50%);
+      bottom: 0; left: 0; right: 0;
+      padding: 50px 14px 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+      font-size: 0.58rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s, transform 0.4s;
     }
-    .transition-fill { background: #050505; }
-    .transition-ring { background: #b8952a; }
+    .photo-item:hover .caption { opacity: 1; transform: translateY(0); }
 
-    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) { .gallery { grid-template-columns: repeat(3, 1fr); padding: 30px clamp(16px, 3vw, 40px); } }
     @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .panel { width: 100% !important; height: 50vh; }
-      .center-line {
-        top: 50%;
-        left: 0;
-        width: 100vw;
-        height: 1px;
-        background: linear-gradient(
-          to right,
-          transparent 0%,
-          rgba(255,255,255,0.15) 20%,
-          rgba(184, 149, 42, 0.3) 50%,
-          rgba(255,255,255,0.15) 80%,
-          transparent 100%
-        );
-      }
-      .panel-writing { border-left: none; border-top: 1px solid rgba(184, 149, 42, 0.2); }
-      .panel-writing::before { top: 24px; left: 24px; width: 40px; height: 40px; }
-      .panel-writing::after { bottom: 24px; right: 24px; width: 40px; height: 40px; }
-      .center-name { padding-top: 5vh; }
-      .center-name h1 { font-size: 1.8rem; letter-spacing: 8px; display: block; }
-      .center-name .first-name,
-      .center-name .last-name { width: auto; text-align: center; padding: 0; display: inline; }
-      .panel-photo .panel-content,
-      .panel-writing .panel-content { padding: 0 24px; }
+      .gallery { grid-template-columns: repeat(2, 1fr); padding: 20px 12px; }
+      .photo-item { padding: 6px !important; }
     }
     @media (max-width: 480px) {
-      .panel-photo .panel-title,
-      .panel-writing .panel-title { font-size: 2rem; }
-      .center-name h1 { font-size: 1.2rem; letter-spacing: 5px; display: block; }
-      .center-name .first-name,
-      .center-name .last-name { width: auto; text-align: center; padding: 0; display: inline; }
+      .gallery { grid-template-columns: repeat(2, 1fr); padding: 12px 6px; }
+      .photo-item { padding: 4px !important; }
+      .photo-item img { transform: none !important; }
+    }
+
+    /* ----- BOOK view ----- */
+    .view-book {
+      background: #f4ecdf;
+      color: #1a1410;
+    }
+    .view-book .back-btn { color: #6b5a44; }
+    .view-book .back-btn:hover { color: #1a1410; }
+    .book-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 120px clamp(20px, 6vw, 60px) 140px;
+    }
+    .book-cover-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 90px;
+    }
+    .book-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #8c7762;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .book-cover {
+      width: clamp(220px, 32vw, 340px);
+      aspect-ratio: 2 / 3;
+      background: linear-gradient(135deg, #2a1f17 0%, #120a06 100%);
+      border: 1px solid #3a2a1e;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.35), inset 0 0 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 30px;
+      margin-bottom: 50px;
+      position: relative;
+    }
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      left: 12px; top: 12px; right: 12px; bottom: 12px;
+      border: 1px solid rgba(232,216,196,0.15);
+      pointer-events: none;
+    }
+    .book-cover-author {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #8c7762;
+      text-align: center;
+    }
+    .book-cover-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+      line-height: 1.1;
+      color: #e8d8c4;
+      text-align: center;
+    }
+    .book-cover-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.78rem;
+      color: #c2a880;
+      letter-spacing: 0.02em;
+      margin-top: 14px;
+      text-align: center;
+    }
+    .book-cover-mark {
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
+      color: #8c7762;
+      text-align: center;
+    }
+    .book-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(2.2rem, 4.6vw, 3.4rem);
+      letter-spacing: -0.01em;
+      text-align: center;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .book-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 1.4vw, 1.2rem);
+      color: #6b5a44;
+      text-align: center;
+      letter-spacing: 0.02em;
+      margin-bottom: 24px;
+    }
+    .book-byline {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #8c7762;
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .book-rule {
+      width: 60px; height: 1px; background: #8c7762;
+      margin: 0 auto 60px;
+    }
+    .book-dedication {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      text-align: center;
+      color: #3a2a1e;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      max-width: 520px;
+      margin: 0 auto 80px;
+    }
+    .book-toc {
+      margin: 0 auto 100px;
+      max-width: 600px;
+    }
+    .book-toc-heading {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #6b5a44;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .book-toc-part {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #8c7762;
+      margin: 30px 0 14px;
+      text-align: center;
+    }
+    .book-toc a {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.02rem;
+      color: #1a1410;
+      text-decoration: none;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid #d8c8a8;
+      transition: padding-left 0.3s, color 0.3s;
+    }
+    .book-toc a:hover {
+      padding-left: 12px;
+      color: #5a3e1e;
+    }
+    .book-toc a span.num {
+      font-style: italic;
+      font-weight: 700;
+      color: #8c7762;
+      flex-shrink: 0;
+      width: 32px;
+    }
+    .book-part {
+      text-align: center;
+      margin: 120px 0 80px;
+      scroll-margin-top: 40px;
+    }
+    .book-part-num {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 8px;
+      color: #8c7762;
+      margin-bottom: 20px;
+    }
+    .book-part-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #2a1f17;
+    }
+    .book-chapter {
+      margin-bottom: 100px;
+      scroll-margin-top: 40px;
+    }
+    .book-ch-num {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #8c7762;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .book-ch-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.005em;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1a1410;
+    }
+    .book-ch-rule {
+      width: 50px; height: 1px; background: #c2a880;
+      margin: 0 auto 50px;
+    }
+    .book-body {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.06rem;
+      line-height: 1.85;
+      color: #1a1410;
+    }
+    .book-body p { margin-bottom: 1.4em; text-indent: 1.8em; }
+    .book-body p:first-of-type { text-indent: 0; }
+    .book-body p:first-of-type::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 3.6em;
+      float: left;
+      line-height: 0.85;
+      margin: 0.05em 0.12em 0 -0.04em;
+      color: #2a1f17;
+    }
+    .book-body h3 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.35rem;
+      margin: 2.2em 0 1em;
+      color: #2a1f17;
+      text-align: center;
+    }
+    .book-body em { font-style: italic; }
+    .book-body blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: #4a3a2a;
+      max-width: 480px;
+      margin: 1.6em auto;
+      padding: 8px 30px;
+      border-left: 2px solid #c2a880;
+      text-indent: 0;
+    }
+    .book-appendix-pre {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      background: #ece1cb;
+      border-left: 2px solid #8c7762;
+      padding: 18px 22px;
+      margin: 1.6em 0;
+      white-space: pre-wrap;
+      color: #2a1f17;
+    }
+    .book-end-mark {
+      text-align: center;
+      font-family: 'Caveat', cursive;
+      font-size: 1.8rem;
+      color: #8c7762;
+      margin: 60px 0 20px;
+    }
+
+    /* ---- Paginated reader ---- */
+    .book-page { display: none; }
+    .book-page.active { display: block; animation: bookFade 0.5s ease; }
+    @keyframes bookFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .book-menu-btn {
+      position: fixed;
+      top: 28px; right: 32px;
+      width: 44px; height: 44px;
+      background: rgba(244,236,223,0.95);
+      border: 1px solid #c2a880;
+      border-radius: 2px;
+      cursor: pointer;
+      z-index: 4001;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .view-book.active .book-menu-btn { display: flex; }
+    .book-menu-btn:hover { background: #ece1cb; border-color: #8c7762; }
+    .book-menu-btn span {
+      display: block;
+      width: 18px; height: 1.5px;
+      background: #2a1f17;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .book-menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .book-menu-btn.open span:nth-child(2) { opacity: 0; }
+    .book-menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .book-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: min(380px, 88vw);
+      height: 100vh;
+      background: #ece1cb;
+      border-left: 1px solid #c2a880;
+      box-shadow: -20px 0 60px rgba(0,0,0,0.15);
+      z-index: 4000;
+      transform: translateX(100%);
+      transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+      padding: 90px 36px 60px;
+    }
+    .book-drawer.open { transform: translateX(0); }
+    .book-drawer-heading {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #6b5a44;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .book-drawer-part {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-style: italic;
+      font-size: 0.72rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #8c7762;
+      margin: 22px 0 10px;
+    }
+    .book-drawer a {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      color: #1a1410;
+      text-decoration: none;
+      padding: 9px 4px;
+      border-bottom: 1px solid #d8c8a8;
+      transition: padding-left 0.25s, color 0.25s;
+      cursor: pointer;
+    }
+    .book-drawer a:hover, .book-drawer a.current {
+      padding-left: 10px;
+      color: #5a3e1e;
+    }
+    .book-drawer a.current { font-weight: 700; }
+    .book-drawer a span.num {
+      font-style: italic;
+      font-weight: 700;
+      color: #8c7762;
+      flex-shrink: 0;
+      width: 28px;
+    }
+    .book-drawer-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,20,16,0.35);
+      backdrop-filter: blur(2px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+      z-index: 3999;
+    }
+    .book-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .book-pagenav {
+      max-width: 760px;
+      margin: 60px auto 0;
+      padding: 30px 0 0;
+      border-top: 1px solid #d8c8a8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: 'Playfair Display', serif;
+    }
+    .book-pagenav button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #6b5a44;
+      padding: 12px 18px;
+      transition: color 0.3s;
+      max-width: 45%;
+      text-align: left;
+    }
+    .book-pagenav button:hover:not(:disabled) { color: #1a1410; }
+    .book-pagenav button.next { text-align: right; }
+    .book-pagenav button:disabled { color: #c2a880; cursor: default; }
+    .book-pagenav .pn-label {
+      display: block;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #8c7762;
+      margin-bottom: 4px;
+      font-style: normal;
+    }
+    .book-pageindex {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #8c7762;
+      text-align: center;
+      margin-top: 18px;
+    }
+    @media (max-width: 600px) {
+      .book-menu-btn { top: 20px; right: 18px; }
+      .book-pagenav { flex-direction: column; gap: 8px; }
+      .book-pagenav button { max-width: 100%; text-align: center !important; }
+    }
+
+    /* Loader (initial) */
+    .loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    .loader.done { opacity: 0; visibility: hidden; }
+    .loader-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.7rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .loader-bar {
+      width: 120px; height: 1px;
+      background: #1a1a1a;
+      margin-top: 20px;
+      position: relative; overflow: hidden;
+    }
+    .loader-bar-fill {
+      position: absolute; left: 0; top: 0;
+      height: 100%; width: 0%;
+      background: var(--text);
+      transition: width 0.2s;
+    }
+
+    /* Lightbox (photography) */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(0,0,0,0.97);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s;
+      backdrop-filter: blur(20px);
+    }
+    .lightbox.active { opacity: 1; pointer-events: all; }
+    .lightbox img {
+      max-width: 90vw; max-height: 90vh;
+      object-fit: contain;
+      transform: scale(0.92); opacity: 0;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.4s;
+    }
+    .lightbox.active img { transform: scale(1); opacity: 1; }
+    .lb-close, .lb-nav {
+      background: none; border: none;
+      transition: color 0.3s, transform 0.3s;
+      z-index: 5001;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .lb-close {
+      position: absolute; top: 24px; right: 32px;
+      color: #555; font-size: 1.5rem; font-weight: 300;
+    }
+    .lb-close:hover { color: #fff; transform: rotate(90deg); }
+    .lb-nav {
+      position: absolute; top: 50%;
+      transform: translateY(-50%);
+      color: #333; font-size: 3rem; padding: 24px;
+      font-weight: 200;
+    }
+    .lb-nav:hover { color: #fff; }
+    .lb-prev { left: 8px; } .lb-next { right: 8px; }
+    .lb-info {
+      position: absolute; bottom: 28px;
+      left: 50%; transform: translateX(-50%);
+      text-align: center;
+    }
+    .lb-caption {
+      font-size: 0.7rem; letter-spacing: 4px;
+      text-transform: uppercase; color: #555;
+    }
+    .lb-counter {
+      font-size: 0.6rem; letter-spacing: 3px;
+      color: #333; margin-top: 4px;
+    }
+    @media (max-width: 768px) {
+      .lb-close, .lb-nav { cursor: pointer; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Circle Iris Page Transition -->
-  <div class="page-transition" id="pageTransition">
-    <div class="transition-ring" id="transRing"></div>
-    <div class="transition-fill" id="transFill"></div>
+  <!-- Loader (waits for fonts + critical assets) -->
+  <div class="loader" id="loader">
+    <div class="loader-text">Lucas Haines</div>
+    <div class="loader-bar"><div class="loader-bar-fill" id="loaderBar"></div></div>
   </div>
 
-  <!-- Center name overlay -->
-  <div class="center-name">
-    <h1><span class="first-name">Lucas</span><span class="last-name">Haines</span></h1>
+  <!-- Grain -->
+  <div class="grain"></div>
+
+  <!-- ===== SELECTOR (LANDING) ===== -->
+  <main class="selector" id="selector">
+    <div class="selector-id">
+      <div class="id-name">Lucas Haines</div>
+      <div class="id-kicker">Selected Works</div>
+    </div>
+    <div class="selector-corner-r">NYC<br>2026</div>
+
+    <div class="selector-bands" id="selectorBands">
+      <a href="#" class="band band-essays" data-genre="essays" style="animation-delay: .1s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">i.</div>
+          <div class="band-name">Essays</div>
+          <div class="band-meta">Four pieces</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-poems" data-genre="poems" style="animation-delay: .18s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">ii.</div>
+          <div class="band-name">Poems</div>
+          <div class="band-meta">Sonnet</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-stories" data-genre="stories" style="animation-delay: .26s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">iii.</div>
+          <div class="band-name">Short Stories</div>
+          <div class="band-meta">Character</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-murals" data-genre="murals" style="animation-delay: .34s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">iv.</div>
+          <div class="band-name">Murals</div>
+          <div class="band-meta">Recognition</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-photography" data-genre="photography" style="animation-delay: .42s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">v.</div>
+          <div class="band-name">Photography</div>
+          <div class="band-meta">100+ frames</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-book" data-genre="book" style="animation-delay: .50s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">vi.</div>
+          <div class="band-name">The Book &mdash; <em>Decoding Human Nature</em></div>
+          <div class="band-meta">Read the manuscript</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+      <a href="#" class="band band-about" data-genre="about" style="animation-delay: .58s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">&mdash;</div>
+          <div class="band-name">About</div>
+          <div class="band-meta">Who I am</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="immersion view-about" data-view="about">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="about-inner">
+      <div class="about-kicker">About</div>
+      <h1 class="about-title">Lucas Haines</h1>
+      <div class="about-body">
+        <p>A writer, painter, and photographer working out of New York.</p>
+        <p>This site is a living archive — essays, poems, short stories, murals, photographs, and the book in progress. Six rooms, one body of work. Each one is its own way of asking the same questions.</p>
+        <p>The work tries to look honestly at things that aren't easily said: identity, inheritance, the difference between what is chosen and what is given. Some of it is in language. Some of it is in paint. Some of it is in light.</p>
+        <p>Take your time.</p>
+      </div>
+      <dl class="about-meta">
+        <div>
+          <dt>Based</dt>
+          <dd>New York City</dd>
+        </div>
+        <div>
+          <dt>Year</dt>
+          <dd>2026</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd><a href="mailto:Lucas@haines.nyc">Lucas@haines.nyc</a></dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd><a href="tel:+16469653243">646 965 3243</a></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ===== ESSAYS ===== -->
+  <section class="immersion view-essays" data-view="essays">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="essays-inner">
+      <div class="essay-kicker">Essays</div>
+      <h1 class="essay-title" style="margin-bottom: 30px;">Collected</h1>
+      <div class="essay-rule"></div>
+
+      <nav class="essay-index">
+        <a href="#essay-paradise-lost"><span class="essay-num">i.</span><span>Examining the Integrity of Free Will in <em>Paradise Lost</em></span></a>
+        <a href="#essay-mask"><span class="essay-num">ii.</span><span>The Mask Is Who We Are</span></a>
+        <a href="#essay-odysseus"><span class="essay-num">iii.</span><span>Odysseus: The Master Weaver of Story and Self</span></a>
+        <a href="#essay-antigone"><span class="essay-num">iv.</span><span>Antigone's Conservative Rebellion</span></a>
+      </nav>
+
+      <article id="essay-paradise-lost" class="essay-piece">
+        <div class="essay-piece-num">i.</div>
+        <h2 class="essay-piece-title">Examining the Integrity of Free Will in <em>Paradise Lost</em></h2>
+        <div class="essay-body">
+        <p>From its opening line, John Milton's <em>Paradise Lost</em> presents the fall of man not as an open possibility but as a settled fact. "Of man's first disobedience, and the fruit / of that forbidden tree whose mortal taste / brought death into the world and all our woe" (1.1-3). The Fall is grammatically over before Satan has taken a single step. The poem does not begin at the start of the story but rather at the end of it. Milton reaches back to explain a catastrophe that has already happened. He invokes the muse not to explain what might happen but to illuminate what already did, framing the poem as an explanation rather than a story whose ending is in question. "Till one greater man / restore us and regain this blissful seat" (1.4-5). Even the "hope" of redemption is declared as a future certainty, not a possibility. Yet Milton insists throughout the poem that Adam and Eve are free agents who choose their fates. This contradiction sits at the heart of the poem: if the fall happens on line one, how is it ever a choice? Despite Milton's insistence that Adam and Eve possess genuine free will, the logic of God's omnipotence and omniscience reveals that the fall is predetermined from the moment of creation.</p>
+        <p>Milton is not unaware of the problem and offers a direct defence, arguing that God's foresight of the fall does not mean He predetermines it, and that both standing and falling remain possible outcomes. God cannot be blamed for an action He does not cause. "Sufficient to have stood, though free to fall" is Milton's clearest formulation of this position, and God reinforces it by saying, "If I foreknew / foreknowledge had no influence on their fault" (3.99, 117-118). God further insists that Adam and Eve "Themselves decreed / their own revolt, not I," placing the origin of the fall on human agency, not God's (3.116-117). On its own terms, this is a coherent argument. Foreknowledge is not the same thing as authorship, and Milton is right that the two must be separate for free will to be possible. A God who sees the future is categorically different from one who predetermines it, and Milton leans into this distinction considerably.</p>
+        <p>This defence collapses because in reality, God is not merely a witness; He is the creator who built the very humans He knows will fall. A passive observer and an omnipotent architect cannot be the same thing, and Milton ignores half of what God is. God knows Adam and Eve will fail even before He makes them, yet He makes them anyway. That is not an observation but a decision. God could create humans to succeed or not create them at all. Choosing to proceed with creation means choosing the fall. God Himself says, "Whose fault / Whose but his own? Ingrate, he had of me / all he could have" (3.96-98). This statement draws attention to Milton and God's logical error. If He gave Adam and Eve everything they needed to stand but built them to fall, then Adam and Eve's sin overrides God's omnipotence, which is by definition impossible. This fact breaks down God and Milton's narrative argument. God chooses the fall, and Milton deceives the reader in order to market Christianity to the audience.</p>
+        <p>The dramatic framing of Satan's mission demonstrates how Milton's rhetoric attempts to persuade the reader that free will exists at all. Because the reader is told the end before the story even begins, Satan's perilous journey is in fact guaranteed to succeed. When Satan details his eventual journey out of hell, he says, "Long is the way / and hard that out of Hell leads up to light" (2.432-433). Milton is making the argument that Satan's journey is dangerous and unlikely to succeed, since Satan needs to escape treacherous hell to reach the "light." This language is misleading because Satan's fate is sealed. When Satan enters Eden, the archangels notice him and actively acknowledge his presence. If the archangels know Satan's plot, then the omniscient God knows as well. God knows and does not thwart Satan's plot because He designed it. Milton uses his literary skill to build suspense in <em>Paradise Lost</em>, but this is ironic because the entire story is guaranteed in the first few lines of the book. Satan truly has no agency to ensure the success of his mission.</p>
+        <p>Ultimately, <em>Paradise Lost</em> cannot reconcile its theological claim with its own logic. The God Milton portrays is not a passive observer but a silent architect. Milton assigns blame to humanity to protect his own Christian beliefs. The poem opens with the fall accomplished, places an omnipotent God behind it, and asks the reader to believe that Adam and Eve are truly free. The tragedy of <em>Paradise Lost</em> is not that humans choose wrong but that they never choose at all.</p>
+        </div>
+      </article>
+
+      <div class="essay-rule"></div>
+
+      <article id="essay-mask" class="essay-piece">
+        <div class="essay-piece-num">ii.</div>
+        <h2 class="essay-piece-title">The Mask Is Who We Are: A Poem Analysis</h2>
+
+        <blockquote class="essay-quote">I resemble everyone<br>but myself, and sometimes see<br>in shop windows,<br>despite the well-known laws<br>of optics,<br>the portrait of a stranger,<br>date unknown,<br>often signed in a corner<br>by my father.</blockquote>
+
+        <div class="essay-body">
+          <p>"Self-Portrait" by A.K. Ramanujan is about the meaning of identity and inner masks. Depending on the reading, "Self-Portrait" has a dual meaning, and in essence, the poem itself wears a mask. One can compare the two scenarios to determine the laws of identity and what it means to wear a mask. The title itself becomes ironic, as the poem questions whether true self-portraiture is even possible when identity remains so unclear. Ramanujan employs ambiguity to reflect the struggle of understanding what identity is. The poem's refusal to provide clear answers mirrors both the speaker's and humanity's struggle to understand who we are beneath the various roles and influences that shape us.</p>
+          <p>The poem's structure leaves the meaning ambiguous and adds weight to its message. It is written in free verse and reads as if the speaker is talking directly to the reader. There is no musicality to the poem, which adds gravitas and a certain seriousness to the speaker's words. Minimal punctuation creates an open-ended feel. The poem is composed of a single stanza and avoids tangible description, which allows the reader to interpret it in many different ways. Ramanujan's deliberate rejection of traditional poetic structures such as the sonnet or ballad reinforces the speaker's feeling of estrangement from those around him. The sparse language creates empty spaces that invite readers to fill in their own experiences.</p>
+          <p>Ramanujan's poem offers two different messages for the reader to connect to. The first reading frames the speaker as a man in an existential crisis. The poem begins with "I resemble everyone / but myself," where the speaker declares that he is a culmination of every stranger he has encountered. This suggests he possesses no original identity of his own. In the middle of the poem, the speaker describes looking at a shop window and seeing a stranger, which is his own reflection. Because he lacks any authentic sense of self, he has become a stranger even to himself. The poem then continues with "often signed in a corner / by my father," which introduces a shift in the speaker's reflection on identity formation. Here, Ramanujan creates an ironic juxtaposition with the poem's title by suggesting that the speaker's father, not the speaker himself, was the true artist who created this "self-portrait." This metaphor implies that the speaker's identity was shaped heavily by his father's influence, reinforcing his lack of autonomous selfhood.</p>
+          <p>The second way to interpret these lines is as a reflection on identity in general. The speaker sees a stranger through the window rather than his own reflection, and this time he believes the stranger is indifferent to him. This idea is confirmed in the closing lines, where the stranger he sees in the window is "often signed in a corner / by my father." The stranger is the same as the speaker because both were created by the same father. In contrast to the first interpretation, the father in this reading represents God. God created both the speaker and the stranger, making them fundamentally connected despite their apparent differences. This universal-creation interpretation suggests that all human beings share a common origin and essence, even when they appear as strangers to one another. The reason they appear different is that they wear different masks. What we perceive as differences between ourselves and others are merely surface-level disguises of ethnic and physical appearance that conceal our shared humanity and divine origin.</p>
+          <p>The fact that both these interpretations coexist and make sense gives rise to a third theory of identity: that identity itself is multifaceted and not simply definable. By comparing the two readings, one can decipher the laws that govern identity. In other words, identity is not a list of personal traits and behaviors but a science governed by universal principles.</p>
+          <p>The first law of identity reveals itself in the shared origin implied by being "signed in a corner / by my father." This law declares that everyone's identity starts as the same blank canvas. Before any inspiration has occurred, before any assimilation takes place, all humans possess identical potential for selfhood. Whether we interpret the "father" as a biological parent or as God, the fundamental principle remains the same: we all begin from the same source. The stranger in the window shares the same signature, the same creator, the same essential beginning as the speaker. This law suggests that beneath all the layers of acquired identity lies a common humanity that connects us to every other person we encounter.</p>
+          <p>The second law of identity emerges from the speaker's declaration that he "resembles everyone / but myself." This law states that identity is acquired only through assimilation to other people. Like creativity, no identity is original; it is inspired by others. The speaker has become a composition of every stranger he has encountered, suggesting that selfhood is built not through internal growth but through an external accumulation of experiences. This process of identity formation through absorption means that authenticity becomes impossible. Ramanujan suggests that we are all walking collections of borrowed traits, mannerisms, and characteristics. The irony deepens when we realize that in trying to become ourselves, we become everyone else. Ramanujan implies that the very act of living in society transforms us into mirrors of those around us, making individual identity a paradox.</p>
+          <p>The third law arises from the image of the "stranger" reflected in the window. Whether the stranger is the speaker himself or a random person, the result is the same: he is alienated from the speaker. The reason is also the same — both wear "masks." This law establishes that identity can only be expressed in the form of masks. The mask becomes not just a disguise but the very medium through which identity manifests. We cannot express our true selves directly; we can only present versions, personas, and interpretations of who we think we are. The mask is both protection and prison, allowing us to interact with the world while keeping our essential selves hidden, even from ourselves. Ramanujan recognizes that the mask is not separate from identity; it is identity. What we call our "true self" is simply the collection of masks we have been subconsciously forced to wear, and the stranger in the window wears his mask just as we wear ours.</p>
+        </div>
+      </article>
+
+      <div class="essay-rule"></div>
+
+      <article id="essay-odysseus" class="essay-piece">
+        <div class="essay-piece-num">iii.</div>
+        <h2 class="essay-piece-title">Odysseus: The Master Weaver of Story and Self</h2>
+        <div class="essay-body">
+          <p>When Odysseus finally reaches the court of the Phaeacians after years of wandering, he does something remarkable. Seated in King Alcinous' hall, he begins to skillfully recount his adventures: the Cyclops, the Sirens, and his descent into the Underworld. The Phaeacians are mesmerized by his tales. In this moment, Odysseus demonstrates that his greatest weapon is not his bow or his sword, but his voice. Odysseus's genius lies in his ability to adapt narratives to different audiences and purposes, thereby gaining renown, influencing his men, and creating strategic deception. Yet Odysseus operates on an even deeper level within Homer's epic. In books nine through twelve, Odysseus takes over as narrator and proceeds to manipulate his own image to both the Phaeacians and the reader in an attempt to acquire kleos. In Homer's <em>The Odyssey</em>, Odysseus demonstrates that weaving narrative is the ultimate tool not only for survival but also for achieving literary immortality.</p>
+          <p>Odysseus's strategic genius rests in his ability to craft radically different narratives depending on his purpose and audience. He tells many stories, each carefully tailored to achieve specific goals. Dramatic storytelling becomes a survival tool when Odysseus faces the Sirens. When approaching them, Odysseus and his men face a dangerous challenge that requires discipline and order. Circe has warned Odysseus about the Sirens' deadly song, and Odysseus must captivate his crew to convince them to follow his outlandish plan. He first instills fear and attentiveness in his men: "We can either die in knowledge of the truth / or else escape," framing the danger as a choice between doom and survival (12.158-159). He then instructs them to put beeswax in their ears and tie him to the mast. Odysseus describes the danger in such a riveting way that it makes them willing to bind their captain and ignore his future commands. He tells his crew that if he ever begs to be released, they must "increase [Odysseus's] bonds / and chain [him] even tighter" (12.165-166). This is storytelling for survival. He creates a narrative so impactful that his men will follow. In the ultimate test of discipline, Odysseus's words trump the temptations of the Sirens.</p>
+          <p>Another example of Odysseus's narrative excellence is his strategic deception upon his return to Ithaca. Odysseus creates a fictional identity designed to elicit specific responses: reverence from servants, information from suitors, and loyalty tests for family members. Disguised as a beggar, he lies to Eumaeus, saying that he "[comes] from spacious Crete / the son of wealthy Castor Hylacides" (14.199-200). As the conversation develops, he baits a reaction out of Eumaeus by telling him that Odysseus is alive. If Eumaeus acted disappointed about Odysseus's survival, Odysseus would know he is not loyal. Psychological traps like this exemplify Odysseus's ability to use stories for social, emotional, and strategic advantage.</p>
+          <p>Odysseus further demonstrates his verbal versatility when twisting a story of his mistakes into sympathy from the Phaeacians. When recounting his tribulations with Helios, he tells King Alcinous, "They poured sweet sleep upon my eyes / meanwhile / Eurylochus proposed a fooling plan" (12.339-341). This careful framing excuses his incompetence as a leader while positioning him as the victimized hero. It was not he but the gods who induced sleep upon him, and therefore he is absolved of responsibility. When Alcinous says, "You have / endured enough; you will get home again," he reveals his emotional attachment to Odysseus (12.6-7). He then goes above and beyond and tells his subjects to "add a mighty tripod and cauldron" to Odysseus's reward (12.12-13). Odysseus miraculously turns his misstep with a god into a ship, a crew, and bountiful treasure. If Odysseus were not such a compelling narrator, he might never have acquired the means to return home.</p>
+          <p>Odysseus's role as weaver of story operates on an even more profound level in <em>The Odyssey</em>. Weaving becomes a simile for the development of narrative, and Odysseus functions as the central thread that Homer weaves through the complex plot of the epic. Odysseus occupies a unique position as both thread and weaver within the epic. As a thread, he is the continuous element that unites disconnected episodes, locations, and timeframes, binding the entire narrative together. As weaver, he creates the plot through his own storytelling. In books nine through twelve, Odysseus becomes the narrator, taking over the role of Homer. The fact that "text" and "textile" derive from the same Latin root reveals the symbolic connection between weaving and narrative. Penelope's role as the "unweaver" helps contextualize Odysseus's central role. Just as Penelope sits at her loom, Odysseus sits in the Phaeacian court. However, they are engaging in opposite activities: Odysseus is assembling stories while Penelope is disassembling Odysseus's burial veil. She stalls the narrative, delaying the suitors and the resolution of the plot by fixing "a mighty loom inside the palace hall / weaving her fine long cloth" (2.95-97), only to unravel it each night. Understanding Penelope's function in the epic gives context to Odysseus's role as progressor of the plot. Odysseus's dual role as both thread and weaver means he is simultaneously the raw material of the epic and the artist shaping that material.</p>
+          <p>The self-embellishment of Odysseus's narrative reveals how his pursuit of kleos fuels his storytelling ability. In Greek culture, kleos is not something one is given but something one earns through actions that generate stories worth retelling. A hero without stories is a hero who will be forgotten. Odysseus understands this fundamental truth. When he introduces himself to the Phaeacians, he declares, "I am Odysseus, Laertes' son / known for my many clever tricks and lies / My fame extends to heaven" (9.20-22). This declaration reveals his self-awareness. His kleos depends not just on what he has done but on how those deeds have been transformed into stories. His story is so prominent that even the gods in heaven are aware of it. His storytelling serves immediate practical purposes — gaining hospitality, protection, and material aid — yet his stories serve a far greater purpose: they ensure his immortality. By doctoring his adventures, he controls how they will be remembered. When he tells his adventures in the Phaeacian court, he produces the central books of Homer's epic. Without Odysseus as the narrator, there would be no account of the Cyclops, no encounter with the Sirens, and no journey to the Underworld. A substantial portion of <em>The Odyssey</em> exists only because Odysseus chose to tell it.</p>
+          <p>Odysseus demonstrates that stories are not merely a source of entertainment but a powerful tool. He uses narrative as a means of survival to rally his men in desperate moments, psychologically assess strangers, and obtain essentials for his voyage. But the overarching purpose of Odysseus's narration is to generate renown. Odysseus's greatest victory is not over Troy, Polyphemus, or the suitors, but over time itself. He set out to earn kleos, and the survival of his name across millennia confirms that he succeeded.</p>
+        </div>
+      </article>
+
+      <div class="essay-rule"></div>
+
+      <article id="essay-antigone" class="essay-piece">
+        <div class="essay-piece-num">iv.</div>
+        <h2 class="essay-piece-title">Antigone's Conservative Rebellion: Religious Duty Over Feminist Progress</h2>
+        <div class="essay-body">
+          <p>Sophocles' <em>Antigone</em> is often celebrated as a feminist tragedy, yet this interpretation fundamentally misreads the play's theological foundation. The play has a female protagonist who openly defies state authority, chooses death over submission, and articulates a moral vision that challenges the moral foundations of her ruler's edict. Yet reading <em>Antigone</em> as a feminist tragedy misses a critical point: the divine laws Antigone invokes to justify her rebellion are embedded in a religious framework that enforces rigid gender hierarchies in Greek society. Her defiance of Creon represents not female liberation but theocratic principles overriding secular power. The play is better understood as a defense of religious obligation against political authority than as a feminist tragedy.</p>
+          <p>To understand why Antigone's rebellion is fundamentally conservative rather than progressive, we must examine the patriarchal nature of the religious culture she defends. The gods Antigone serves are the gods of a patriarchal order where Zeus rules through masculine authority. Greek religious practices assign specific gender roles: men conduct public sacrifices and hold positions of power, while women's religious and political participation is limited and supervised. The religion that Antigone is so attached to includes the very customs that keep women subordinate. When Antigone justifies her actions as abiding by "the gods' unwritten and unfailing laws," she is not dismantling gender hierarchy but reinforcing one form of patriarchal authority over another (455). What this means is that Antigone replaces Creon's political patriarchy, where male rulers make laws based on state interests, with religious patriarchy, where male gods dictate absolute laws that humans must follow. Both systems place men at the top of the hierarchy and restrict women's autonomy, but religious patriarchy holds ultimate authority. Antigone believes that the patriarchal order established by the gods supersedes the patriarchal order established by human kings. Her act of burial is framed as family duty, traditionally a woman's sphere, not as a challenge to the gendered division of labor.</p>
+          <p>Antigone's actual motivation is salvation, not social justice. She tells Ismene that she must bury Polynices because the alternative is "Keeping from honor what the gods have honored" (77). This quotation reveals that Antigone's concern is fundamentally about religious obligation and divine honor rather than any worldly principle of justice or equality. She acts not to challenge human authority structures but to fulfill what she believes the gods demand, ensuring her own righteous standing before them. When she faces death, she frames her choice in religious terms: "I shall lie with him, yes, with my loved one, / when I have dared the crime of piety" (73-74). Antigone describes her burial of Polynices as a "crime of piety," emphasizing that what is criminal in Creon's political order is sacred duty in the gods' order. The phrase "lie with him" refers to being buried alongside her brother, united in death through proper burial rites. She never questions why women are subordinate or challenges the gender roles her society imposes. She tells the chorus she will "Come as a dear friend to my dear father, / to you, my mother, and my brother" to the underworld (898-899). This passage demonstrates that Antigone envisions death not as loss but as reunion with her family in the afterlife. She anticipates being welcomed by her deceased relatives, implying she expects divine reward for her piety.</p>
+          <p>Her defiance costs her nothing, because she abandons no real future, no meaningful life, and no genuine hope in the mortal world. From her perspective, dying young and joining Polynices is not a tragedy but a fulfillment. This indifference toward mortal life reveals why the play functions as theological tragedy rather than feminist tragedy. Antigone sacrifices nothing she values. She trades a life she sees as meaningless for eternal pleasure in Elysium. A truly feminist tragedy would require a protagonist who recognizes the value of her mortal existence and autonomy yet chooses to sacrifice them in the name of societal change. Antigone never values her mortal life enough for her death to constitute genuine sacrifice.</p>
+          <p>Ismene, not Antigone, is the closest thing the play has to a proto-feminist character. She is the only figure who recognizes the power structure that confines women and names it openly. She states that women are "not to fight with men" because women are "subject to stronger power" (62, 63). These lines acknowledge the reality of patriarchal oppression that Antigone ignores entirely. Ismene understands that women occupy a subordinate position in society and that direct confrontation with male authority invites destruction. When Antigone proposes to bury Polynices despite Creon's law, Ismene responds with clear-eyed awareness of women's vulnerability: "We must remember that we two are women, / so not to fight with men" (61-62). Here, Ismene explicitly names gender as the limiting factor, something Antigone never does. She continues, explaining that their position as women means they "must hear these orders, or any that may be worse" (64). Ismene grasps the practical dangers of defying both Creon and the patriarchal order he represents. If Ismene had defied Creon and chosen to bury Polynices despite real consequences — giving up a life she actually valued, without the expectation of divine reward — that act would constitute genuine feminist tragedy. It would be an actual sacrifice. Antigone cannot make this sacrifice because she acts with unwavering religious conviction and absolute faith in an afterlife that renders the mortal world irrelevant. Ismene's refusal to join Antigone's mission is not cowardice but a realistic assessment of women's position. She is the only character in the play who sees the gender hierarchy clearly, which is precisely why a feminist reading should center on her, not on Antigone.</p>
+          <p>The play itself clarifies that its moral framework is theological, not feminist. When the prophet Teiresias confronts Creon, he does not condemn him for silencing a woman. Teiresias condemns him for religious transgression: "you keep up here that which belongs / below, a corpse unburied and unholy" (1070-1071). Teiresias explains that Creon's refusal to allow Polynices' burial has polluted the city and angered the gods. The prophet describes how the gods have rejected Thebes' sacrifices and how birds of omen screech with terrible signs because they have fed on the corpse's flesh. The gods are angry because a religious obligation has been violated, not because women deserve autonomy. After ignoring Teiresias' warnings, Creon suffers the loss of both his son Haemon and his wife Eurydice, who kill themselves in response to Antigone's death. The chorus frames this catastrophe as punishment for Creon's impiety. They proclaim that "Our happiness depends / on wisdom all the way" and that "The gods must have their dues" (1347-1348, 1349). The chorus emphasizes that Creon's downfall results from his failure to honor divine law, stating that "Great words by men of pride / bring greater blows upon them" (1351-1352). Throughout their final judgment, the chorus never suggests that Creon's crime involved suppressing a woman's voice or that women's status needs to change. They vindicate Antigone not because she courageously defied male authority as a woman, but because she correctly upheld the gods' eternal laws against a mortal ruler's temporary decree. Antigone is praised because she was right about religious duty, not because her gender should not have limited her authority. If a man had defied Creon for identical religious reasons, the play's moral would be identical.</p>
+          <p>The modern impulse to read <em>Antigone</em> as feminist stems from seeing female defiance of male authority as inherently progressive. But this reading projects contemporary values onto an ancient text that operates within entirely different frameworks. Antigone fights not for women's liberation but for religious conservation against secular innovation. Creon represents a new political order where state necessity overrides traditional religious obligations. Antigone represents the old order, where divine law is absolute, and that old order includes and enforces gender hierarchy. The conflict between them is about which form of authority, political or religious, should govern human action. The play dramatizes this theological question, with religious law emerging as superior. Antigone functions as a champion of divine authority against human hubris, making her a defender of theocratic values rather than a pioneer of women's rights.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== POEMS ===== -->
+  <section class="immersion view-poems" data-view="poems">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="poems-inner">
+      <div class="poem-kicker">A Sonnet</div>
+      <h1 class="poem-title">Debt</h1>
+      <div class="poem-body">I have been paying since before I knew the debt,
+not to the world but to myself, a boy
+who set the terms before he was ready yet
+to know the weight of what he would employ.
+
+The creditor lives inside, not somewhere out.
+It does not ask. It takes what it is owed.
+And on the days I falter, fill with doubt,
+the fear collects like interest down the road.
+
+I used to think the work was mine to keep.
+Now I know it is a payment, not a climb,
+a minimum against a balance steep
+I signed before I understood the time.
+
+Not to arrive. Just to become the name
+I gave myself before I knew the game.</div>
+    </div>
+  </section>
+
+  <!-- ===== SHORT STORIES ===== -->
+  <section class="immersion view-stories" data-view="stories">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="stories-inner">
+      <div class="story-kicker">// Short Story</div>
+      <h1 class="story-title">Character</h1>
+      <div class="story-body">
+        <p>I was sitting in a classroom. Third row from the back. The teacher was drawing connections on the whiteboard, building an argument, and the argument had a hole in it. I said something but I didn't decide to say it. The words came out clean and specific, and a few kids turned around, and one of them gave a look of interest, and the moment passed the way it always passes. It happens every day. I used to think this was something I did. Now I think there is a system and I am inside of it, and the system is what speaks.</p>
+        <p>But I did not always think this way. For a long time I believed I was awake.</p>
+        <p>I looked at the government and saw a performance. I looked at pop culture and saw desire being manufactured and sold back. I said the sharp thing in every room I entered and watched the faces change. I know that face now. Everyone made the same one. It is the face people make when a clock starts running backward. Not anger. Discomfort. Like watching something break that they thought was working fine. I did not care. I liked it. I thought I was seeing things clearly and everyone else was asleep. I thought I had chosen to be this way. That the choosing was what made me different. For years this was the story I told about myself. I was the one who could see. And I believed that seeing was the same thing as being free.</p>
+        <p>I walk through the city every day. Every crosswalk and traffic signal and subway entrance was placed by someone who was not me. The placement decides where I walk and when I stop and which direction I turn. Everyone moves through it the same way. Same routes. Same signals. Same places at roughly the same times. No one seems to find this strange. I used to try to walk against it. I cut through blocks at diagonals. I ducked into alleys that led nowhere. I found an empty lot at the end of one of them where the concrete had cracked and a weed was pushing through and I told myself this was the place where things break down. The place the structure could not reach. But I got there by walking. On legs that were told the way. Because something in me needed to find the broken place, and that need was in me before I started walking. The alleys were still inside the grid. The diagonals still crossed streets someone else had paved. Every time I thought I was going off the path, the path was already there, waiting for me to think that. The system does not care if you walk straight or diagonal. It made both roads.</p>
+        <p>The thing that I cannot stop thinking about is not that the world runs like a machine. I already knew that. The thing is that I run like one too. I question everything. I always have. But I never chose to be this way any more than a stone chooses to fall. It is just what I do. It is what I have always done. A disruption that happens on schedule is not a disruption. It is just another part of how the system works. I cannot find the moment this started. The system was just there one day, fully formed, and I built everything around it the way you build walls around a foundation that was already in the ground when you got there. Every thought I have ever had came from the one before it. Follow the chain back far enough and you end up before I was born, in a room I have never seen, in a "choice" someone else made that I am still living out.</p>
+        <p>I tried to prove myself wrong. If the pattern was that I always question, I would stop. I sat in class and said nothing. The teacher made his argument and I let it stand. The silence felt like holding my breath underwater. The kid next to me looked over. He was used to me talking. The whole room was. And I knew as I sat there that the silence was its own kind of disruption. And I knew that knowing this was part of the pattern. And I knew that knowing that was part of it too, and it kept going down and I could not find the bottom. I tried other things. I ate what everyone ate. I watched what everyone watched. For three days straight I did nothing that was mine. On the third day I caught myself studying my own performance and I stopped trying. There is no bottom. There is no layer where you finally reach the part of you that you built yourself. Every layer was put there by something before it.</p>
+        <p>I went for a walk after that. I did not pick a direction. My legs moved and I followed them and when I stopped I was standing at the same lot. Same fence. Same crack in the concrete. The weed was still there. I stood there for a long time looking at it. The last time I came here I thought I had found the edge of the grid, the place where things fall apart. Now I saw something else. The weed did not decide to grow there. A seed landed in a crack and the crack held water and the water was enough. It did not choose the crack. The crack did not choose it. But there they were, together, and it looked right. It looked like it was supposed to be there. Everything looks like it belongs once it is already in place.</p>
+        <p>And I stood there and for the first time I did not want to fight it.</p>
+        <p>The weed was not free. It did not pick the crack. But it was the only thing growing there. It was doing what it was going to do regardless of whether it understood why. That was all it had. And standing in that lot I thought maybe that is all anyone has. Not a door out of the building. Just a window. You can see the whole thing from where you are standing. You can see the walls and the grid and the routes and the signals. You can see that you did not build any of it. You can see that you were placed here the same way the weed was placed in the crack. And seeing it does not get you out. But not seeing it does not get you out either. Nothing gets you out. So you might as well see it.</p>
+        <p>I am putting this down because something in me needs to put it down. That need did not come from nowhere. It came from every classroom and every sharp thing I said and every face that changed and every block I walked at a diagonal thinking I was going somewhere new. I sit at the desk and my hand moves and the words come out in an order I did not plan and I set them down because that is what comes next. I did not choose this. But I am here. The weed did not choose the crack. But it grew anyway.</p>
+        <p>I keep trying to put a name on it. The system. The thing that was here before me and will be here after. Some nights I think it is God, and then I think God is just a word people use when they can feel the edges of something they cannot see. Other times I think it is biology or chemistry or the long slow chain of every cause and every effect going back to the first thing that ever moved. And other times I think it is simpler than any of that, that there is no name for it because it is not a thing, it is just the way things are, the water that feeds the crack and the crack that holds the seed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MURALS ===== -->
+  <section class="immersion view-murals" data-view="murals">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="murals-inner">
+      <div class="mural-frame">
+        <img src="works/recognition.jpg" alt="Recognition" id="muralImg" loading="lazy">
+      </div>
+      <div class="mural-label">
+        <div class="mural-label-title">Recognition</div>
+        <div class="mural-label-meta">Mural &middot; 2025<br>Lucas Haines</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PHOTOGRAPHY ===== -->
+  <section class="immersion view-photography" data-view="photography">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <header class="photography-header">
+      <div class="photography-kicker">Selected Frames</div>
+      <h1 class="photography-title">Photography</h1>
+    </header>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <!-- ===== BOOK ===== -->
+  <section class="immersion view-book" data-view="book">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <button class="book-menu-btn" id="bookMenuBtn" aria-label="Chapter menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="book-drawer-overlay" id="bookDrawerOverlay"></div>
+    <aside class="book-drawer" id="bookDrawer">
+      <div class="book-drawer-heading">Chapters</div>
+      <a data-page="bk-front"><span class="num">&mdash;</span>Cover &amp; Dedication</a>
+      <a data-page="bk-howto"><span class="num">&mdash;</span>How to Read This Book</a>
+      <a data-page="bk-intro"><span class="num">&mdash;</span>Introduction</a>
+      <div class="book-drawer-part">Part I &middot; The Framework</div>
+      <a data-page="bk-ch1"><span class="num">1.</span>What Are Emotional Objectives?</a>
+      <a data-page="bk-ch2"><span class="num">2.</span>The Cynic&rsquo;s Lens</a>
+      <div class="book-drawer-part">Part II &middot; Five Objectives in Action</div>
+      <a data-page="bk-ch3"><span class="num">3.</span>Status &mdash; Napoleon</a>
+      <a data-page="bk-ch4"><span class="num">4.</span>Compassion &mdash; Mother Teresa</a>
+      <a data-page="bk-ch5"><span class="num">5.</span>Belonging &mdash; John Lennon</a>
+      <a data-page="bk-ch6"><span class="num">6.</span>Freedom &mdash; Steve Jobs</a>
+      <a data-page="bk-ch7"><span class="num">7.</span>Security &mdash; Howard Hughes</a>
+      <div class="book-drawer-part">Part III &middot; Objectives in Conflict</div>
+      <a data-page="bk-ch8"><span class="num">8.</span>Internal Wars</a>
+      <a data-page="bk-ch9"><span class="num">9.</span>Interpersonal Conflicts</a>
+      <a data-page="bk-ch10"><span class="num">10.</span>Historical Conflicts</a>
+      <div class="book-drawer-part">Part IV &middot; Practical Application</div>
+      <a data-page="bk-ch11"><span class="num">11.</span>Identifying Objectives in Others</a>
+      <a data-page="bk-ch12"><span class="num">12.</span>Discovering Your Own Objectives</a>
+      <a data-page="bk-ch13"><span class="num">13.</span>Using the Knowledge Ethically</a>
+      <a data-page="bk-ch14"><span class="num">14.</span>Living with Intention</a>
+      <div class="book-drawer-part">Part V &middot; Advanced Concepts</div>
+      <a data-page="bk-ch15"><span class="num">15.</span>When Objectives Change</a>
+      <a data-page="bk-ch16"><span class="num">16.</span>The Price of Unmet Objectives</a>
+      <a data-page="bk-ch17"><span class="num">17.</span>Psychopaths &amp; Unconventional Fulfillment</a>
+      <a data-page="bk-ch18"><span class="num">18.</span>The Future of Human Motivation</a>
+      <div class="book-drawer-part">End Matter</div>
+      <a data-page="bk-conclusion"><span class="num">&mdash;</span>Conclusion</a>
+      <a data-page="bk-appA"><span class="num">A.</span>Quick Reference Guide</a>
+      <a data-page="bk-appB"><span class="num">B.</span>Assessment Tools</a>
+      <a data-page="bk-appC"><span class="num">C.</span>Formal Logical Proofs</a>
+      <a data-page="bk-ack"><span class="num">&mdash;</span>Acknowledgments</a>
+      <a data-page="bk-author"><span class="num">&mdash;</span>About the Author</a>
+      <a data-page="bk-bib"><span class="num">&mdash;</span>Bibliography</a>
+      <a data-page="bk-gloss"><span class="num">&mdash;</span>Glossary</a>
+    </aside>
+    <div class="book-inner">
+      <div class="book-page active" id="bk-front">
+      <div class="book-cover-wrap">
+        <div class="book-kicker">A Book by Lucas Haines</div>
+        <div class="book-cover">
+          <div class="book-cover-author">Lucas Haines</div>
+          <div>
+            <div class="book-cover-title">Decoding<br>Human Nature</div>
+            <div class="book-cover-sub">The Five Emotional Objectives<br>Behind Every Action</div>
+          </div>
+          <div class="book-cover-mark">— LH</div>
+        </div>
+        <h1 class="book-title">Decoding Human Nature</h1>
+        <div class="book-subtitle">The Five Emotional Objectives Behind Every Action</div>
+        <div class="book-byline">First Edition &middot; 2026</div>
+      </div>
+
+      <div class="book-rule"></div>
+
+      <div class="book-dedication">
+        <em>For Stu McLaughlin</em><br><br>
+        Who showed me, through his warmth, his humility, and his humor,<br>
+        how finite and fragile life really is.<br><br>
+        His passing reminded me that the time to do the work that matters<br>
+        is now, because we are not promised later.<br><br>
+        This book exists because of that lesson.
+      </div>
+
+      <div class="book-dedication" style="margin-bottom:120px;">
+        &ldquo;The heart has its reasons of which reason knows nothing.&rdquo;<br>
+        <span style="font-style:normal;font-size:0.85rem;letter-spacing:3px;text-transform:uppercase;color:#8c7762;">— Blaise Pascal</span>
+      </div>
+
+      <div class="book-toc">
+        <div class="book-toc-heading">Table of Contents</div>
+        <a data-page="bk-howto"><span class="num">&mdash;</span>How to Read This Book</a>
+        <a data-page="bk-intro"><span class="num">&mdash;</span>Introduction: Why We Do What We Do</a>
+        <div class="book-toc-part">Part I &middot; The Framework</div>
+        <a data-page="bk-ch1"><span class="num">1.</span>What Are Emotional Objectives?</a>
+        <a data-page="bk-ch2"><span class="num">2.</span>The Cynic&rsquo;s Lens</a>
+        <div class="book-toc-part">Part II &middot; The Five Objectives in Action</div>
+        <a data-page="bk-ch3"><span class="num">3.</span>Respect &amp; Status: Napoleon Bonaparte</a>
+        <a data-page="bk-ch4"><span class="num">4.</span>Compassion &amp; Goodness: Mother Teresa</a>
+        <a data-page="bk-ch5"><span class="num">5.</span>Acceptance &amp; Belonging: John Lennon</a>
+        <a data-page="bk-ch6"><span class="num">6.</span>Freedom &amp; Autonomy: Steve Jobs</a>
+        <a data-page="bk-ch7"><span class="num">7.</span>Security &amp; Stability: Howard Hughes</a>
+        <div class="book-toc-part">Part III &middot; Objectives in Conflict</div>
+        <a data-page="bk-ch8"><span class="num">8.</span>Internal Wars</a>
+        <a data-page="bk-ch9"><span class="num">9.</span>Interpersonal Conflicts</a>
+        <a data-page="bk-ch10"><span class="num">10.</span>Historical Conflicts</a>
+        <div class="book-toc-part">Part IV &middot; Practical Application</div>
+        <a data-page="bk-ch11"><span class="num">11.</span>Identifying Objectives in Others</a>
+        <a data-page="bk-ch12"><span class="num">12.</span>Discovering Your Own Objectives</a>
+        <a data-page="bk-ch13"><span class="num">13.</span>Using the Knowledge Ethically</a>
+        <a data-page="bk-ch14"><span class="num">14.</span>Living with Intention</a>
+        <div class="book-toc-part">Part V &middot; Advanced Concepts</div>
+        <a data-page="bk-ch15"><span class="num">15.</span>When Objectives Change</a>
+        <a data-page="bk-ch16"><span class="num">16.</span>The Price of Unmet Objectives</a>
+        <a data-page="bk-ch17"><span class="num">17.</span>Psychopaths and Unconventional Fulfillment</a>
+        <a data-page="bk-ch18"><span class="num">18.</span>The Future of Human Motivation</a>
+        <div class="book-toc-part">&nbsp;</div>
+        <a data-page="bk-conclusion"><span class="num">&mdash;</span>Conclusion: The Compass of Human Nature</a>
+        <a data-page="bk-appA"><span class="num">A.</span>Quick Reference Guide</a>
+        <a data-page="bk-appB"><span class="num">B.</span>Assessment Tools</a>
+        <a data-page="bk-appC"><span class="num">C.</span>Formal Logical Proofs</a>
+        <a data-page="bk-ack"><span class="num">&mdash;</span>Acknowledgments</a>
+        <a data-page="bk-author"><span class="num">&mdash;</span>About the Author</a>
+        <a data-page="bk-bib"><span class="num">&mdash;</span>Bibliography</a>
+        <a data-page="bk-gloss"><span class="num">&mdash;</span>Glossary</a>
+      </div>
+      </div><!-- /bk-front -->
+
+      <div class="book-page book-chapter" id="bk-howto">
+        <div class="book-ch-num">Preface</div>
+        <h2 class="book-ch-title">How to Read This Book</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>This book is organized into five parts, each building on the last. Parts I and II establish the framework: what emotional objectives are, how they form hierarchies, and how each of the five objectives manifests in real human lives through the stories of historical figures. Part III explores what happens when objectives collide, both within a single person and between people. Part IV turns the lens practical, teaching you how to identify objectives in others, discover your own hierarchy, use this knowledge ethically, and live with greater intention. Part V extends the framework into advanced territory.</p>
+          <p>You can read the book straight through for the full experience, or you can focus on the parts most relevant to your interests. If you want to understand the theory, start with Parts I and II. If you want practical tools immediately, skip to Part IV. If you are dealing with a specific relationship conflict, Chapter 9 and the Appendix B worksheet will be most useful.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-intro">
+        <div class="book-ch-num">Introduction</div>
+        <h2 class="book-ch-title">Why We Do What We Do</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>I was fifteen, sitting in my bedroom with that hollow feeling expanding in my chest again. My friend had just bailed on our plans for the third time that month, choosing instead to hang out with kids who barely acknowledged his existence. It made no sense. Or at least, it didn&rsquo;t until I stopped asking the wrong question.</p>
+          <p>Instead of wondering &ldquo;Why is he doing this to me?&rdquo; I found myself asking something different: &ldquo;What does he really want?&rdquo;</p>
+          <p>The answer hit me like a revelation. He wasn&rsquo;t acting randomly or trying to hurt me. He was chasing the approval of that popular group, the security of feeling accepted by them, the tantalizing possibility of climbing the social ladder. Once I saw that drive, everything he did made perfect sense. After years of observation, reading, and analysis, I began to notice the Five Emotional Objectives, the core drives that explain virtually all human behavior.</p>
+          <h3>The Five Forces That Drive Us All</h3>
+          <p><em>Respect &amp; Status</em> &mdash; the hunger for admiration, recognition, and social standing.</p>
+          <p><em>Compassion &amp; Goodness</em> &mdash; the need to see oneself as moral, virtuous, and caring.</p>
+          <p><em>Acceptance &amp; Belonging</em> &mdash; the desire for connection, love, and inclusion in groups.</p>
+          <p><em>Freedom &amp; Autonomy</em> &mdash; the craving for independence, self-determination, and control.</p>
+          <p><em>Security &amp; Stability</em> &mdash; the need for safety, predictability, and protection from risk.</p>
+          <p>Every person you&rsquo;ll ever meet prioritizes these objectives differently. These different hierarchies explain why people can look at identical situations and make completely opposite choices.</p>
+          <h3>The Logical Foundation</h3>
+          <p><em>Premise 1:</em> All humans strive to maintain a positive self-concept. <em>Premise 2:</em> The five emotional objectives are the primary means through which humans achieve and maintain a positive self-concept. <em>Conclusion 1:</em> Therefore, humans will consistently seek to fulfill their emotional objectives. <em>Premise 3:</em> Different individuals develop different hierarchies. <em>Premise 4:</em> When forced to choose, people will favor whichever objective ranks higher. <em>Final Conclusion:</em> People&rsquo;s decisions can be predicted and explained by identifying which emotional objectives they prioritize.</p>
+          <h3>The Uncomfortable Truth</h3>
+          <p>I believe these emotional objectives are the only things that truly motivate human action. Every act of generosity, every heroic gesture, and every moment of apparent selflessness ultimately serves one or more of these drives. Recognizing the true motivations behind behavior doesn&rsquo;t diminish the value of good actions; it just reveals the psychology that makes them possible.</p>
+          <h3>The Promise</h3>
+          <p>By the end of this book, you will never look at human behavior the same way again. You&rsquo;ll see elegant patterns where others see only chaos. This understanding won&rsquo;t make you cynical. It will make you realistic about human nature while remaining compassionate about human needs. Once you understand what people really want, what they truly, desperately need, you understand everything that matters about being human.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-part" id="bk-part1">
+        <div class="book-part-num">Part I</div>
+        <div class="book-part-title">The Framework</div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch1">
+        <div class="book-ch-num">Chapter One</div>
+        <h2 class="book-ch-title">What Are Emotional Objectives?</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Human beings are not rational creatures who occasionally act emotionally. We are emotional creatures who occasionally think rationally. Every choice you make can be traced back to a fundamental drive to feel a certain way about yourself and your place in the world.</p>
+          <p>These drives, what I call emotional objectives, are not conscious goals. They operate beneath the surface of awareness, like an underground river that shapes the landscape above it.</p>
+          <h3>The Architecture of Human Motivation</h3>
+          <p>An emotional objective is a psychological state that a person unconsciously seeks to achieve or maintain. It&rsquo;s not a want or a preference: it&rsquo;s a need so fundamental that failing to meet it creates genuine psychological distress. Think of emotional objectives as the invisible software running in the background of human consciousness.</p>
+          <h3>Why Only Five?</h3>
+          <p>Every human drive can be categorized under one of these umbrellas. Power appears to be its own drive until you realize people seek power for different reasons &mdash; some for respect, others for security, still others for freedom. Love might seem fundamental, but examine what people actually seek from love: acceptance, compassion, security. The five emotional objectives represent the fundamental psychological needs that all other drives serve. They are irreducible.</p>
+          <h3>Your Personal Hierarchy</h3>
+          <p>Not everyone prioritizes these objectives equally. Each person develops a unique hierarchy. Your hierarchy isn&rsquo;t fixed permanently, but it&rsquo;s remarkably stable. It typically forms in childhood and adolescence based on your experiences, family dynamics and cultural environment.</p>
+          <h3>The Moral Compass Theory</h3>
+          <p>What we call someone&rsquo;s &ldquo;moral compass&rdquo; is actually the result of how they balance the five emotional objectives. People aren&rsquo;t inherently good or evil, they simply prioritize different psychological needs.</p>
+          <h3>The Trade-offs We Cannot Escape</h3>
+          <p>You cannot maximize all five objectives simultaneously. Life forces you to choose, and every choice involves sacrifice. These conflicts aren&rsquo;t character flaws &mdash; they&rsquo;re the natural result of being human in a world that forces choices between fundamental psychological needs.</p>
+          <p>And once you see the patterns, you can never unsee them. The question becomes: what will you do with this knowledge?</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch2">
+        <div class="book-ch-num">Chapter Two</div>
+        <h2 class="book-ch-title">The Cynic&rsquo;s Lens</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>The most difficult truth about human nature is also the most liberating: every action we take can be traced back to our own emotional needs. There is no such thing as pure altruism. There are only different ways of serving our psychological objectives.</p>
+          <p>The &ldquo;cynic&rdquo; in this chapter&rsquo;s title is not a pessimist or a misanthrope. The cynic&rsquo;s lens is a tool for clarity: seeing human behavior as it actually operates, rather than as we wish it would.</p>
+          <h3>The Myth of Pure Altruism</h3>
+          <p>The soldier who throws himself on a grenade fulfills his need to see himself as honorable and brave. The working mother reinforces her identity as a caring, responsible parent. The philanthropic billionaire builds a legacy of goodness. Every supposedly selfless act serves the actor&rsquo;s emotional objectives. This doesn&rsquo;t make these actions less valuable. The benefits to others are completely real. But so are the psychological benefits to the people taking these actions.</p>
+          <h3>The Self-Serving Nature of Goodness</h3>
+          <p>Watch what happens when someone&rsquo;s &ldquo;generous&rdquo; actions stop serving their emotional objectives. The volunteer stops showing up when they don&rsquo;t receive sufficient recognition. People continue &ldquo;selfless&rdquo; behaviors only as long as those behaviors serve their emotional objectives.</p>
+          <h3>The Liberation of Realism</h3>
+          <p>Accepting that all human behavior is ultimately self-serving is not depressing: it&rsquo;s liberating. It frees you from the impossible burden of trying to be completely selfless and from the constant disappointment of expecting others to be purely altruistic. Once you can see these patterns, every interaction makes sense, every conflict becomes understandable, and every relationship becomes navigable.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-part" id="bk-part2">
+        <div class="book-part-num">Part II</div>
+        <div class="book-part-title">The Five Objectives in Action</div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch3">
+        <div class="book-ch-num">Chapter Three</div>
+        <h2 class="book-ch-title">Respect &amp; Status &mdash; Napoleon Bonaparte</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>In December 1804, Pope Pius VII stood in Notre-Dame Cathedral holding the crown of France. As the Pope raised the crown, Napoleon stepped forward and took it from the pontiff&rsquo;s hands, placing it on his own head before crowning his wife Josephine himself. What appeared to be spontaneous arrogance was actually meticulously planned. Napoleon had choreographed a statement that would echo through history: his authority came from himself alone.</p>
+          <p>This moment crystallized the driving force behind one of history&rsquo;s most spectacular rises and falls. Napoleon&rsquo;s entire life was shaped by a single overwhelming emotional objective: Respect &amp; Status.</p>
+          <h3>The Making of a Status-Seeker</h3>
+          <p>Born in 1769 on the island of Corsica, Napoleon arrived at military school in mainland France at age nine and was marked immediately as an outsider. These early experiences of exclusion created a wound that would drive him for the rest of his life. Rather than seeking belonging through conformity, he turned to achievement as his path to recognition.</p>
+          <h3>The Performance of Genius</h3>
+          <p>When given command of the Army of Italy in 1796, Napoleon didn&rsquo;t just win battles; he turned them into theatrical performances. He wrote his own battle reports, commissioned dramatic paintings of key moments, and consistently chose risky approaches over safer alternatives. Legends are made from dramatic gestures.</p>
+          <h3>The Coronation Calculation</h3>
+          <p>By crowning himself, Napoleon declared his authority was self-generated. He permanently alienated the Catholic Church and offended European royalty. A person driven by Security would never have risked so much for a symbolic gesture. But Napoleon, driven by Status, calculated that being remembered as the man who crowned himself was worth more than the practical benefits of traditional legitimacy.</p>
+          <h3>The Cult of Napoleon</h3>
+          <p>By 1807, Napoleon had created a personality cult built around his own genius. The narrative construction required constant maintenance and escalation. This is why Napoleon launched the disastrous 1812 invasion of Russia. Napoleon couldn&rsquo;t tolerate anyone defying his authority.</p>
+          <h3>The Eternal Emperor</h3>
+          <p>Napoleon died on St. Helena in 1821, defeated and in exile. In death, he achieved the permanent recognition he had craved. But this success came at the cost of everything else. He became immortal by sacrificing his actual life to the pursuit of eternal reputation.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch4">
+        <div class="book-ch-num">Chapter Four</div>
+        <h2 class="book-ch-title">Compassion &amp; Goodness &mdash; Mother Teresa</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>In August 1982, a small Albanian woman in a white sari bordered with blue walked through the rubble-strewn streets of West Beirut. Mother Teresa, then seventy-two, had come to rescue thirty-seven mentally disabled children. Examined through the lens of emotional objectives, she didn&rsquo;t just save those children; she orchestrated a globally televised demonstration of her own virtue.</p>
+          <h3>The Making of a Moral Identity</h3>
+          <p>When Agnes Bojaxhiu&rsquo;s father died when she was eight, the family fell into reduced circumstances. When conventional sources of status were removed, Agnes turned to virtue as her path to significance. Working in the slums, touching the untouchable, caring for the dying &mdash; this would create the moral distinction she craved.</p>
+          <h3>The Performance of Virtue</h3>
+          <p>The sisters wore distinctive white saris with blue borders. They refused modern medical equipment, emphasizing personal touch over technical intervention. The deliberately primitive conditions made them look like living saints.</p>
+          <h3>The Selective Nature of Saintly Compassion</h3>
+          <p>Teresa consistently focused on caring for the dying rather than treating the curable. Caring for dying people provided maximum emotional impact with minimum accountability for outcomes. Teresa consistently chose the more dramatic, emotionally resonant forms of charity over the more practically effective ones.</p>
+          <h3>The Private Doubts of a Public Saint</h3>
+          <p>Her private correspondence reveals decades of spiritual doubt. For nearly fifty years, Teresa experienced what she described as &ldquo;darkness&rdquo; and &ldquo;emptiness.&rdquo; Yet publicly, she maintained an image of perfect faith. The Compassion objective had trapped her in a role she could no longer authentically inhabit.</p>
+          <h3>The Legacy of a Compassion-Driven Life</h3>
+          <p>Teresa was canonized in 2016. Her legacy forces an uncomfortable question: can the drive to be seen as good produce genuine good in the world? The millions she comforted were real. The limitations of her methods were also real.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch5">
+        <div class="book-ch-num">Chapter Five</div>
+        <h2 class="book-ch-title">Acceptance &amp; Belonging &mdash; John Lennon</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>On March 25, 1969, John Lennon and Yoko Ono lay in bed at the Amsterdam Hilton, surrounded by reporters, staging a &ldquo;bed-in for peace.&rdquo; Lennon wasn&rsquo;t just protesting war; he was publicly demonstrating his membership in the global peace movement, his connection to his new wife, and his identity as someone who cared about humanity.</p>
+          <h3>The Making of a Belonging-Seeker</h3>
+          <p>John&rsquo;s father abandoned the family when John was five. His mother gave him to her sister to raise. When Julia was killed by a drunk driver in 1958, seventeen-year-old John lost his hope that anyone would love him without conditions. He approached every situation asking, &ldquo;How will this help me belong?&rdquo;</p>
+          <h3>The Beatles as Surrogate Family</h3>
+          <p>John&rsquo;s partnership with Paul McCartney was emotional codependency disguised as artistic genius. The Beatles weren&rsquo;t John Lennon&rsquo;s backing band; they were a unit where individual identity merged into collective belonging. Beatlemania provided mass acceptance on an unprecedented scale.</p>
+          <h3>The Yoko Fusion</h3>
+          <p>John&rsquo;s relationship with Yoko Ono represents the complete merger of identity with another person. He brought her to Beatles recording sessions because he couldn&rsquo;t risk being alone with his need for acceptance. He essentially abandoned his first son Julian.</p>
+          <h3>The Eternal Dreamer</h3>
+          <p>John Lennon was murdered in 1980. &ldquo;Imagine&rdquo; remains beloved not because it offers practical political solutions, but because it expresses the universal human longing to belong to something larger than ourselves.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch6">
+        <div class="book-ch-num">Chapter Six</div>
+        <h2 class="book-ch-title">Freedom &amp; Autonomy &mdash; Steve Jobs</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>On January 24, 1984, Steve Jobs walked onto a stage at the Flint Center in Cupertino. Jobs wasn&rsquo;t just launching a computer; he was performing his own deepest psychological need for absolute autonomy and control.</p>
+          <h3>The Making of a Control Seeker</h3>
+          <p>The adoption itself created a deep psychological wound: someone else had made the most important decision of his life before he was old enough to have any control over it. This early experience of powerlessness created the foundation for everything that followed.</p>
+          <h3>The Cult of Different</h3>
+          <p>Jobs recruited employees by promising them the chance to &ldquo;think different,&rdquo; but once they joined, he expected complete submission. The famous &ldquo;reality distortion field&rdquo; was really his Freedom objective in action. He couldn&rsquo;t accept external limitations because accepting those limitations would compromise his autonomy.</p>
+          <h3>The iPhone as Ultimate Control Expression</h3>
+          <p>The iPhone&rsquo;s closed ecosystem wasn&rsquo;t just a technical architecture; it was the physical manifestation of Jobs&rsquo; psychological need for control. Critics argued that this approach limited user freedom, but Jobs saw it as protecting users from chaos.</p>
+          <h3>The Cost of Creative Tyranny</h3>
+          <p>His relationship with his daughter Lisa illustrates the tragedy. When Chrisann Brennan became pregnant, Jobs initially denied paternity, not because he doubted the biological facts, but because accepting responsibility would require accommodating someone else&rsquo;s needs.</p>
+          <h3>The Eternal Innovator</h3>
+          <p>Steve Jobs died at fifty-six, having bent entire industries to his will while never fully bending the people closest to him. The man who gave millions of people liberating technology could never liberate himself from the need to control everything he touched.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch7">
+        <div class="book-ch-num">Chapter Seven</div>
+        <h2 class="book-ch-title">Security &amp; Stability &mdash; Howard Hughes</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>In December 1966, Howard Hughes arrived in Las Vegas in the dead of night, transported in a stretcher to the ninth floor of the Desert Inn hotel. He would not leave that penthouse for four years. Every bizarre ritual served a single emotional objective: the elimination of risk and the achievement of perfect security.</p>
+          <h3>The Making of an Anxious Empire</h3>
+          <p>His mother died from complications during surgery when he was sixteen. Two years later, his father died of a heart attack. At eighteen, Howard inherited a massive fortune but also a profound lesson: no amount of wealth could guarantee the security of the people you loved most.</p>
+          <h3>The Performance of Control</h3>
+          <p>Hughes founded Hughes Aircraft Company to create aircraft he could trust with his own life. He maintained absolute control while other producers shared risks.</p>
+          <h3>The Hidden Cost of Perfect Control</h3>
+          <p>By his final decades, Hughes had achieved virtually everything the Security objective could provide. Yet he experienced constant anxiety, overwhelming isolation, and deep fear of losing what he had built. The Security objective had trapped him in a system he could no longer escape.</p>
+          <h3>The Legacy of a Security-Obsessed Life</h3>
+          <p>Hughes died in 1976, emaciated and alone. He had spent decades building walls against every conceivable threat and discovered, too late, that the walls had become the threat. His story is a warning: if safety requires the elimination of all uncertainty, and if human connection is inherently uncertain, then the pursuit of perfect safety will eventually require the elimination of human connection.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-part" id="bk-part3">
+        <div class="book-part-num">Part III</div>
+        <div class="book-part-title">Objectives in Conflict</div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch8">
+        <div class="book-ch-num">Chapter Eight</div>
+        <h2 class="book-ch-title">Internal Wars</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>The most brutal battles are not fought on distant fields between armies, but within the confines of a single mind. These conflicts arise from the competing demands of our five emotional objectives, each pulling us in different directions.</p>
+          <h3>The Architecture of Internal Conflict</h3>
+          <p>The <em>Classic Standoff</em> occurs when two objectives demand mutually exclusive actions. The <em>Saboteur Dynamic</em> emerges when one objective actively undermines another&rsquo;s goals. The <em>Guilt Spiral</em> develops when achieving one objective requires violating another&rsquo;s moral code. There are only three possible outcomes of any internal conflict: sacrifice, compromise, or paralysis.</p>
+          <h3>The Procrastination Paradox</h3>
+          <p>Every act of procrastination serves at least one emotional objective. Security-based procrastination emerges when taking action feels more dangerous than remaining stuck. Freedom-driven procrastination rebels against external expectations. Acceptance-based procrastination fears that completing the task will change relationships.</p>
+          <h3>Strategies for Internal Peace Negotiations</h3>
+          <p>Resolving internal conflicts requires the skills of a diplomat rather than the tactics of a general. The <em>Objective Audit</em>, <em>Creative Compromise</em>, <em>Sequential Satisfaction</em>, and <em>The Compassionate Perspective</em> all work better than brute willpower.</p>
+          <h3>The Myth of Internal Consistency</h3>
+          <p>The most creative, successful people often experience the most intense internal conflicts because they have developed multiple objectives to high levels. The goal isn&rsquo;t to eliminate internal conflicts but to dance with them more skillfully.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch9">
+        <div class="book-ch-num">Chapter Nine</div>
+        <h2 class="book-ch-title">Interpersonal Conflicts</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Most interpersonal conflicts that appear to be about practical matters are actually collisions between competing emotional objectives.</p>
+          <h3>Parent-Child Conflicts: Security vs. Freedom</h3>
+          <p>The most universal interpersonal conflicts follow the same script: Security versus Freedom. Parents develop stronger Security objectives. Children prioritize Freedom. The breakthrough comes when each side recognizes the other&rsquo;s emotional objective.</p>
+          <h3>When Identical Objectives Collide</h3>
+          <p>The most confusing interpersonal conflicts often occur between people who share the same dominant emotional objective. When two Status-driven professionals vie for the same recognition, the resulting conflicts can be more destructive than disagreements between people with different objectives entirely.</p>
+          <h3>Predicting Conflict: The Warning Signs</h3>
+          <p>Repetitive arguments about seemingly different topics that always follow the same emotional pattern. Emotional reactions disproportionate to practical importance. The absence of effective compromise solutions.</p>
+          <h3>Managing Conflicts: Strategies That Work</h3>
+          <p>Effective conflict management begins with objective recognition rather than position negotiation. Strategies include explicit objective mapping, sequential satisfaction, objective-based role differentiation, and preemptive objective support.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch10">
+        <div class="book-ch-num">Chapter Ten</div>
+        <h2 class="book-ch-title">Historical Conflicts</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>History is not written by the victors but by the emotional objectives that triumph. The American Revolution was about freedom declaring war on security. World War I was about respect and status run amok. The Civil Rights Movement was about refusing to accept exclusion any longer.</p>
+          <h3>The French Revolution</h3>
+          <p>In 1789, the French populace faced a choice between the security of familiar oppression and the dangerous liberation they desperately craved. The system designed to provide safety had become the primary source of danger.</p>
+          <h3>World War I</h3>
+          <p>The Great War represents the most devastating example of status and respect run amok. Each nation&rsquo;s pursuit of respect concluded that backing down would be more damaging than fighting.</p>
+          <h3>The Civil Rights Movement</h3>
+          <p>Martin Luther King Jr. brilliantly framed civil rights as serving white Americans&rsquo; need for moral righteousness. His strategy of nonviolent resistance forced white Americans to confront the contradiction between their stated moral values and their actual behavior.</p>
+          <h3>Patterns in Historical Conflict</h3>
+          <p><em>Objective Exhaustion</em>, <em>Objective Capture</em>, <em>Generational Objective Shifts</em>, and <em>False Objective Synthesis</em> all transcend specific time periods. The most successful historical leaders are those who recognize that lasting change requires serving multiple objectives.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-part" id="bk-part4">
+        <div class="book-part-num">Part IV</div>
+        <div class="book-part-title">Practical Application</div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch11">
+        <div class="book-ch-num">Chapter Eleven</div>
+        <h2 class="book-ch-title">Identifying Objectives in Others</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>People&rsquo;s true emotional objectives rarely match their public presentations. Learning to identify these hidden drives transforms your ability to predict behavior. Emotional objectives operate largely below conscious awareness.</p>
+          <h3>The Language of Emotional Objectives</h3>
+          <p><em>Status-driven people</em> pepper conversation with comparisons. <em>Security-driven people</em> use the language of caution. <em>Freedom-driven people</em> resist language that implies obligation. <em>Compassion-driven people</em> drift toward the welfare of others. <em>Belonging-driven people</em> reference group identity.</p>
+          <h3>Behavioral Patterns That Reveal Objectives</h3>
+          <p>Status-driven behavior centers on visibility and differentiation. Security-driven behavior centers on control and preparation. Freedom-driven behavior centers on autonomy and choice. Compassion-driven behavior centers on care. Belonging-driven behavior centers on inclusion.</p>
+          <h3>Common Assessment Mistakes</h3>
+          <p><em>Projection Error:</em> assuming others share your dominant objective. <em>Surface Behavior Confusion:</em> mistaking symptoms for underlying objectives. <em>Conscious Statement Acceptance:</em> taking stated motivations at face value.</p>
+          <h3>The Ethics of Objective Recognition</h3>
+          <p>The constructive approach recognizes that everyone benefits when emotional objectives are satisfied in healthy ways. The most sustainable approach recognizes that objective identification serves relationship building rather than power accumulation.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch12">
+        <div class="book-ch-num">Chapter Twelve</div>
+        <h2 class="book-ch-title">Discovering Your Own Objectives</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>The hardest person to understand is yourself. You live inside your own mind, listening to the constant narrative that seems to explain your choices. Yet this intimate access creates its own blindness.</p>
+          <h3>The Decision Pattern Analysis</h3>
+          <p>Your emotional objectives demonstrate themselves most clearly through your decision-making patterns. Did you choose the job with the highest salary, the most prestige, the best work-life balance, or the nicest people? Your pattern of trade-offs reveals your objective hierarchy more accurately than your stated priorities.</p>
+          <h3>Self-Reflection Exercises</h3>
+          <p>The <em>Peak Experience Analysis</em>: identify moments when you felt most energized. The <em>Energy Drain Inventory</em>: identify activities that leave you depleted. The <em>Automatic Reaction Assessment</em>: pay attention to your immediate, uncensored responses.</p>
+          <h3>Understanding Your Personal Hierarchy</h3>
+          <p>Your primary objective is the emotional need that consistently wins when it conflicts with others. The goal isn&rsquo;t to change your objectives but to understand them clearly enough to make conscious choices about how to serve them.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch13">
+        <div class="book-ch-num">Chapter Thirteen</div>
+        <h2 class="book-ch-title">Using the Knowledge Ethically</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Understanding emotional objectives gives you a form of power that most people don&rsquo;t possess. The question is what kind of person you become when you use it.</p>
+          <h3>The Manipulation Temptation</h3>
+          <p>Manipulation occurs when you structure interactions primarily to serve your objectives while pretending to serve theirs. The test for manipulation is simple: would you be comfortable explaining your strategy to the person you&rsquo;re influencing?</p>
+          <h3>Building Genuine Connections vs. Exploitation</h3>
+          <p>Genuine connection means using insights to communicate more effectively about mutual concerns. Exploitation occurs when you use objective-based insights to extract value while minimizing what you give in return.</p>
+          <h3>Influence vs. Control</h3>
+          <p>Ethical influence respects autonomy. Control compromises someone&rsquo;s ability to make independent decisions. Ethical influence survives transparency. Control depends on concealment.</p>
+          <h3>Living With the Knowledge</h3>
+          <p>The goal isn&rsquo;t perfect ethical purity but conscious choice rather than automatic exploitation, genuine connection as the default rather than manipulation as the norm.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch14">
+        <div class="book-ch-num">Chapter Fourteen</div>
+        <h2 class="book-ch-title">Living with Intention</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Most people live reactively, responding to immediate pressures and external expectations without examining whether their daily choices serve their actual psychological needs. Then they wonder why success feels hollow.</p>
+          <h3>Aligning Actions with Your True Objectives</h3>
+          <p>Examine your major life domains: <em>Career alignment</em>, <em>Relationship alignment</em>, and <em>Lifestyle alignment</em>. Identify critical misalignments, moderate misalignments, and untapped opportunities.</p>
+          <h3>Making Conscious Trade-offs</h3>
+          <p>Living intentionally doesn&rsquo;t mean you can satisfy all your objectives perfectly all the time. Many apparent trade-offs are false dichotomies. When facing genuine trade-offs, your objective hierarchy should guide decisions.</p>
+          <h3>Building a Life That Satisfies</h3>
+          <p>Create objective-aligned defaults. Protect high-value activities. Eliminate low-value obligations. The goal is consistent consciousness about whether your choices serve your genuine psychological needs.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-part" id="bk-part5">
+        <div class="book-part-num">Part V</div>
+        <div class="book-part-title">Advanced Concepts</div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch15">
+        <div class="book-ch-num">Chapter Fifteen</div>
+        <h2 class="book-ch-title">When Objectives Change</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Your emotional hierarchy is not a fixed document you carry from birth to death. It is more like a living structure that reorganizes itself in response to the conditions of your life.</p>
+          <h3>Life Stages and Objective Evolution</h3>
+          <p>A young child is primarily oriented toward Security. As the child grows into adolescence, Acceptance and Belonging become increasingly urgent. By early adulthood, Freedom rises sharply. As people age, Compassion often moves upward.</p>
+          <h3>Trauma as a Catalyst</h3>
+          <p>Trauma seizes your hierarchy and inverts it. Trauma often pushes Security to the top of the hierarchy with immediate force.</p>
+          <h3>Success and Failure as Triggers</h3>
+          <p>The emptiness you feel after achieving a goal that is not actually yours is not a sign of ingratitude. It is information. Failure forces prioritization.</p>
+          <h3>The Stability Myth</h3>
+          <p>Your hierarchy is not stable, and that is not a problem. That is the correct response to having lived longer and learned more.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch16">
+        <div class="book-ch-num">Chapter Sixteen</div>
+        <h2 class="book-ch-title">The Price of Unmet Objectives</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>When you are prevented from pursuing your dominant emotional objective, your body does not shrug and move on. It registers the deprivation. It activates emergency responses.</p>
+          <h3>The Deprivation Response</h3>
+          <p>For Security, the response is acute vigilance. For Belonging, desperate reaching. For Status, diminishment of self-worth. For Freedom, either passive resignation or explosive rebellion.</p>
+          <h3>Depression as Objective Starvation</h3>
+          <p>Depression is often a rational response to objective deprivation. The person whose dominant objective cannot be met stops trying. This is not laziness. This is your brain registering the futility of pursuit.</p>
+          <h3>Rage as Frustrated Pursuit</h3>
+          <p>Rage is a controlled response to a specific situation: the blocked pursuit of a dominant objective combined with the belief that the blockage is unjust or removable.</p>
+          <h3>Addiction as Substitute Fulfillment</h3>
+          <p>Addiction is an attempt to meet a dominant objective through an alternative channel when the primary channel is blocked. True recovery requires addressing the blocked objective.</p>
+          <h3>Recovery: Rebuilding or Restructuring</h3>
+          <p>Real recovery requires honesty about what you actually want, acceptance of what you actually cannot have, and courage to reorganize your life around objectives that can be met.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch17">
+        <div class="book-ch-num">Chapter Seventeen</div>
+        <h2 class="book-ch-title">Psychopaths and Unconventional Fulfillment</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>The psychopath is not suffering from an excess of something. The psychopath is suffering from a deficit. Specifically, a deficit in the emotional architecture that makes Compassion and Belonging feel real.</p>
+          <h3>The Psychopath&rsquo;s Hierarchy</h3>
+          <p>In the psychopathic hierarchy, the mesh of objectives dissolves. Status and Freedom at the peak. At the base, invisible: Compassion and true Belonging. The psychopath does experience emotions &mdash; fear, anger, pride. But empathy and the warm reciprocal pleasure of genuine connection are not available, the way color is not available to someone born blind.</p>
+          <h3>Cult Leaders: Belonging as a Weapon</h3>
+          <p>The cult leader weaponizes the human hunger for Belonging. She understands it not because she feels it, but because she has studied it. The followers, hungry for connection, pay the price willingly.</p>
+          <h3>Corporate Psychopaths</h3>
+          <p>The corporate world is a Status hierarchy made literal. The psychopath rises quickly, unencumbered by conscience.</p>
+          <h3>Recognizing and Protecting Yourself</h3>
+          <p>Trust your gut when something feels mechanically wrong. Watch people under stress. The neural architecture was either built or it was not. If it was not, the best you can do is recognize that fact and remove yourself from their orbit.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ch18">
+        <div class="book-ch-num">Chapter Eighteen</div>
+        <h2 class="book-ch-title">The Future of Human Motivation</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>The five objectives have not changed. The vehicles for pursuing them have transformed completely. The 1925 factory owner pursued Status through property. The 2025 person pursues Status through attention. They are pursuing the same emotional objective with the same desperation.</p>
+          <h3>Technology and the Amplification of Status-Seeking</h3>
+          <p>Your Status-seeking drive is unchanged from 1925. But it is now running on a system designed by engineers who understand psychology more precisely than the 1925 factory owner ever could.</p>
+          <h3>The Belonging Paradox</h3>
+          <p>We have never been more connected. We have never been more alone. Digital Belonging allows you to curate the self you present. People respond to this curated self, but they are not responding to you.</p>
+          <h3>Freedom in the Age of Surveillance</h3>
+          <p>Individuals have more formal freedom than ever, but the substrate through which freedom is exercised has become increasingly constrained by invisible systems.</p>
+          <h3>What Stays the Same</h3>
+          <p>The five objectives are not fashions that come and go. They are the bedrock of human motivation. They will survive whatever comes next. The methods change. The motivation does not.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-conclusion">
+        <div class="book-ch-num">Conclusion</div>
+        <h2 class="book-ch-title">The Compass of Human Nature</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>It was a Tuesday evening in late autumn, and I was seventeen years old. I sat at the edge of my bed, watching the world through a window that overlooked a neighborhood I thought I understood. A group of kids had gathered on the lawn across the street, arguing about something. I watched them for twenty minutes, fascinated not by the argument itself, but by what lay beneath it.</p>
+          <p>That night, I started writing down reasons. It took me twenty-five years to answer that question with any real confidence. Behind every argument, every sacrifice, every betrayal, every act of heroism, there are five emotional objectives.</p>
+          <h3>The Cynic Becomes the Sage</h3>
+          <p>The Cynic uses knowledge to dominate. The sage uses knowledge to connect. You get to choose which one you become.</p>
+          <h3>The Framework as Compass</h3>
+          <p>I promised you a compass, and I meant it. But a compass is not a map. A compass does not tell you where to go. It only tells you which direction you are facing and, if you know where you want to go, which way to turn.</p>
+          <h3>The Only Choice That Matters</h3>
+          <p>You cannot control what other people pursue. What you can control is yourself. Understanding the five emotional objectives is the process of waking up.</p>
+          <p>The compass is in your hands now. You know which direction you are facing. You know what you want. You know what others want. You know what gets in the way. Now it is time to walk.</p>
+          <div class="book-end-mark">— LH</div>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-appA">
+        <div class="book-ch-num">Appendix A</div>
+        <h2 class="book-ch-title">Quick Reference Guide</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <h3>The Five Objectives at a Glance</h3>
+          <p><em>Respect and Status:</em> the drive to be admired, valued, and recognized as significant.</p>
+          <p><em>Compassion and Goodness:</em> the human need to be seen as kind, generous, and morally sound.</p>
+          <p><em>Acceptance and Belonging:</em> the fundamental need to be liked, included, and part of a group.</p>
+          <p><em>Freedom and Autonomy:</em> the need to make your own choices and not be controlled.</p>
+          <p><em>Security and Stability:</em> the need for safety, predictability, and freedom from threat.</p>
+          <h3>Conflict Patterns</h3>
+          <p><em>Freedom vs. Security:</em> direct opposition. <em>Status vs. Belonging:</em> the path to Status can threaten Belonging. <em>Compassion vs. Freedom:</em> Compassion-driven people may exhaust themselves; Freedom-driven people set boundaries that feel selfish. <em>Status vs. Security:</em> Status drives risk; Security prefers protection. <em>Belonging vs. Autonomy:</em> Belonging requires fitting in; Freedom requires going your own way.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-appB">
+        <div class="book-ch-num">Appendix B</div>
+        <h2 class="book-ch-title">Assessment Tools</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <h3>Self-Assessment Questionnaire</h3>
+          <p>Rate your agreement with the following statements on a scale of 1 to 5. Total your scores for each objective group.</p>
+          <p><em>Status:</em> I feel satisfaction when others recognize my accomplishments. I am motivated to pursue roles with more authority. When overlooked, I feel strong frustration. I care how my choices will be perceived. I tend to remember and feel good about my accomplishments.</p>
+          <p><em>Compassion:</em> I feel uncomfortable when someone is struggling and I am not helping. I make decisions partly based on how they affect others. I feel guilt if I have done something unkind. I naturally listen to others&rsquo; problems. Being seen as a good person is important.</p>
+          <p><em>Belonging:</em> I adapt my behavior to fit the group. Being excluded creates real emotional pain. I invest time in maintaining relationships. I am sensitive to whether I fit in. I prefer compromise over winning.</p>
+          <p><em>Freedom:</em> I get frustrated when my choices are constrained. I am drawn to situations where I can set my own direction. I feel uncomfortable being micromanaged. I resent arbitrary rules. I would rather struggle with my own experiment than follow procedures.</p>
+          <p><em>Security:</em> Knowing what to expect gives me comfort. I make decisions carefully. I feel anxious in chaotic situations. Loyalty matters to me. I want to understand how something works before committing.</p>
+          <p>The objective with your highest score represents the most salient driver of your behavior.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-appC">
+        <div class="book-ch-num">Appendix C</div>
+        <h2 class="book-ch-title">Formal Logical Proofs</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Each chapter makes a central argument that can be expressed as a formal proof. The notation uses standard propositional logic.</p>
+          <h3>Introduction: The Predictive Framework</h3>
+          <p>If you know someone&rsquo;s hierarchy, you can identify their objectives. If you identify their objectives, you can map their behavioral patterns. If you map their patterns, you can predict their behavior.</p>
+          <h3>Chapter 1: Exhaustiveness of Five Objectives</h3>
+          <p>If a goal doesn&rsquo;t fit any of the five categories, it would fail to satisfy any emotional need &mdash; a contradiction. Therefore every emotional goal must fit into one of the five.</p>
+          <h3>Chapter 2: The Cynic&rsquo;s Lens</h3>
+          <p>Every apparently altruistic act produces emotional satisfaction. That satisfaction serves one of the five objectives. Therefore even acts that appear purely selfless serve at least one emotional objective.</p>
+          <h3>Chapter 3: Status Escalation</h3>
+          <p>If Status is dominant, recognition thresholds rise after each achievement. Rising thresholds necessitate increasingly extreme pursuits. Extreme pursuits create unsustainable risk exposure.</p>
+          <h3>Chapter 6: Freedom Paradox</h3>
+          <p>If Freedom is dominant, the actor seeks to control their environment. Environmental control requires restricting others&rsquo; autonomy. Restricting others&rsquo; autonomy undermines the universal Freedom that autonomy-dominance values.</p>
+          <h3>Chapter 7: Security Self-Defeat</h3>
+          <p>Security-seeking past a critical threshold produces the very insecurity it sought to prevent.</p>
+          <h3>Chapter 8: Three Outcomes</h3>
+          <p>Internal objective conflict produces exactly three outcomes: sacrifice, compromise, or paralysis. No fourth option exists.</p>
+          <h3>Chapter 13: Manipulation is Self-Defeating</h3>
+          <p>Manipulation achieves short-term goals but destroys trust when discovered. Sustained relationships require trust. Therefore manipulation undermines the conditions needed for lasting success.</p>
+          <h3>Chapter 14: Alignment Produces Satisfaction</h3>
+          <p>When actions align with one&rsquo;s true hierarchy, satisfaction follows. Alignment is the path to sustainable satisfaction.</p>
+          <h3>Chapter 15: Dynamic Hierarchies</h3>
+          <p>Emotional objectives are shaped by experience. Experience accumulates over a lifetime. Therefore objective hierarchies must be dynamic, not static.</p>
+          <h3>Chapter 18: Technology Independence</h3>
+          <p>The five emotional objectives are intrinsic to human psychology. Technology provides new methods for pursuing them but cannot eliminate or replace them.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-ack">
+        <div class="book-ch-num">&nbsp;</div>
+        <h2 class="book-ch-title">Acknowledgments</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>This book exists because of the people who shaped me, challenged me, and refused to let me give it anything less than everything I had.</p>
+          <p>To Mom and Dad, for building the foundation I stand on. Everything I understand about how people work, I first learned by watching you.</p>
+          <p>To Dean, for being the kind of brother who makes you sharper just by being in the room.</p>
+          <p>To Logan, for the conversations that turned half-formed ideas into real arguments, and for never letting me get away with lazy thinking.</p>
+          <p>To Ms. Chandhok, for teaching me that rigor and curiosity are not opposites, and for expecting more from me than I expected from myself.</p>
+          <p>To Jelly, for everything that does not fit into a single sentence. You know.</p>
+          <p>And to Stu McLaughlin, whose warmth lives in every page of this book. You showed me what it looks like to be fully present in a life. I finished this because of you.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-author">
+        <div class="book-ch-num">&nbsp;</div>
+        <h2 class="book-ch-title">About the Author</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p>Lucas Haines lives in New York City with his parents and brother. He got interested in psychology and philosophy for practical reasons, not academic ones: he wanted to understand how to shape his own mind into something more productive and dynamic. Most people stumble into these fields through college requirements or casual curiosity. Lucas approached them as tools for self-modification, studying psychological principles and philosophical frameworks the way an engineer studies mechanics, looking for leverage points where small insights create disproportionate changes in how the mind operates.</p>
+          <p><em>Decoding Human Nature</em> is his first book.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-bib">
+        <div class="book-ch-num">&nbsp;</div>
+        <h2 class="book-ch-title">Bibliography</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <h3>Historical Figures Referenced</h3>
+          <p>Napoleon Bonaparte (1769&ndash;1821): Chapter 3, case study in Respect/Status-dominant hierarchy.</p>
+          <p>Mother Teresa (1910&ndash;1997): Chapter 4, case study in Compassion/Goodness-dominant hierarchy.</p>
+          <p>John Lennon (1940&ndash;1980): Chapter 5, case study in Acceptance/Belonging-dominant hierarchy.</p>
+          <p>Steve Jobs (1955&ndash;2011): Chapter 6, case study in Freedom/Autonomy-dominant hierarchy.</p>
+          <p>Howard Hughes (1905&ndash;1976): Chapter 7, case study in Security/Stability-dominant hierarchy.</p>
+          <h3>Suggested Further Reading</h3>
+          <p>Maslow, A. H. (1943). <em>A Theory of Human Motivation.</em> Psychological Review.</p>
+          <p>Deci, E. L., &amp; Ryan, R. M. (2000). <em>The &ldquo;What&rdquo; and &ldquo;Why&rdquo; of Goal Pursuits.</em> Psychological Inquiry.</p>
+          <p>Baumeister, R. F., &amp; Leary, M. R. (1995). <em>The Need to Belong.</em> Psychological Bulletin.</p>
+          <p>Hare, R. D. (1999). <em>Without Conscience.</em> Guilford Press.</p>
+          <p>Frankl, V. E. (1946). <em>Man&rsquo;s Search for Meaning.</em> Beacon Press.</p>
+        </div>
+      </div>
+
+      <div class="book-page book-chapter" id="bk-gloss">
+        <div class="book-ch-num">&nbsp;</div>
+        <h2 class="book-ch-title">Glossary</h2>
+        <div class="book-ch-rule"></div>
+        <div class="book-body">
+          <p><em>Acceptance &amp; Belonging:</em> The emotional objective centered on being included, loved, and valued.</p>
+          <p><em>Compassion &amp; Goodness:</em> The emotional objective driven by the need to see oneself as moral and benevolent.</p>
+          <p><em>Cynic&rsquo;s Lens:</em> A perspective that sees human behavior reduced to its raw objectives.</p>
+          <p><em>Deprivation Response:</em> The emergency responses triggered when someone is prevented from pursuing their dominant emotional objective.</p>
+          <p><em>Emotional Objective:</em> A psychological state that a person unconsciously seeks to achieve or maintain.</p>
+          <p><em>Emotional Objective Hierarchy:</em> The personal ranking of the five emotional objectives.</p>
+          <p><em>Freedom &amp; Autonomy:</em> The emotional objective centered on independence and self-determination.</p>
+          <p><em>Hierarchy Restructuring:</em> The reorganization of which emotional objectives matter most.</p>
+          <p><em>Moral Compass Theory:</em> The insight that moral compass is the result of how one balances the five objectives.</p>
+          <p><em>Objective Starvation:</em> The result when a dominant emotional objective cannot be met.</p>
+          <p><em>Psychopath:</em> A person in whom the capacity for Compassion and/or Belonging did not develop.</p>
+          <p><em>Respect &amp; Status:</em> The emotional objective centered on recognition and standing in the eyes of others.</p>
+          <p><em>Security &amp; Stability:</em> The emotional objective centered on safety and protection from threats.</p>
+          <p><em>Substitute Fulfillment:</em> Addiction to substances or behaviors that provide false satisfaction.</p>
+          <p><em>Unconventional Fulfillment:</em> The pursuit of emotional objectives through pathways most humans would never travel.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Lightbox (photography only) -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lbClose">&times;</button>
+    <button class="lb-nav lb-prev" id="lbPrev">&#8249;</button>
+    <button class="lb-nav lb-next" id="lbNext">&#8250;</button>
+    <img id="lbImg" src="" alt="">
+    <div class="lb-info">
+      <div class="lb-caption" id="lbCaption"></div>
+      <div class="lb-counter" id="lbCounter"></div>
+    </div>
   </div>
-
-  <!-- Center divider -->
-  <div class="center-line"></div>
-
-  <!-- Photography Half -->
-  <a href="photography.html" class="panel panel-photo" data-dest="photo">
-    <div class="photo-grid">
-      <img src="thumbs/IMG_0743.jpg" alt="" loading="lazy">
-      <img src="thumbs/IMG_0469.jpg" alt="" loading="lazy">
-      <img src="thumbs/IMG_1861.jpg" alt="" loading="lazy">
-      <img src="thumbs/IMG_0555.jpg" alt="" loading="lazy">
-      <img src="thumbs/IMG_2141.jpg" alt="" loading="lazy">
-      <img src="thumbs/IMG_0914.jpg" alt="" loading="lazy">
-    </div>
-    <div class="panel-content">
-      <div class="panel-label">Gallery</div>
-      <div class="panel-title">Photo</div>
-      <div class="panel-below">
-        <span class="panel-arrow">
-          View gallery &rarr;
-          <div class="panel-underline"></div>
-        </span>
-      </div>
-    </div>
-  </a>
-
-  <!-- Writing Half -->
-  <a href="writing.html" class="panel panel-writing" data-dest="writing">
-    <div class="panel-content">
-      <div class="panel-label">Book</div>
-      <div class="panel-title">Writing</div>
-      <div class="panel-below">
-        <div class="panel-subtitle">Decoding Human Nature</div>
-        <div class="panel-divider"></div>
-        <span class="panel-arrow">Read chapters &rarr;</span>
-      </div>
-    </div>
-  </a>
 
   <script>
-    // ===== CIRCLE IRIS PAGE TRANSITION =====
+    // ===== PHOTOS DATA =====
+    const photos = [
+      { file: "0D9271AE-AC94-4313-9286-B534B5FC888F.png", caption: "" },
+      { file: "4FE265B2-DB33-4243-B382-C670B087E510.png", caption: "" },
+      { file: "AAB7B2F3-0FEF-4DAB-B320-16E793B77087.png", caption: "" },
+      { file: "ADB667A7-E3C2-4EEA-BA28-7B3E2A342C921.png", caption: "" },
+      { file: "DAA7DC1C-EEF3-4529-BDAA-630EF8AE5D9C1.png", caption: "" },
+      { file: "IMG_03822.png", caption: "" },
+      { file: "IMG_0483.png", caption: "" },
+      { file: "IMG_0602.png", caption: "" },
+      { file: "IMG_0997.png", caption: "" },
+      { file: "IMG_10221.png", caption: "" },
+      { file: "IMG_11132.png", caption: "" },
+      { file: "IMG_11381.png", caption: "" },
+      { file: "IMG_11981.png", caption: "" },
+      { file: "IMG_1359Copy1.png", caption: "" },
+      { file: "IMG_1439.png", caption: "" },
+      { file: "IMG_1583.png", caption: "" },
+      { file: "IMG_1730.png", caption: "" },
+      { file: "IMG_1890.png", caption: "" },
+      { file: "IMG_24411.png", caption: "" },
+      { file: "Image1-23-26.png", caption: "" },
+    ];
+
+    // ===== GENRE NAVIGATION =====
+    const selector = document.getElementById('selector');
+    const views = document.querySelectorAll('.immersion');
+    const viewMap = {};
+    views.forEach(v => viewMap[v.dataset.view] = v);
+
+    function openGenre(name) {
+      const view = viewMap[name];
+      if (!view) return;
+      selector.classList.add('hidden');
+      view.classList.add('active');
+      view.scrollTop = 0;
+      window.scrollTo(0, 0);
+      document.body.style.overflow = 'hidden';
+      // allow scroll inside the view
+      setTimeout(() => { document.body.style.overflow = ''; }, 300);
+      history.pushState({ genre: name }, '', '#' + name);
+    }
+    function closeGenre() {
+      views.forEach(v => v.classList.remove('active'));
+      selector.classList.remove('hidden');
+      window.scrollTo(0, 0);
+      if (history.state && history.state.genre) history.pushState({}, '', '#');
+    }
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a[href^="#"]');
+      if (!link) return;
+      const container = link.closest('.immersion');
+      if (!container) return;
+      const href = link.getAttribute('href');
+      if (href === '#' || href.length < 2) return;
+      const target = container.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 40;
+      container.scrollTo({ top, behavior: 'smooth' });
+    }, true);
+
+    document.querySelectorAll('.band').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        openGenre(link.dataset.genre);
+      });
+    });
+    document.querySelectorAll('[data-back]').forEach(btn => {
+      btn.addEventListener('click', closeGenre);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const lb = document.getElementById('lightbox');
+        if (lb.classList.contains('active')) return;
+        const anyActive = Array.from(views).some(v => v.classList.contains('active'));
+        if (anyActive) closeGenre();
+      }
+    });
+    window.addEventListener('popstate', () => {
+      const hash = location.hash.replace('#', '');
+      if (hash && viewMap[hash]) openGenre(hash);
+      else closeGenre();
+    });
+
+    // Honor initial hash if present
+    const initial = location.hash.replace('#', '');
+    if (initial && viewMap[initial]) {
+      // open after first paint so loader can finish
+      setTimeout(() => openGenre(initial), 300);
+    }
+
+    // ===== PHOTOGRAPHY GALLERY =====
+    const gallery = document.getElementById('gallery');
+    function seededRandom(seed) {
+      let s = seed;
+      return function() { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    }
+    const rand = seededRandom(42);
+
+    function createPhotoItem(photo, idx) {
+      const item = document.createElement('div');
+      item.className = 'photo-item';
+      const yOffset = (rand() - 0.5) * 40;
+      const padTop = 10 + rand() * 30;
+      const padBottom = 10 + rand() * 30;
+      const padLeft = 8 + rand() * 20;
+      const padRight = 8 + rand() * 20;
+      const scale = 0.88 + rand() * 0.12;
+      const rotate = (rand() - 0.5) * 1.6;
+
+      item.style.padding = `${padTop}px ${padRight}px ${padBottom}px ${padLeft}px`;
+      item.style.transform = `translateY(${30 + yOffset}px)`;
+      item.style.setProperty('--y-offset', `${yOffset}px`);
+      item.style.transitionDelay = `${(idx % 5) * 0.07}s`;
+
+      item.innerHTML = `
+        <img src="photos/${photo.file}" alt="${photo.caption}" loading="lazy"
+             style="transform: scale(${scale}) rotate(${rotate}deg);">
+        <div class="caption">${photo.caption}</div>
+      `;
+      item.addEventListener('click', () => openLightbox(idx));
+
+      item.addEventListener('mousemove', (e) => {
+        const rect = item.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        const img = item.querySelector('img');
+        img.style.transform = `scale(${scale * 1.04}) rotate(${rotate}deg) rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
+      });
+      item.addEventListener('mouseleave', () => {
+        const img = item.querySelector('img');
+        img.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+      });
+      return item;
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const yOff = entry.target.style.getPropertyValue('--y-offset') || '0px';
+          entry.target.style.transform = `translateY(${yOff})`;
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+
+    const fragment = document.createDocumentFragment();
+    photos.forEach((p, i) => {
+      const item = createPhotoItem(p, i);
+      fragment.appendChild(item);
+      revealObserver.observe(item);
+    });
+    gallery.appendChild(fragment);
+
+    // ===== LIGHTBOX =====
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCaption = document.getElementById('lbCaption');
+    const lbCounter = document.getElementById('lbCounter');
+    let idx = 0;
+
+    function openLightbox(i) {
+      idx = i;
+      showLB();
+      lightbox.classList.add('active');
+    }
+    function showLB() {
+      const real = ((idx % photos.length) + photos.length) % photos.length;
+      const p = photos[real];
+      lbImg.src = `photos/${p.file}`;
+      lbImg.alt = p.caption;
+      lbCaption.textContent = p.caption;
+      lbCounter.textContent = `${real + 1} / ${photos.length}`;
+    }
+    function closeLB() { lightbox.classList.remove('active'); }
+    function navLB(dir) {
+      idx = (idx + dir + photos.length) % photos.length;
+      lbImg.style.opacity = '0';
+      lbImg.style.transform = `scale(0.95) translateX(${dir * 30}px)`;
+      setTimeout(() => {
+        showLB();
+        lbImg.style.opacity = '1';
+        lbImg.style.transform = 'scale(1) translateX(0)';
+      }, 200);
+    }
+    document.getElementById('lbClose').addEventListener('click', closeLB);
+    document.getElementById('lbPrev').addEventListener('click', () => navLB(-1));
+    document.getElementById('lbNext').addEventListener('click', () => navLB(1));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLB(); });
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLB();
+      if (e.key === 'ArrowLeft') navLB(-1);
+      if (e.key === 'ArrowRight') navLB(1);
+    });
+    lbImg.style.transition = 'opacity 0.3s, transform 0.4s cubic-bezier(0.16,1,0.3,1)';
+
+    // ===== MURAL CLICK -> LIGHTBOX =====
+    const muralImg = document.getElementById('muralImg');
+    if (muralImg) {
+      muralImg.style.cursor = 'zoom-in';
+      muralImg.addEventListener('click', () => {
+        lbImg.src = 'works/recognition.jpg';
+        lbImg.alt = 'Recognition';
+        lbCaption.textContent = 'Recognition — Mural';
+        lbCounter.textContent = '';
+        lightbox.classList.add('active');
+      });
+    }
+
+    // ===== LOADER =====
     (function() {
-      'use strict';
-      var FILL_DUR = 600, RING_DUR = 550, RING_DELAY = 50, NAV_DELAY = 680;
-      var EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
-      var EASE_IN  = 'cubic-bezier(0.7, 0, 0.84, 0)';
-      var ring = document.getElementById('transRing');
-      var fill = document.getElementById('transFill');
-      var navigating = false;
+      const loader = document.getElementById('loader');
+      const fill = document.getElementById('loaderBar');
+      let p = 0;
+      const tick = setInterval(() => {
+        p = Math.min(100, p + Math.random() * 12);
+        fill.style.width = p + '%';
+        if (p >= 100) {
+          clearInterval(tick);
+          setTimeout(() => loader.classList.add('done'), 200);
+        }
+      }, 80);
+      window.addEventListener('load', () => {
+        p = 100;
+        fill.style.width = '100%';
+        setTimeout(() => loader.classList.add('done'), 200);
+      });
+    })();
 
-      function maxR(x, y) {
-        var w = window.innerWidth, h = window.innerHeight;
-        return Math.ceil(Math.hypot(Math.max(x, w - x), Math.max(y, h - y)));
+    // ===== BOOK paginated reader =====
+    (function(){
+      const view = document.querySelector('.view-book');
+      if (!view) return;
+      const pages = Array.from(view.querySelectorAll('.book-page'));
+      const order = pages.map(p => p.id);
+      const titles = {
+        'bk-front': 'Cover & Dedication',
+        'bk-howto': 'How to Read This Book',
+        'bk-intro': 'Introduction',
+        'bk-part1': 'Part I — The Framework',
+        'bk-ch1': 'Ch. 1 — What Are Emotional Objectives?',
+        'bk-ch2': 'Ch. 2 — The Cynic’s Lens',
+        'bk-part2': 'Part II — Five Objectives in Action',
+        'bk-ch3': 'Ch. 3 — Status: Napoleon',
+        'bk-ch4': 'Ch. 4 — Compassion: Mother Teresa',
+        'bk-ch5': 'Ch. 5 — Belonging: John Lennon',
+        'bk-ch6': 'Ch. 6 — Freedom: Steve Jobs',
+        'bk-ch7': 'Ch. 7 — Security: Howard Hughes',
+        'bk-part3': 'Part III — Objectives in Conflict',
+        'bk-ch8': 'Ch. 8 — Internal Wars',
+        'bk-ch9': 'Ch. 9 — Interpersonal Conflicts',
+        'bk-ch10': 'Ch. 10 — Historical Conflicts',
+        'bk-part4': 'Part IV — Practical Application',
+        'bk-ch11': 'Ch. 11 — Identifying Objectives in Others',
+        'bk-ch12': 'Ch. 12 — Discovering Your Own Objectives',
+        'bk-ch13': 'Ch. 13 — Using the Knowledge Ethically',
+        'bk-ch14': 'Ch. 14 — Living with Intention',
+        'bk-part5': 'Part V — Advanced Concepts',
+        'bk-ch15': 'Ch. 15 — When Objectives Change',
+        'bk-ch16': 'Ch. 16 — The Price of Unmet Objectives',
+        'bk-ch17': 'Ch. 17 — Psychopaths & Unconventional Fulfillment',
+        'bk-ch18': 'Ch. 18 — The Future of Human Motivation',
+        'bk-conclusion': 'Conclusion',
+        'bk-appA': 'Appendix A — Quick Reference',
+        'bk-appB': 'Appendix B — Assessment Tools',
+        'bk-appC': 'Appendix C — Formal Proofs',
+        'bk-ack': 'Acknowledgments',
+        'bk-author': 'About the Author',
+        'bk-bib': 'Bibliography',
+        'bk-gloss': 'Glossary'
+      };
+
+      // Append prev/next nav to each page
+      pages.forEach((page, i) => {
+        const nav = document.createElement('div');
+        nav.className = 'book-pagenav';
+        const prev = document.createElement('button');
+        prev.className = 'prev';
+        const next = document.createElement('button');
+        next.className = 'next';
+        if (i === 0) {
+          prev.disabled = true;
+          prev.innerHTML = '<span class="pn-label">&nbsp;</span>&nbsp;';
+        } else {
+          prev.dataset.target = order[i-1];
+          prev.innerHTML = '<span class="pn-label">&larr; Previous</span>' + (titles[order[i-1]] || '');
+        }
+        if (i === pages.length - 1) {
+          next.disabled = true;
+          next.innerHTML = '<span class="pn-label">&nbsp;</span>&nbsp;';
+        } else {
+          next.dataset.target = order[i+1];
+          next.innerHTML = '<span class="pn-label">Next &rarr;</span>' + (titles[order[i+1]] || '');
+        }
+        nav.appendChild(prev);
+        nav.appendChild(next);
+        const idx = document.createElement('div');
+        idx.className = 'book-pageindex';
+        idx.textContent = (i+1) + ' / ' + pages.length;
+        page.appendChild(nav);
+        page.appendChild(idx);
+      });
+
+      const drawer = document.getElementById('bookDrawer');
+      const overlay = document.getElementById('bookDrawerOverlay');
+      const menuBtn = document.getElementById('bookMenuBtn');
+      const drawerLinks = drawer.querySelectorAll('a[data-page]');
+
+      function setActive(id) {
+        if (!order.includes(id)) id = 'bk-front';
+        pages.forEach(p => p.classList.toggle('active', p.id === id));
+        drawerLinks.forEach(a => a.classList.toggle('current', a.dataset.page === id));
+        view.scrollTop = 0;
+      }
+      function openDrawer() {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        menuBtn.classList.add('open');
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+        menuBtn.classList.remove('open');
       }
 
-      function setClip(el, val) {
-        el.style.clipPath = val;
-        el.style.webkitClipPath = val;
-      }
+      menuBtn.addEventListener('click', () => {
+        if (drawer.classList.contains('open')) closeDrawer();
+        else openDrawer();
+      });
+      overlay.addEventListener('click', closeDrawer);
 
-      function exitTransition(href, cx, cy) {
-        if (navigating) return;
-        navigating = true;
-        var r = maxR(cx, cy);
-        var o = cx + 'px ' + cy + 'px';
-        var start = 'circle(0px at ' + o + ')';
-        var end = 'circle(' + r + 'px at ' + o + ')';
+      // Drawer links
+      drawerLinks.forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          setActive(a.dataset.page);
+          closeDrawer();
+        });
+      });
 
-        try { sessionStorage.setItem('iris_x', cx); sessionStorage.setItem('iris_y', cy); } catch(e) {}
-
-        ring.style.transition = 'none'; fill.style.transition = 'none';
-        setClip(ring, start); setClip(fill, start);
-        void ring.offsetHeight;
-
-        ring.style.transition = 'clip-path ' + RING_DUR + 'ms ' + EASE_IN + ', -webkit-clip-path ' + RING_DUR + 'ms ' + EASE_IN;
-        fill.style.transition = 'clip-path ' + FILL_DUR + 'ms ' + EASE_IN + ' ' + RING_DELAY + 'ms, -webkit-clip-path ' + FILL_DUR + 'ms ' + EASE_IN + ' ' + RING_DELAY + 'ms';
-        setClip(ring, end); setClip(fill, end);
-        ring.parentElement.style.pointerEvents = 'all';
-
-        setTimeout(function() { window.location.href = href; }, NAV_DELAY);
-      }
-
-      function enterTransition() {
-        var cx, cy;
-        try { cx = parseFloat(sessionStorage.getItem('iris_x')); cy = parseFloat(sessionStorage.getItem('iris_y')); sessionStorage.removeItem('iris_x'); sessionStorage.removeItem('iris_y'); } catch(e) {}
-        if (isNaN(cx) || isNaN(cy)) { cx = window.innerWidth / 2; cy = window.innerHeight / 2; }
-
-        var r = maxR(cx, cy);
-        var o = cx + 'px ' + cy + 'px';
-        var full = 'circle(' + r + 'px at ' + o + ')';
-        var zero = 'circle(0px at ' + o + ')';
-
-        ring.style.transition = 'none'; fill.style.transition = 'none';
-        setClip(ring, full); setClip(fill, full);
-        void ring.offsetHeight;
-
-        requestAnimationFrame(function() { requestAnimationFrame(function() {
-          fill.style.transition = 'clip-path ' + FILL_DUR + 'ms ' + EASE_OUT + ', -webkit-clip-path ' + FILL_DUR + 'ms ' + EASE_OUT;
-          ring.style.transition = 'clip-path ' + RING_DUR + 'ms ' + EASE_OUT + ' ' + RING_DELAY + 'ms, -webkit-clip-path ' + RING_DUR + 'ms ' + EASE_OUT + ' ' + RING_DELAY + 'ms';
-          setClip(fill, zero); setClip(ring, zero);
-
-          setTimeout(function() {
-            ring.style.transition = 'none'; fill.style.transition = 'none';
-            ring.parentElement.style.pointerEvents = '';
-            navigating = false;
-          }, Math.max(FILL_DUR, RING_DUR + RING_DELAY) + 100);
-        }); });
-      }
-
-      document.querySelectorAll('a[href]').forEach(function(link) {
-        var href = link.getAttribute('href');
-        if (href && href.endsWith('.html') && !href.startsWith('http') && !href.startsWith('mailto')) {
-          link.addEventListener('click', function(e) {
-            e.preventDefault();
-            var rect = link.getBoundingClientRect();
-            var x = e.clientX || (rect.left + rect.width / 2);
-            var y = e.clientY || (rect.top + rect.height / 2);
-            exitTransition(href, x, y);
-          });
+      // In-page TOC links and prev/next buttons
+      view.addEventListener('click', (e) => {
+        const a = e.target.closest('a[data-page]');
+        if (a) {
+          e.preventDefault();
+          setActive(a.dataset.page);
+          return;
+        }
+        const btn = e.target.closest('.book-pagenav button[data-target]');
+        if (btn && !btn.disabled) {
+          setActive(btn.dataset.target);
         }
       });
 
-      window.addEventListener('pageshow', function(e) { if (e.persisted) { navigating = false; enterTransition(); } });
-      enterTransition();
+      // When the book view is opened, reset to front
+      document.querySelectorAll('.band-book').forEach(b => {
+        b.addEventListener('click', () => setTimeout(() => setActive('bk-front'), 50));
+      });
     })();
   </script>
 </body>

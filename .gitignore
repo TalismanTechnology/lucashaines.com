@@ -1,6 +1,1 @@
-.DS_Store
-.vscode/
-*.py
-*.json
-*.heic
-*.png
+.vercel
