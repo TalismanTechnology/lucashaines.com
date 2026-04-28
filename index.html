@@ -842,56 +842,76 @@
       text-align: center;
     }
     .book-cover {
-      width: clamp(220px, 32vw, 340px);
+      width: clamp(240px, 32vw, 360px);
       aspect-ratio: 2 / 3;
-      background: linear-gradient(135deg, #2a1f17 0%, #120a06 100%);
-      border: 1px solid #3a2a1e;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.35), inset 0 0 60px rgba(0,0,0,0.3);
+      background:
+        radial-gradient(ellipse at center, #f5ead0 0%, #e8d9b8 100%);
+      box-shadow:
+        0 40px 90px rgba(40,28,14,0.28),
+        0 6px 18px rgba(40,28,14,0.12),
+        inset 0 0 0 1px rgba(60,40,20,0.1);
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: space-between;
-      padding: 40px 30px;
+      padding: 46px 36px;
       margin-bottom: 50px;
       position: relative;
+      color: #2a1810;
     }
-    .book-cover::before {
+    .book-cover::before,
+    .book-cover::after {
       content: '';
       position: absolute;
-      left: 12px; top: 12px; right: 12px; bottom: 12px;
-      border: 1px solid rgba(232,216,196,0.15);
-      pointer-events: none;
+      left: 36px; right: 36px;
+      height: 1px;
+      background: #2a1810;
     }
+    .book-cover::before { top: 38px; }
+    .book-cover::after  { bottom: 38px; }
     .book-cover-author {
       font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 0.9rem;
-      letter-spacing: 3px;
+      font-size: 0.7rem;
+      letter-spacing: 5px;
       text-transform: uppercase;
-      color: #8c7762;
+      color: #2a1810;
       text-align: center;
+      margin-top: 14px;
     }
     .book-cover-title {
       font-family: 'Playfair Display', serif;
       font-weight: 700;
-      font-size: clamp(1.5rem, 2.6vw, 2.1rem);
-      line-height: 1.1;
-      color: #e8d8c4;
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.05;
+      color: #1a0e08;
       text-align: center;
+      letter-spacing: 0.005em;
     }
     .book-cover-sub {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.78rem;
-      color: #c2a880;
-      letter-spacing: 0.02em;
-      margin-top: 14px;
+      color: #5a3e1e;
+      letter-spacing: 0.04em;
+      margin-top: 18px;
       text-align: center;
+      line-height: 1.5;
     }
     .book-cover-mark {
-      font-family: 'Caveat', cursive;
-      font-size: 1.6rem;
-      color: #8c7762;
-      text-align: center;
+      width: 22px; height: 22px;
+      border: 1px solid #2a1810;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: #2a1810;
+      letter-spacing: 0;
+      margin: 0 auto;
+      margin-bottom: 14px;
     }
     .book-title {
       font-family: 'Playfair Display', serif;
@@ -1663,7 +1683,7 @@ I gave myself before I knew the game.</div>
             <div class="book-cover-title">Decoding<br>Human Nature</div>
             <div class="book-cover-sub">The Five Emotional Objectives<br>Behind Every Action</div>
           </div>
-          <div class="book-cover-mark">— LH</div>
+          <div class="book-cover-mark">LH</div>
         </div>
         <h1 class="book-title">Decoding Human Nature</h1>
         <div class="book-subtitle">The Five Emotional Objectives Behind Every Action</div>
