@@ -513,16 +513,6 @@
       pointer-events: none;
       text-align: center;
     }
-    .ink-bleed {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at var(--bx, 50%) var(--by, 50%), #0a0805 0%, rgba(10,8,5,0.7) 12%, rgba(10,8,5,0) 60%);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 50;
-      transition: opacity 0.55s ease;
-    }
-    .ink-bleed.on { opacity: 1; }
     @media (max-width: 700px) {
       .quill-3d-wrap { aspect-ratio: 4 / 5; }
     }
@@ -1367,7 +1357,6 @@
         <canvas class="quill-3d" id="quill3d"></canvas>
       </div>
       <div class="quill-caption" id="quillCaption">&nbsp;</div>
-      <div class="ink-bleed" id="inkBleed"></div>
 
       <nav class="essay-index">
         <a href="#essay-paradise-lost"><span class="essay-num">i.</span><span>Examining the Integrity of Free Will in <em>Paradise Lost</em></span></a>
@@ -2890,7 +2879,6 @@ I gave myself before I knew the game.</div>
     const essaysView = document.querySelector('.view-essays');
     const qCanvas = document.getElementById('quill3d');
     const captionEl = document.getElementById('quillCaption');
-    const inkBleedEl = document.getElementById('inkBleed');
 
     const essayTitles = [
       { short: 'Paradise Lost', full: 'i. Examining the Integrity of Free Will in Paradise Lost', anchor: '#essay-paradise-lost', num: 'I' },
@@ -2912,18 +2900,18 @@ I gave myself before I knew the game.</div>
       const x = c.getContext('2d');
       const cx = 512, cy = 512;
 
-      // Base wax color
-      x.fillStyle = '#7a1a16';
+      // Base wax color — saturated oxblood
+      x.fillStyle = '#9c1e18';
       x.beginPath();
       x.arc(cx, cy, 500, 0, Math.PI * 2);
       x.fill();
 
       // Radial highlight to fake the curvature of pressed wax
       const radial = x.createRadialGradient(cx - 140, cy - 160, 30, cx, cy, 540);
-      radial.addColorStop(0,    'rgba(255,180,150,0.55)');
-      radial.addColorStop(0.25, 'rgba(180,40,30,0.25)');
-      radial.addColorStop(0.65, 'rgba(60,10,8,0.30)');
-      radial.addColorStop(1,    'rgba(20,4,3,0.55)');
+      radial.addColorStop(0,    'rgba(255,210,180,0.65)');
+      radial.addColorStop(0.22, 'rgba(220,80,60,0.35)');
+      radial.addColorStop(0.6,  'rgba(80,14,10,0.30)');
+      radial.addColorStop(1,    'rgba(20,4,3,0.65)');
       x.fillStyle = radial;
       x.beginPath();
       x.arc(cx, cy, 500, 0, Math.PI * 2);
@@ -3022,43 +3010,62 @@ I gave myself before I knew the game.</div>
       return tex;
     }
 
+    function buildWaxShape(seed, baseR) {
+      // Closed shape with organic, dripped outline — slightly noisy radius with low-freq bumps.
+      const shape = new THREE.Shape();
+      const N = 96;
+      let rng = seed;
+      const rand = () => { rng = (rng * 9301 + 49297) % 233280; return rng / 233280; };
+      for (let i = 0; i <= N; i++) {
+        const a = (i / N) * Math.PI * 2;
+        const bump =
+          Math.sin(a * 3 + seed) * 0.045 +
+          Math.sin(a * 7 + seed * 1.7) * 0.022 +
+          Math.sin(a * 13 + seed * 0.5) * 0.012;
+        const jitter = (rand() - 0.5) * 0.010;
+        const r = baseR + bump + jitter;
+        const x = Math.cos(a) * r;
+        const y = Math.sin(a) * r;
+        if (i === 0) shape.moveTo(x, y);
+        else shape.lineTo(x, y);
+      }
+      return shape;
+    }
+
     function buildSeal(t, i) {
-      // Seal faces the camera (axis along +Z). Lathe is built around Y, then rotated.
       const group = new THREE.Group();
+      const seed = (i + 1) * 17.31;
 
-      const profile = [
-        new THREE.Vector2(0.0,  0.10),
-        new THREE.Vector2(0.78, 0.10),
-        new THREE.Vector2(0.92, 0.04),
-        new THREE.Vector2(0.96, -0.04),
-        new THREE.Vector2(0.86, -0.10),
-        new THREE.Vector2(0.0, -0.10),
-      ];
-      const lathe = new THREE.LatheGeometry(profile, 64);
-      const sideMat = new THREE.MeshStandardMaterial({
-        color: 0x5a0e0c,
-        roughness: 0.6,
-        metalness: 0.05,
+      const shape = buildWaxShape(seed, 0.90);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: 0.18,
+        bevelEnabled: true,
+        bevelThickness: 0.06,
+        bevelSize: 0.07,
+        bevelSegments: 6,
+        curveSegments: 1,
       });
-      const body = new THREE.Mesh(lathe, sideMat);
-      body.rotation.x = -Math.PI / 2; // axis now points along +Z (toward camera)
-      group.add(body);
+      geo.translate(0, 0, -0.18); // so the front face (capped at z=0) faces camera
 
-      // Embossed face — disk on the +Z side
       const faceTex = makeSealFace(t.num);
       const faceMat = new THREE.MeshStandardMaterial({
         map: faceTex,
-        roughness: 0.55,
+        roughness: 0.42,
         metalness: 0.08,
         emissive: 0x000000,
       });
-      const face = new THREE.Mesh(new THREE.CircleGeometry(0.78, 64), faceMat);
-      face.position.z = 0.101;
-      group.add(face);
+      const sideMat = new THREE.MeshStandardMaterial({
+        color: 0x6b1410,
+        roughness: 0.65,
+        metalness: 0.05,
+      });
+      // ExtrudeGeometry creates two groups: 0 = top+bottom caps, 1 = sides/bevel
+      const body = new THREE.Mesh(geo, [faceMat, sideMat]);
+      group.add(body);
 
-      // Slight static tilt — like the wax was pressed unevenly
-      const wiggleY = ((i * 13) % 7 - 3) * 0.018;
-      const wiggleX = ((i * 7) % 5 - 2) * 0.015;
+      // Static asymmetric tilt — like pressed unevenly
+      const wiggleY = ((i * 13) % 7 - 3) * 0.022;
+      const wiggleX = ((i * 7) % 5 - 2) * 0.018;
       group.rotation.y = wiggleY;
       group.rotation.x = wiggleX;
 
@@ -3161,15 +3168,7 @@ I gave myself before I knew the game.</div>
     function qOnClick(e) {
       if (!qHover) return;
       const t = qHover.userData.title;
-      const rect = qCanvas.getBoundingClientRect();
-      const cx = ((e.clientX - rect.left) / rect.width) * 100;
-      const cy = ((e.clientY - rect.top) / rect.height) * 100;
-      inkBleedEl.style.setProperty('--bx', cx + '%');
-      inkBleedEl.style.setProperty('--by', (cy + (rect.top / window.innerHeight) * 100) + '%');
-      // Press the seal down briefly
-      const pressed = qHover;
-      pressed.userData.pressing = performance.now();
-      inkBleedEl.classList.add('on');
+      qHover.userData.pressing = performance.now();
       setTimeout(() => {
         document.querySelectorAll('.essays-inner .essay-piece').forEach(el => el.classList.remove('revealed'));
         const target = document.querySelector(t.anchor);
@@ -3177,8 +3176,7 @@ I gave myself before I knew the game.</div>
           target.classList.add('revealed');
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        setTimeout(() => inkBleedEl.classList.remove('on'), 250);
-      }, 420);
+      }, 380);
     }
 
     function qAnimate() {
@@ -3208,10 +3206,10 @@ I gave myself before I knew the game.</div>
         }
         qHover = hoveredSeal;
         if (qHover) {
-          qHover.userData.targetRotX = qHover.userData.baseRotX - 0.08;
+          qHover.userData.targetRotX = qHover.userData.baseRotX - 0.04;
           qHover.userData.targetRotY = qHover.userData.baseRotY;
-          qHover.userData.targetZ = 0.35;
-          qHover.userData.targetEmissive = 0.22;
+          qHover.userData.targetZ = 0.15;
+          qHover.userData.targetEmissive = 0.20;
           captionEl.textContent = qHover.userData.title.full;
           captionEl.classList.add('visible');
         } else {
@@ -3239,13 +3237,13 @@ I gave myself before I knew the game.</div>
         u.faceMat.emissive.setHex(0x3a0c08);
         u.faceMat.emissiveIntensity = nextEm;
 
-        // Press-in animation — push along Z briefly
+        // Press-in animation — brief push along Z
         if (u.pressing) {
           const dt = now - u.pressing;
           if (dt < 380) {
             const k = Math.sin(Math.min(1, dt / 380) * Math.PI);
-            s.position.z = u.basePos.z + u.targetZ - k * 0.5;
-            s.scale.set(1 + k * 0.03, 1 + k * 0.03, 1 - k * 0.25);
+            s.position.z = u.basePos.z + u.targetZ - k * 0.22;
+            s.scale.set(1 + k * 0.02, 1 + k * 0.02, 1 - k * 0.15);
           } else {
             s.scale.set(1, 1, 1);
             u.pressing = null;
