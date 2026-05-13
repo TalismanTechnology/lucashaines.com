@@ -724,7 +724,7 @@
 
     /* ----- RESEARCH view ----- */
     .view-research {
-      background: #f4efe2;
+      background: #efe9da;
       color: #1a1814;
     }
     .view-research .back-btn { color: #777; font-family: 'IBM Plex Mono', monospace; }
@@ -732,66 +732,96 @@
     .research-inner {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
       padding: 120px clamp(20px, 4vw, 60px) 100px;
     }
-    .research-header {
-      max-width: 900px;
+    .research-card {
+      max-width: 720px;
       width: 100%;
+      background: #fbf8ef;
+      padding: clamp(40px, 6vw, 80px) clamp(32px, 6vw, 90px);
+      box-shadow: 0 40px 120px rgba(60, 40, 20, 0.18), 0 2px 6px rgba(60, 40, 20, 0.06);
+      border: 1px solid rgba(0,0,0,0.05);
       text-align: center;
-      margin-bottom: 50px;
+      position: relative;
     }
+    .research-card::before,
+    .research-card::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 1px;
+      background: #1a1814;
+      opacity: 0.5;
+    }
+    .research-card::before { top: 32px; }
+    .research-card::after { bottom: 32px; }
     .research-kicker {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 6px;
+      font-size: 0.65rem;
+      letter-spacing: 8px;
       text-transform: uppercase;
-      color: #888;
-      margin-bottom: 20px;
+      color: #6a5a3a;
+      margin-bottom: 28px;
     }
     .research-title {
       font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-      font-style: italic;
       font-weight: 500;
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-size: clamp(2rem, 4.4vw, 3.2rem);
       line-height: 1.1;
-      margin: 0 0 18px;
+      margin: 0 0 14px;
+      letter-spacing: -0.01em;
     }
-    .research-meta {
+    .research-subtitle {
+      font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+      color: #555;
+      margin: 0 0 28px;
+    }
+    .research-byline {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       letter-spacing: 4px;
       text-transform: uppercase;
       color: #888;
+      margin-bottom: 36px;
     }
-    .research-frame {
-      max-width: 1100px;
-      width: 100%;
-      aspect-ratio: 8.5 / 11;
-      box-shadow: 0 30px 100px rgba(0,0,0,0.25);
-      background: #fff;
-      border-radius: 1px;
-      overflow: hidden;
+    .research-abstract {
+      font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      line-height: 1.65;
+      color: #2a2620;
+      max-width: 520px;
+      margin: 0 auto 44px;
+      text-align: left;
     }
-    .research-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
-    .research-download {
-      margin-top: 30px;
+    .research-cta {
+      display: inline-block;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #1a1814;
+      text-decoration: none;
+      padding: 14px 32px;
+      border: 1px solid #1a1814;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .research-cta:hover { background: #1a1814; color: #fbf8ef; }
+    .research-pages {
+      display: block;
+      margin-top: 18px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: #555;
-      text-decoration: none;
-      border-bottom: 1px solid #888;
-      padding-bottom: 3px;
+      color: #999;
     }
-    .research-download:hover { color: #1a1814; border-color: #1a1814; }
 
     /* ----- PHOTOGRAPHY view ----- */
     .view-photography { background: var(--bg); }
@@ -1228,15 +1258,15 @@ I gave myself before I knew the game.</div>
   <section class="immersion view-research" data-view="research">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="research-inner">
-      <header class="research-header">
-        <div class="research-kicker">Research</div>
-        <h1 class="research-title">The Elliptical Model</h1>
-        <div class="research-meta">Lucas Haines &middot; 2026</div>
-      </header>
-      <div class="research-frame">
-        <iframe src="works/elliptical-model.pdf#view=FitH" title="The Elliptical Model"></iframe>
-      </div>
-      <a class="research-download" href="works/elliptical-model.pdf" target="_blank" rel="noopener">Open PDF &rarr;</a>
+      <article class="research-card">
+        <div class="research-kicker">Research &middot; Paper</div>
+        <h1 class="research-title">The Elliptical Model of Digital Consumption</h1>
+        <p class="research-subtitle">The geometry of the doomscroll</p>
+        <div class="research-byline">Lucas Haines &middot; 2026</div>
+        <p class="research-abstract">A study of how attention bends in the feed — why the scroll rarely ends where it began, and how the shape of return reveals something about the medium and the mind that meets it.</p>
+        <a class="research-cta" href="works/elliptical-model.pdf" target="_blank" rel="noopener">Read the paper</a>
+        <span class="research-pages">PDF &middot; 9 pages</span>
+      </article>
     </div>
   </section>
 
