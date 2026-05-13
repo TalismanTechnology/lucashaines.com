@@ -7,6 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500;1,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -175,24 +182,6 @@
     }
 
     /* === Per-band styling === */
-    /* About */
-    .band-about {
-      background: linear-gradient(90deg, #0a0a0a 0%, #141414 100%);
-      color: #f0ede8;
-    }
-    .band-about .band-bg {
-      background:
-        radial-gradient(ellipse at 70% 50%, rgba(200,180,140,0.08) 0%, transparent 60%);
-    }
-    .band-about .band-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-weight: 400;
-      font-size: clamp(1.2rem, 2.2vw, 1.8rem);
-      letter-spacing: 0.01em;
-      color: #c8b89a;
-    }
-
     /* Essays */
     .band-essays { background: #1a1814; color: #f0ede4; }
     .band-essays .band-bg {
@@ -326,6 +315,31 @@
       --hover-spacing: 14px;
     }
 
+    /* 3D bookshelf overlays the bands */
+    .shelf-3d {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 4;
+      cursor: grab;
+    }
+    .shelf-3d:active { cursor: grabbing; }
+    .selector.shelf-active .selector-bands > .band { visibility: hidden; }
+    .shelf-hint {
+      position: absolute;
+      bottom: 24px; left: 0; right: 0;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #555;
+      z-index: 6;
+      pointer-events: none;
+    }
+
     .selector-bands {
       flex: 1;
       display: flex;
@@ -393,79 +407,6 @@
       .back-btn { top: 14px; left: 16px; cursor: pointer; font-size: 0.7rem; letter-spacing: 4px; }
     }
 
-    /* ----- ABOUT view ----- */
-    .view-about {
-      background: #0a0a0a;
-      color: #e8e3d4;
-    }
-    .about-inner {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 140px clamp(20px, 6vw, 60px) 140px;
-    }
-    .about-kicker {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 8px;
-      text-transform: uppercase;
-      color: #555;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .about-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      letter-spacing: -0.02em;
-      text-align: center;
-      margin-bottom: 80px;
-    }
-    .about-body {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.15rem, 1.6vw, 1.4rem);
-      line-height: 1.8;
-      color: #e8e3d4;
-      letter-spacing: 0.005em;
-    }
-    .about-body p { margin-bottom: 1.4em; }
-    .about-body p:first-of-type {
-      font-style: italic;
-      font-size: 1.15em;
-      color: #c8b89a;
-      border-left: 2px solid #3a3020;
-      padding-left: 28px;
-      margin-bottom: 2em;
-    }
-    .about-meta {
-      margin-top: 80px;
-      padding-top: 40px;
-      border-top: 1px solid #2a2a2a;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 30px 50px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 2px;
-      color: #888;
-    }
-    .about-meta dt {
-      font-size: 0.6rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: #555;
-      margin-bottom: 6px;
-    }
-    .about-meta dd {
-      color: #d8d3c8;
-    }
-    .about-meta dd a {
-      color: #d8d3c8;
-      text-decoration: none;
-      border-bottom: 1px solid #444;
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .about-meta dd a:hover { color: #fff; border-bottom-color: #fff; }
-
     /* ----- ESSAYS view ----- */
     .view-essays {
       background: #f4f1ea;
@@ -520,7 +461,80 @@
     }
     .essay-body em, .essay-body i { font-style: italic; }
 
-    .essay-index {
+    /* Essays 3D scene: wax-seal medallions */
+    .quill-3d-wrap {
+      position: relative;
+      width: min(900px, 92vw);
+      margin: 30px auto 60px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      aspect-ratio: 4 / 3;
+      max-height: 640px;
+    }
+    .quill-3d {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: default;
+      touch-action: pan-y;
+      background: transparent;
+      border: 0;
+      outline: 0;
+    }
+    .quill-3d.hovering { cursor: pointer; }
+    .quill-caption {
+      width: min(900px, 92vw);
+      margin: 6px auto 0;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: #6a5a44;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      text-align: center;
+      min-height: 1.4em;
+    }
+    .quill-caption.visible { opacity: 1; }
+    .quill-hint {
+      width: min(900px, 92vw);
+      margin: 0 auto 18px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #b0a48c;
+      pointer-events: none;
+      text-align: center;
+    }
+    .ink-bleed {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at var(--bx, 50%) var(--by, 50%), #0a0805 0%, rgba(10,8,5,0.7) 12%, rgba(10,8,5,0) 60%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+      transition: opacity 0.55s ease;
+    }
+    .ink-bleed.on { opacity: 1; }
+    @media (max-width: 700px) {
+      .quill-3d-wrap { aspect-ratio: 4 / 5; }
+    }
+
+    /* Text index is replaced by the 3D quill scene */
+    .essay-index { display: none; }
+    /* Essays + inter-essay dividers are hidden until a floating title is clicked */
+    .essays-inner .essay-piece { display: none; }
+    .essays-inner .essay-piece + .essay-rule { display: none; }
+    .essays-inner .essay-piece.revealed { display: block; }
+
+    .essay-index-legacy {
       max-width: 540px;
       margin: 0 auto 90px;
       display: flex;
@@ -590,10 +604,38 @@
 
     /* ----- POEMS view ----- */
     .view-poems {
-      background: #07070a;
+      background: #05050a;
       color: #f0ede8;
+      overflow: hidden;
     }
+    .poems-sky {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    .poems-sky:active { cursor: grabbing; }
+    .poems-sky.zooming { cursor: default; }
+    .poems-sky-hint {
+      position: absolute;
+      left: 50%; bottom: 36px;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #5a5a78;
+      pointer-events: none;
+      opacity: 0;
+      animation: skyHintFade 2.4s ease 1.6s forwards;
+      z-index: 2;
+    }
+    @keyframes skyHintFade { to { opacity: 1; } }
+    .poems-sky-hint.hidden { opacity: 0 !important; transition: opacity .6s ease; }
     .poems-inner {
+      position: absolute;
+      inset: 0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -601,15 +643,43 @@
       justify-content: center;
       padding: 140px clamp(20px, 6vw, 80px) 100px;
       text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s ease;
+      z-index: 3;
     }
+    .poems-inner.revealed {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .poems-return {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+      background: transparent;
+      border: none;
+      color: #6b6b88;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .8s ease, color .3s ease;
+      z-index: 4;
+    }
+    .poems-return.revealed { opacity: 1; }
+    .poems-return:hover { color: #e8e3d4; }
     .poem-kicker {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-size: 0.85rem;
       letter-spacing: 6px;
       text-transform: uppercase;
-      color: #555;
+      color: #9b7fb8;
       margin-bottom: 50px;
+      text-shadow: 0 0 18px rgba(155,127,184,0.45);
     }
     .poem-title {
       font-family: 'Cormorant Garamond', serif;
@@ -619,6 +689,10 @@
       letter-spacing: 0.005em;
       margin-bottom: 70px;
       line-height: 1;
+      color: #fff7e1;
+      text-shadow:
+        0 0 24px rgba(255,232,180,0.55),
+        0 0 60px rgba(255,210,150,0.25);
     }
     .poem-body {
       font-family: 'Cormorant Garamond', serif;
@@ -627,9 +701,10 @@
       font-size: clamp(1.15rem, 1.6vw, 1.5rem);
       line-height: 2.1;
       letter-spacing: 0.01em;
-      color: #e8e3d4;
+      color: #ece6d2;
       max-width: 720px;
       white-space: pre-line;
+      text-shadow: 0 0 14px rgba(10,10,20,0.85), 0 0 2px rgba(10,10,20,0.9);
     }
     .poem-stanza-break { height: 1.4em; }
 
@@ -637,15 +712,135 @@
     .view-stories {
       background: #f6f3ed;
       color: #2a2a2a;
+      overflow: hidden;
     }
-    .view-stories .back-btn { color: #888; font-family: 'IBM Plex Mono', monospace; }
+    .view-stories .back-btn { color: #888; font-family: 'IBM Plex Mono', monospace; z-index: 5; }
     .view-stories .back-btn:hover { color: #2a2a2a; }
-    .stories-inner {
+
+    .stories-header {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 4;
+      pointer-events: none;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .stories-kicker {
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+    }
+    .stories-heading {
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #2a2a2a;
+    }
+    .stories-hint {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #999;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .stories-scene {
+      position: absolute;
+      inset: 0;
+      perspective: 1100px;
+      perspective-origin: 50% 50%;
+      cursor: grab;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .stories-scene.dragging { cursor: grabbing; }
+    .stories-world {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .story-frag {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-style: preserve-3d;
+      white-space: nowrap;
+      color: #2a2a2a;
+      user-select: none;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+    .story-frag.is-title {
+      pointer-events: auto;
+      cursor: pointer;
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      padding: 24px 40px;
+      border: 1px solid rgba(42,42,42,0.4);
+      background: rgba(246,243,237,0.92);
+      backdrop-filter: blur(2px);
+      transition: border-color .3s, color .3s, background .3s;
+      z-index: 2;
+    }
+    .story-frag.is-title:hover {
+      border-color: #2a2a2a;
+      background: #f6f3ed;
+    }
+    .story-frag.is-word {
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      color: rgba(42,42,42,0.65);
+    }
+    .story-frag.is-kicker {
+      font-size: 0.6rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    /* ----- Story reader overlay ----- */
+    .story-reader {
+      position: fixed;
+      inset: 0;
+      background: #f6f3ed;
+      color: #2a2a2a;
+      z-index: 60;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .35s ease;
+      overflow-y: auto;
+    }
+    .story-reader.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .story-reader-inner {
       max-width: 640px;
       margin: 0 auto;
       padding: 140px clamp(20px, 6vw, 60px) 140px;
       font-family: 'IBM Plex Mono', monospace;
     }
+    .story-reader .back-btn {
+      color: #2a2a2a;
+      font-family: 'IBM Plex Mono', monospace;
+      z-index: 62;
+    }
+    .story-reader .back-btn:hover { color: #000; }
     .story-kicker {
       font-size: 0.7rem;
       letter-spacing: 6px;
@@ -662,6 +857,7 @@
       margin-bottom: 50px;
       border-bottom: 1px solid #ccc;
       padding-bottom: 30px;
+      color: #2a2a2a;
     }
     .story-body {
       font-size: 0.96rem;
@@ -683,18 +879,89 @@
       justify-content: center;
       padding: 120px clamp(20px, 4vw, 60px) 100px;
     }
-    .mural-frame {
+    .mural-stage {
       max-width: 1100px;
       width: 100%;
       position: relative;
     }
-    .mural-frame img {
+    .mural-canvas-wrap {
+      position: relative;
+      width: 100%;
+      cursor: crosshair;
+      user-select: none;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.65), 0 60px 140px rgba(0,0,0,0.45);
+      background: #050505;
+      overflow: hidden;
+    }
+    .mural-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .mural-canvas-wrap img.mural-fallback {
+      display: block;
       width: 100%;
       height: auto;
-      display: block;
-      box-shadow: 0 30px 100px rgba(0,0,0,0.7);
-      border-radius: 1px;
     }
+    .mural-hint {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #666;
+      margin-top: 22px;
+      text-align: center;
+    }
+    .mural-activate {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 22px;
+      background: transparent;
+      border: 1px solid #3a3a3a;
+      color: #c8b89a;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 14px 24px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    }
+    .mural-activate:hover {
+      color: #f4e4d4;
+      border-color: #6a6a6a;
+      background: rgba(255,255,255,0.02);
+    }
+    .mural-activate.active { color: #888; border-color: #2a2a2a; }
+    .mural-activate .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #555; transition: background 0.3s ease;
+    }
+    .mural-activate.active .dot { background: #c47d7d; box-shadow: 0 0 8px #c47d7d; }
+    .mural-privacy {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+      margin-top: 12px;
+      text-align: center;
+      max-width: 480px;
+    }
+    .mural-expand {
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: #888;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .mural-expand:hover { color: #f4e4d4; border-color: #555; }
     .mural-label {
       margin-top: 40px;
       max-width: 1100px;
@@ -787,11 +1054,51 @@
     .research-download:hover { color: #1a1814; border-color: #1a1814; }
 
     /* ----- PHOTOGRAPHY view ----- */
-    .view-photography { background: var(--bg); }
-    .photography-header {
-      padding: 140px clamp(24px, 4vw, 60px) 60px;
-      text-align: center;
+    .view-photography {
+      background: #000;
+      overflow: hidden;
+      height: 100vh;
     }
+    .view-photography .back-btn { color: #888; z-index: 30; }
+    .view-photography .back-btn:hover { color: #fff; }
+    .photography-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 90px clamp(24px, 4vw, 60px) 0;
+      text-align: center;
+      pointer-events: none;
+      z-index: 20;
+      color: #f0ede8;
+    }
+    .photography-header .photography-kicker { color: #666; }
+    .photography-header .photography-title { color: #f0ede8; }
+    .photography-header .photography-title::before,
+    .photography-header .photography-title::after { border-color: #f0ede8; }
+    .photography-hint {
+      position: absolute;
+      bottom: 28px; left: 0; right: 0;
+      text-align: center;
+      font-size: 0.55rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #444;
+      pointer-events: none;
+      z-index: 20;
+      animation: hintFade 2.4s ease-in-out infinite;
+    }
+    @keyframes hintFade {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+    .gallery-3d {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    .gallery-3d:active { cursor: grabbing; }
     .photography-kicker {
       font-size: 0.6rem;
       letter-spacing: 8px;
@@ -1042,51 +1349,10 @@
           <div class="band-arrow">&rarr;</div>
         </div>
       </a>
-      <a href="#" class="band band-about" data-genre="about" style="animation-delay: .58s;">
-        <div class="band-bg"></div>
-        <div class="band-bg-overlay"></div>
-        <div class="band-content">
-          <div class="band-num">&mdash;</div>
-          <div class="band-name">About</div>
-          <div class="band-meta">Who I am</div>
-          <div class="band-arrow">&rarr;</div>
-        </div>
-      </a>
     </div>
+    <canvas class="shelf-3d" id="shelf3d"></canvas>
+    <div class="shelf-hint">Hover &middot; click a spine</div>
   </main>
-
-  <!-- ===== ABOUT ===== -->
-  <section class="immersion view-about" data-view="about">
-    <button class="back-btn" data-back><span>&larr;</span> Back</button>
-    <div class="about-inner">
-      <div class="about-kicker">About</div>
-      <h1 class="about-title">Lucas Haines</h1>
-      <div class="about-body">
-        <p>A writer, painter, and photographer working out of New York.</p>
-        <p>This site is a living archive — essays, poems, short stories, murals, photographs, and the book in progress. Six rooms, one body of work. Each one is its own way of asking the same questions.</p>
-        <p>The work tries to look honestly at things that aren't easily said: identity, inheritance, the difference between what is chosen and what is given. Some of it is in language. Some of it is in paint. Some of it is in light.</p>
-        <p>Take your time.</p>
-      </div>
-      <dl class="about-meta">
-        <div>
-          <dt>Based</dt>
-          <dd>New York City</dd>
-        </div>
-        <div>
-          <dt>Year</dt>
-          <dd>2026</dd>
-        </div>
-        <div>
-          <dt>Email</dt>
-          <dd><a href="mailto:Lucas@haines.nyc">Lucas@haines.nyc</a></dd>
-        </div>
-        <div>
-          <dt>Phone</dt>
-          <dd><a href="tel:+16469653243">646 965 3243</a></dd>
-        </div>
-      </dl>
-    </div>
-  </section>
 
   <!-- ===== ESSAYS ===== -->
   <section class="immersion view-essays" data-view="essays">
@@ -1095,6 +1361,13 @@
       <div class="essay-kicker">Essays</div>
       <h1 class="essay-title" style="margin-bottom: 30px;">Collected</h1>
       <div class="essay-rule"></div>
+
+      <div class="quill-hint">Hover a seal. Click to read.</div>
+      <div class="quill-3d-wrap">
+        <canvas class="quill-3d" id="quill3d"></canvas>
+      </div>
+      <div class="quill-caption" id="quillCaption">&nbsp;</div>
+      <div class="ink-bleed" id="inkBleed"></div>
 
       <nav class="essay-index">
         <a href="#essay-paradise-lost"><span class="essay-num">i.</span><span>Examining the Integrity of Free Will in <em>Paradise Lost</em></span></a>
@@ -1172,7 +1445,10 @@
   <!-- ===== POEMS ===== -->
   <section class="immersion view-poems" data-view="poems">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
-    <div class="poems-inner">
+    <canvas class="poems-sky" id="poemsSky"></canvas>
+    <div class="poems-sky-hint" id="poemsSkyHint">Drag to look around &middot; Click the bright star</div>
+    <button class="poems-return" id="poemsReturn">&uarr; Return to the sky</button>
+    <div class="poems-inner" id="poemsInner">
       <div class="poem-kicker">A Sonnet</div>
       <h1 class="poem-title">Debt</h1>
       <div class="poem-body">I have been paying since before I knew the debt,
@@ -1198,24 +1474,25 @@ I gave myself before I knew the game.</div>
   <!-- ===== SHORT STORIES ===== -->
   <section class="immersion view-stories" data-view="stories">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
-    <div class="stories-inner">
-      <div class="story-kicker">// Short Story</div>
-      <h1 class="story-title">Character</h1>
-      <div class="story-body">
-        <p>I was sitting in a classroom. Third row from the back. The teacher was drawing connections on the whiteboard, building an argument, and the argument had a hole in it. I said something but I didn't decide to say it. The words came out clean and specific, and a few kids turned around, and one of them gave a look of interest, and the moment passed the way it always passes. It happens every day. I used to think this was something I did. Now I think there is a system and I am inside of it, and the system is what speaks.</p>
-        <p>But I did not always think this way. For a long time I believed I was awake.</p>
-        <p>I looked at the government and saw a performance. I looked at pop culture and saw desire being manufactured and sold back. I said the sharp thing in every room I entered and watched the faces change. I know that face now. Everyone made the same one. It is the face people make when a clock starts running backward. Not anger. Discomfort. Like watching something break that they thought was working fine. I did not care. I liked it. I thought I was seeing things clearly and everyone else was asleep. I thought I had chosen to be this way. That the choosing was what made me different. For years this was the story I told about myself. I was the one who could see. And I believed that seeing was the same thing as being free.</p>
-        <p>I walk through the city every day. Every crosswalk and traffic signal and subway entrance was placed by someone who was not me. The placement decides where I walk and when I stop and which direction I turn. Everyone moves through it the same way. Same routes. Same signals. Same places at roughly the same times. No one seems to find this strange. I used to try to walk against it. I cut through blocks at diagonals. I ducked into alleys that led nowhere. I found an empty lot at the end of one of them where the concrete had cracked and a weed was pushing through and I told myself this was the place where things break down. The place the structure could not reach. But I got there by walking. On legs that were told the way. Because something in me needed to find the broken place, and that need was in me before I started walking. The alleys were still inside the grid. The diagonals still crossed streets someone else had paved. Every time I thought I was going off the path, the path was already there, waiting for me to think that. The system does not care if you walk straight or diagonal. It made both roads.</p>
-        <p>The thing that I cannot stop thinking about is not that the world runs like a machine. I already knew that. The thing is that I run like one too. I question everything. I always have. But I never chose to be this way any more than a stone chooses to fall. It is just what I do. It is what I have always done. A disruption that happens on schedule is not a disruption. It is just another part of how the system works. I cannot find the moment this started. The system was just there one day, fully formed, and I built everything around it the way you build walls around a foundation that was already in the ground when you got there. Every thought I have ever had came from the one before it. Follow the chain back far enough and you end up before I was born, in a room I have never seen, in a "choice" someone else made that I am still living out.</p>
-        <p>I tried to prove myself wrong. If the pattern was that I always question, I would stop. I sat in class and said nothing. The teacher made his argument and I let it stand. The silence felt like holding my breath underwater. The kid next to me looked over. He was used to me talking. The whole room was. And I knew as I sat there that the silence was its own kind of disruption. And I knew that knowing this was part of the pattern. And I knew that knowing that was part of it too, and it kept going down and I could not find the bottom. I tried other things. I ate what everyone ate. I watched what everyone watched. For three days straight I did nothing that was mine. On the third day I caught myself studying my own performance and I stopped trying. There is no bottom. There is no layer where you finally reach the part of you that you built yourself. Every layer was put there by something before it.</p>
-        <p>I went for a walk after that. I did not pick a direction. My legs moved and I followed them and when I stopped I was standing at the same lot. Same fence. Same crack in the concrete. The weed was still there. I stood there for a long time looking at it. The last time I came here I thought I had found the edge of the grid, the place where things fall apart. Now I saw something else. The weed did not decide to grow there. A seed landed in a crack and the crack held water and the water was enough. It did not choose the crack. The crack did not choose it. But there they were, together, and it looked right. It looked like it was supposed to be there. Everything looks like it belongs once it is already in place.</p>
-        <p>And I stood there and for the first time I did not want to fight it.</p>
-        <p>The weed was not free. It did not pick the crack. But it was the only thing growing there. It was doing what it was going to do regardless of whether it understood why. That was all it had. And standing in that lot I thought maybe that is all anyone has. Not a door out of the building. Just a window. You can see the whole thing from where you are standing. You can see the walls and the grid and the routes and the signals. You can see that you did not build any of it. You can see that you were placed here the same way the weed was placed in the crack. And seeing it does not get you out. But not seeing it does not get you out either. Nothing gets you out. So you might as well see it.</p>
-        <p>I am putting this down because something in me needs to put it down. That need did not come from nowhere. It came from every classroom and every sharp thing I said and every face that changed and every block I walked at a diagonal thinking I was going somewhere new. I sit at the desk and my hand moves and the words come out in an order I did not plan and I set them down because that is what comes next. I did not choose this. But I am here. The weed did not choose the crack. But it grew anyway.</p>
-        <p>I keep trying to put a name on it. The system. The thing that was here before me and will be here after. Some nights I think it is God, and then I think God is just a word people use when they can feel the edges of something they cannot see. Other times I think it is biology or chemistry or the long slow chain of every cause and every effect going back to the first thing that ever moved. And other times I think it is simpler than any of that, that there is no name for it because it is not a thing, it is just the way things are, the water that feeds the crack and the crack that holds the seed.</p>
-      </div>
+    <header class="stories-header">
+      <div class="stories-kicker">// Short Stories</div>
+      <div class="stories-heading">Drift &middot; Click a title</div>
+    </header>
+    <div class="stories-scene" id="storiesScene">
+      <div class="stories-world" id="storiesWorld"></div>
     </div>
+    <div class="stories-hint">Move the mouse to look around</div>
   </section>
+
+  <!-- Story reader overlay -->
+  <div class="story-reader" id="storyReader">
+    <button class="back-btn" id="storyReaderClose" type="button"><span>&larr;</span> Back</button>
+    <div class="story-reader-inner">
+      <div class="story-kicker" id="storyReaderKicker"></div>
+      <h1 class="story-title" id="storyReaderTitle"></h1>
+      <div class="story-body" id="storyReaderBody"></div>
+    </div>
+  </div>
 
   <!-- ===== RESEARCH ===== -->
   <section class="immersion view-research" data-view="research">
@@ -1232,12 +1509,19 @@ I gave myself before I knew the game.</div>
   <section class="immersion view-murals" data-view="murals">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="murals-inner">
-      <div class="mural-frame">
-        <img src="works/recognition.jpg" alt="Recognition" id="muralImg" loading="lazy">
+      <div class="mural-stage" id="muralStage">
+        <div class="mural-canvas-wrap" id="muralWrap">
+          <img src="works/recognitionreal.jpg" alt="Recognition" id="muralImg" class="mural-fallback" crossorigin="anonymous">
+          <canvas id="muralCanvas" style="display:none;"></canvas>
+        </div>
       </div>
+      <div class="mural-hint">Drag across the surface &mdash; the paint is still wet</div>
       <div class="mural-label">
         <div class="mural-label-title">Recognition</div>
-        <div class="mural-label-meta">Mural &middot; 2025<br>Lucas Haines</div>
+        <div style="display:flex; align-items:flex-end; gap:24px;">
+          <button class="mural-expand" id="muralExpand">Expand</button>
+          <div class="mural-label-meta">Mural &middot; 2025<br>Lucas Haines</div>
+        </div>
       </div>
     </div>
   </section>
@@ -1249,7 +1533,8 @@ I gave myself before I knew the game.</div>
       <div class="photography-kicker">Selected Frames</div>
       <h1 class="photography-title">Photography</h1>
     </header>
-    <div class="gallery" id="gallery"></div>
+    <canvas class="gallery-3d" id="gallery3d"></canvas>
+    <div class="photography-hint">Scroll to drift &middot; click a frame</div>
   </section>
 
   <!-- Lightbox (photography only) -->
@@ -1267,30 +1552,75 @@ I gave myself before I knew the game.</div>
   <script>
     // ===== PHOTOS DATA =====
     const photos = [
-      { file: "IMG_2145.png", caption: "" },
       { file: "IMG_2162.png", caption: "" },
-      { file: "IMG_2084.png", caption: "" },
+      { file: "IMG_2156.png", caption: "" },
+      { file: "IMG_2145.png", caption: "" },
+      { file: "IMG_2135.png", caption: "" },
       { file: "IMG_2107.png", caption: "" },
-      { file: "0D9271AE-AC94-4313-9286-B534B5FC888F.png", caption: "" },
+      { file: "IMG_2100.png", caption: "" },
+      { file: "IMG_2084.png", caption: "" },
+      { file: "IMG_2008.png", caption: "" },
+      { file: "IMG_1947.png", caption: "" },
+      { file: "IMG_1890.png", caption: "" },
+      { file: "IMG_1782.png", caption: "" },
+      { file: "IMG_1764.png", caption: "" },
+      { file: "IMG_1727.png", caption: "" },
+      { file: "IMG_1633.png", caption: "" },
+      { file: "IMG_1612.png", caption: "" },
+      { file: "IMG_1583.png", caption: "" },
       { file: "4FE265B2-DB33-4243-B382-C670B087E510.png", caption: "" },
       { file: "AAB7B2F3-0FEF-4DAB-B320-16E793B77087.png", caption: "" },
-      { file: "ADB667A7-E3C2-4EEA-BA28-7B3E2A342C921.png", caption: "" },
-      { file: "DAA7DC1C-EEF3-4529-BDAA-630EF8AE5D9C1.png", caption: "" },
-      { file: "IMG_03822.png", caption: "" },
-      { file: "IMG_0483.png", caption: "" },
-      { file: "IMG_0602.png", caption: "" },
+      { file: "IMG_1508.png", caption: "" },
+      { file: "0D9271AE-AC94-4313-9286-B534B5FC888F.png", caption: "" },
+      { file: "IMG_1222.png", caption: "" },
+      { file: "IMG_1198.png", caption: "" },
+      { file: "IMG_1161.png", caption: "" },
+      { file: "IMG_1148.png", caption: "" },
+      { file: "IMG_1138.png", caption: "" },
+      { file: "IMG_1113.png", caption: "" },
+      { file: "IMG_1071.png", caption: "" },
+      { file: "IMG_1022.png", caption: "" },
+      { file: "IMG_1014.png", caption: "" },
       { file: "IMG_0997.png", caption: "" },
-      { file: "IMG_10221.png", caption: "" },
-      { file: "IMG_11132.png", caption: "" },
-      { file: "IMG_11381.png", caption: "" },
-      { file: "IMG_11981.png", caption: "" },
-      { file: "IMG_1359Copy1.png", caption: "" },
-      { file: "IMG_1439.png", caption: "" },
-      { file: "IMG_1583.png", caption: "" },
-      { file: "IMG_1730.png", caption: "" },
-      { file: "IMG_1890.png", caption: "" },
-      { file: "IMG_24411.png", caption: "" },
+      { file: "IMG_0975.png", caption: "" },
+      { file: "IMG_0961.png", caption: "" },
+      { file: "IMG_0959.png", caption: "" },
       { file: "Image1-23-26.png", caption: "" },
+      { file: "IMG_0814.png", caption: "" },
+      { file: "IMG_0670.png", caption: "" },
+      { file: "IMG_0634.png", caption: "" },
+      { file: "IMG_0602.png", caption: "" },
+      { file: "258FEEB3-4663-40E2-9FC8-402844511E15.jpg", caption: "" },
+      { file: "DAA7DC1C-EEF3-4529-BDAA-630EF8AE5D9C.jpg", caption: "" },
+      { file: "IMG_0485.png", caption: "" },
+      { file: "IMG_0484.png", caption: "" },
+      { file: "IMG_0483.png", caption: "" },
+      { file: "IMG_0469.png", caption: "" },
+      { file: "IMG_0459.png", caption: "" },
+      { file: "IMG_2441.png", caption: "" },
+      { file: "IMG_2141.png", caption: "" },
+      { file: "IMG_0419.png", caption: "" },
+      { file: "IMG_0395.png", caption: "" },
+      { file: "IMG_0392.png", caption: "" },
+      { file: "IMG_0382.png", caption: "" },
+      { file: "IMG_0240.png", caption: "" },
+      { file: "IMG_0186.png", caption: "" },
+      { file: "IMG_0154.png", caption: "" },
+      { file: "IMG_0114.png", caption: "" },
+      { file: "0C45E398-EEAA-424D-92FB-06D51C15F429.png", caption: "" },
+      { file: "IMG_2452.png", caption: "" },
+      { file: "IMG_2449.png", caption: "" },
+      { file: "IMG_2443.png", caption: "" },
+      { file: "ADB667A7-E3C2-4EEA-BA28-7B3E2A342C92.png", caption: "" },
+      { file: "IMG_2331.png", caption: "" },
+      { file: "IMG_2017.png", caption: "" },
+      { file: "IMG_1916.png", caption: "" },
+      { file: "IMG_1133.png", caption: "" },
+      { file: "IMG_1861.png", caption: "" },
+      { file: "IMG_1469.png", caption: "" },
+      { file: "IMG_1359.png", caption: "" },
+      { file: "IMG_1199.png", caption: "" },
+      { file: "IMG_0743.png", caption: "" },
     ];
 
     // ===== GENRE NAVIGATION =====
@@ -1317,6 +1647,7 @@ I gave myself before I knew the game.</div>
       window.scrollTo(0, 0);
       if (history.state && history.state.genre) history.pushState({}, '', '#');
     }
+    window.__openGenre = openGenre;
 
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a[href^="#"]');
@@ -1363,69 +1694,9 @@ I gave myself before I knew the game.</div>
       setTimeout(() => openGenre(initial), 300);
     }
 
-    // ===== PHOTOGRAPHY GALLERY =====
-    const gallery = document.getElementById('gallery');
-    function seededRandom(seed) {
-      let s = seed;
-      return function() { s = (s * 16807) % 2147483647; return s / 2147483647; };
-    }
-    const rand = seededRandom(42);
-
-    function createPhotoItem(photo, idx) {
-      const item = document.createElement('div');
-      item.className = 'photo-item';
-      const yOffset = (rand() - 0.5) * 40;
-      const padTop = 10 + rand() * 30;
-      const padBottom = 10 + rand() * 30;
-      const padLeft = 8 + rand() * 20;
-      const padRight = 8 + rand() * 20;
-      const scale = 0.88 + rand() * 0.12;
-      const rotate = (rand() - 0.5) * 1.6;
-
-      item.style.padding = `${padTop}px ${padRight}px ${padBottom}px ${padLeft}px`;
-      item.style.transform = `translateY(${30 + yOffset}px)`;
-      item.style.setProperty('--y-offset', `${yOffset}px`);
-      item.style.transitionDelay = `${(idx % 5) * 0.07}s`;
-
-      item.innerHTML = `
-        <img src="photos/${photo.file}" alt="${photo.caption}" loading="lazy"
-             style="transform: scale(${scale}) rotate(${rotate}deg);">
-        <div class="caption">${photo.caption}</div>
-      `;
-      item.addEventListener('click', () => openLightbox(idx));
-
-      item.addEventListener('mousemove', (e) => {
-        const rect = item.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        const img = item.querySelector('img');
-        img.style.transform = `scale(${scale * 1.04}) rotate(${rotate}deg) rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
-      });
-      item.addEventListener('mouseleave', () => {
-        const img = item.querySelector('img');
-        img.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-      });
-      return item;
-    }
-
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const yOff = entry.target.style.getPropertyValue('--y-offset') || '0px';
-          entry.target.style.transform = `translateY(${yOff})`;
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
-
-    const fragment = document.createDocumentFragment();
-    photos.forEach((p, i) => {
-      const item = createPhotoItem(p, i);
-      fragment.appendChild(item);
-      revealObserver.observe(item);
-    });
-    gallery.appendChild(fragment);
+    // ===== PHOTOGRAPHY GALLERY (3D) — see module script below =====
+    window.__openLightbox = (i) => openLightbox(i);
+    window.__photos = photos;
 
     // ===== LIGHTBOX =====
     const lightbox = document.getElementById('lightbox');
@@ -1470,18 +1741,367 @@ I gave myself before I knew the game.</div>
     });
     lbImg.style.transition = 'opacity 0.3s, transform 0.4s cubic-bezier(0.16,1,0.3,1)';
 
-    // ===== MURAL CLICK -> LIGHTBOX =====
-    const muralImg = document.getElementById('muralImg');
-    if (muralImg) {
-      muralImg.style.cursor = 'zoom-in';
-      muralImg.addEventListener('click', () => {
-        lbImg.src = 'works/recognition.jpg';
-        lbImg.alt = 'Recognition';
-        lbCaption.textContent = 'Recognition — Mural';
-        lbCounter.textContent = '';
-        lightbox.classList.add('active');
-      });
-    }
+    // ===== MURAL: LIQUID PAINT (WebGL2 fluid sim) =====
+    (function() {
+      const wrap = document.getElementById('muralWrap');
+      const img = document.getElementById('muralImg');
+      const canvas = document.getElementById('muralCanvas');
+      const expandBtn = document.getElementById('muralExpand');
+      if (!wrap || !img || !canvas) return;
+
+      const gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false });
+      if (!gl) return; // keep <img> fallback
+      const hf = gl.getExtension('EXT_color_buffer_half_float') || gl.getExtension('EXT_color_buffer_float');
+      if (!hf) return; // need float framebuffers for signed displacement
+      const INTERNAL = gl.RGBA16F;
+      const TEX_TYPE = gl.HALF_FLOAT;
+
+      const VS = `#version 300 es
+        in vec2 a_pos;
+        out vec2 v_uv;
+        void main() {
+          v_uv = a_pos * 0.5 + 0.5;
+          gl_Position = vec4(a_pos, 0.0, 1.0);
+        }
+      `;
+
+      // Update pass: advect displacement field, decay, splat from cursor drag
+      const FS_UPDATE = `#version 300 es
+        precision highp float;
+        in vec2 v_uv;
+        out vec4 o_color;
+        uniform sampler2D u_prev;
+        uniform vec2 u_mousePos;
+        uniform vec2 u_mouseDelta;
+        uniform float u_mouseStrength;
+        uniform float u_decay;
+        uniform float u_dt;
+        uniform float u_aspect;
+
+        void main() {
+          vec2 uv = v_uv;
+          vec2 prev = texture(u_prev, uv).rg;
+          // Self-advection: sample previous field offset by itself (paint flows along its own gradient)
+          vec2 advected = texture(u_prev, uv - prev * 0.5 * u_dt).rg;
+          vec2 disp = advected * u_decay;
+
+          // Mouse drag splat — gaussian falloff in aspect-corrected space
+          vec2 d = uv - u_mousePos;
+          d.x *= u_aspect;
+          float r2 = dot(d, d);
+          float radius = 0.10;
+          float g = exp(-r2 / (radius * radius));
+          disp += u_mouseDelta * g * u_mouseStrength * 3.5;
+
+          // Cheap diffusion (4-tap neighbor blur)
+          vec2 px = 1.0 / vec2(textureSize(u_prev, 0));
+          vec2 nb = (
+            texture(u_prev, uv + vec2( px.x, 0.0)).rg +
+            texture(u_prev, uv - vec2( px.x, 0.0)).rg +
+            texture(u_prev, uv + vec2(0.0,  px.y)).rg +
+            texture(u_prev, uv - vec2(0.0,  px.y)).rg
+          ) * 0.25;
+          disp = mix(disp, nb * u_decay, 0.08);
+
+          o_color = vec4(disp, 0.0, 1.0);
+        }
+      `;
+
+      // Render pass: sample mural at displaced uv, add painterly substrate
+      const FS_RENDER = `#version 300 es
+        precision highp float;
+        in vec2 v_uv;
+        out vec4 o_color;
+        uniform sampler2D u_img;
+        uniform sampler2D u_disp;
+        uniform vec2 u_res;
+        uniform float u_time;
+
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float vnoise(vec2 p) {
+          vec2 i = floor(p), f = fract(p);
+          float a = hash(i);
+          float b = hash(i + vec2(1.0, 0.0));
+          float c = hash(i + vec2(0.0, 1.0));
+          float d = hash(i + vec2(1.0, 1.0));
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+        }
+
+        void main() {
+          vec2 uvImg = vec2(v_uv.x, 1.0 - v_uv.y);
+          vec2 disp = texture(u_disp, v_uv).rg;
+          // Flip Y of displacement so visual drag direction matches cursor
+          disp.y = -disp.y;
+
+          float dl = length(disp);
+          float ca = 0.014 * smoothstep(0.0, 0.05, dl);
+          vec3 col;
+          col.r = texture(u_img, uvImg + disp + disp * ca).r;
+          col.g = texture(u_img, uvImg + disp).g;
+          col.b = texture(u_img, uvImg + disp - disp * ca).b;
+
+          // Wet sheen where paint is stretched
+          float wet = smoothstep(0.0, 0.08, dl);
+          col *= (1.0 + wet * 0.2);
+
+          // Canvas weave + grain
+          float weave =
+              sin(v_uv.x * u_res.x * 0.42) * 0.5 +
+              sin(v_uv.y * u_res.y * 0.42 + 1.2) * 0.5;
+          float grain = (vnoise(v_uv * 380.0) - 0.5) * 0.05;
+          col *= (1.0 + grain) * (1.0 + weave * 0.04);
+
+          // Vignette
+          vec2 cv = v_uv - 0.5;
+          float vig = smoothstep(0.95, 0.25, dot(cv, cv) * 1.8);
+          col *= mix(0.82, 1.0, vig);
+
+          o_color = vec4(col, 1.0);
+        }
+      `;
+
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.warn('shader compile:', gl.getShaderInfoLog(s));
+        }
+        return s;
+      }
+      function link(vs, fs) {
+        const p = gl.createProgram();
+        gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
+        gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+        gl.linkProgram(p);
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+          console.warn('program link:', gl.getProgramInfoLog(p));
+        }
+        return p;
+      }
+      const progUpdate = link(VS, FS_UPDATE);
+      const progRender = link(VS, FS_RENDER);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1,-1,  1,-1, -1,1,
+        -1,1,   1,-1,  1,1
+      ]), gl.STATIC_DRAW);
+
+      function bindQuad(prog) {
+        gl.useProgram(prog);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        const loc = gl.getAttribLocation(prog, 'a_pos');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      }
+
+      // Mural texture
+      const imgTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, imgTex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([20,20,20,255]));
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+      let imgW = 1, imgH = 1;
+      function uploadImage() {
+        gl.bindTexture(gl.TEXTURE_2D, imgTex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+        const maxSize = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), 4096);
+        let src = img;
+        const nw = img.naturalWidth, nh = img.naturalHeight;
+        if (nw > maxSize || nh > maxSize) {
+          const scale = Math.min(maxSize / nw, maxSize / nh);
+          const tw = Math.floor(nw * scale), th = Math.floor(nh * scale);
+          const c = document.createElement('canvas');
+          c.width = tw; c.height = th;
+          c.getContext('2d').drawImage(img, 0, 0, tw, th);
+          src = c;
+        }
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+        imgW = nw; imgH = nh;
+      }
+
+      // Ping-pong displacement field
+      const SIM_SCALE = 0.5;
+      let simW = 0, simH = 0;
+      let texA = null, texB = null, fboA = null, fboB = null;
+      function makeSimTex(w, h) {
+        const t = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.texImage2D(gl.TEXTURE_2D, 0, INTERNAL, w, h, 0, gl.RGBA, TEX_TYPE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        return t;
+      }
+      function makeFBO(tex) {
+        const f = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        return f;
+      }
+      function initSim(cw, ch) {
+        simW = Math.max(96, Math.round(cw * SIM_SCALE));
+        simH = Math.max(96, Math.round(ch * SIM_SCALE));
+        texA = makeSimTex(simW, simH);
+        texB = makeSimTex(simW, simH);
+        fboA = makeFBO(texA);
+        fboB = makeFBO(texB);
+        // Clear both to zero (no displacement) to avoid undefined initial state
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboA);
+        gl.viewport(0, 0, simW, simH);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboB);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      }
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const w = wrap.clientWidth;
+        if (!imgW || !imgH) return;
+        const h = Math.round(w * imgH / imgW);
+        wrap.style.height = h + 'px';
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        initSim(canvas.width, canvas.height);
+      }
+
+      // Mouse
+      let mouseX = 0.5, mouseY = 0.5;
+      let prevMouseX = 0.5, prevMouseY = 0.5;
+      let mouseDX = 0, mouseDY = 0;
+      let mouseStrength = 0;
+      let inside = false;
+
+      function setMouseFromEvent(e) {
+        const rect = wrap.getBoundingClientRect();
+        mouseX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        mouseY = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+      }
+      wrap.addEventListener('mouseenter', e => { inside = true; setMouseFromEvent(e); prevMouseX = mouseX; prevMouseY = mouseY; });
+      wrap.addEventListener('mousemove', e => { setMouseFromEvent(e); mouseStrength = 1; });
+      wrap.addEventListener('mouseleave', () => { inside = false; mouseStrength = 0; });
+      wrap.addEventListener('touchstart', e => {
+        if (!e.touches.length) return;
+        inside = true;
+        setMouseFromEvent(e.touches[0]);
+        prevMouseX = mouseX; prevMouseY = mouseY;
+      }, { passive: true });
+      wrap.addEventListener('touchmove', e => {
+        if (!e.touches.length) return;
+        setMouseFromEvent(e.touches[0]); mouseStrength = 1;
+      }, { passive: true });
+      wrap.addEventListener('touchend', () => { inside = false; mouseStrength = 0; });
+
+      const uU = {
+        prev: gl.getUniformLocation(progUpdate, 'u_prev'),
+        mp: gl.getUniformLocation(progUpdate, 'u_mousePos'),
+        md: gl.getUniformLocation(progUpdate, 'u_mouseDelta'),
+        ms: gl.getUniformLocation(progUpdate, 'u_mouseStrength'),
+        decay: gl.getUniformLocation(progUpdate, 'u_decay'),
+        dt: gl.getUniformLocation(progUpdate, 'u_dt'),
+        aspect: gl.getUniformLocation(progUpdate, 'u_aspect')
+      };
+      const uR = {
+        img: gl.getUniformLocation(progRender, 'u_img'),
+        disp: gl.getUniformLocation(progRender, 'u_disp'),
+        res: gl.getUniformLocation(progRender, 'u_res'),
+        time: gl.getUniformLocation(progRender, 'u_time')
+      };
+
+      let lastTime = performance.now();
+      const startTime = lastTime;
+
+      const section = wrap.closest('.immersion');
+      function step() {
+        const now = performance.now();
+        let dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        if (section && !section.classList.contains('active')) {
+          requestAnimationFrame(step);
+          return;
+        }
+
+        const rdx = mouseX - prevMouseX;
+        const rdy = mouseY - prevMouseY;
+        mouseDX = rdx;
+        mouseDY = rdy;
+        prevMouseX = mouseX; prevMouseY = mouseY;
+        if (Math.hypot(rdx, rdy) < 0.0005) mouseStrength *= 0.85;
+
+        // Update pass: render to fboB, sampling texA
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboB);
+        gl.viewport(0, 0, simW, simH);
+        bindQuad(progUpdate);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texA);
+        gl.uniform1i(uU.prev, 0);
+        gl.uniform2f(uU.mp, mouseX, 1.0 - mouseY);
+        gl.uniform2f(uU.md, mouseDX, -mouseDY);
+        gl.uniform1f(uU.ms, inside ? mouseStrength : 0);
+        gl.uniform1f(uU.decay, 0.985);
+        gl.uniform1f(uU.dt, dt * 60.0);
+        gl.uniform1f(uU.aspect, simW / simH);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // swap
+        let t = texA; texA = texB; texB = t;
+        let f = fboA; fboA = fboB; fboB = f;
+
+        // Render to screen
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        bindQuad(progRender);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, imgTex);
+        gl.uniform1i(uR.img, 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, texA);
+        gl.uniform1i(uR.disp, 1);
+        gl.uniform2f(uR.res, canvas.width, canvas.height);
+        gl.uniform1f(uR.time, (now - startTime) / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        requestAnimationFrame(step);
+      }
+
+      function start() {
+        uploadImage();
+        img.style.display = 'none';
+        canvas.style.display = 'block';
+        resize();
+        window.addEventListener('resize', resize);
+        requestAnimationFrame(step);
+      }
+
+      if (img.complete && img.naturalWidth) {
+        start();
+      } else {
+        img.addEventListener('load', start, { once: true });
+      }
+
+      if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+          lbImg.src = 'works/recognitionreal.jpg';
+          lbImg.alt = 'Recognition';
+          lbCaption.textContent = 'Recognition — Mural';
+          lbCounter.textContent = '';
+          lightbox.classList.add('active');
+        });
+      }
+    })();
 
     // ===== LOADER =====
     (function() {
@@ -1501,6 +2121,1377 @@ I gave myself before I knew the game.</div>
         fill.style.width = '100%';
         setTimeout(() => loader.classList.add('done'), 200);
       });
+    })();
+
+    // ===== POEMS CONSTELLATION =====
+    (function initPoemsConstellation() {
+      const sky = document.getElementById('poemsSky');
+      const inner = document.getElementById('poemsInner');
+      const hint = document.getElementById('poemsSkyHint');
+      const returnBtn = document.getElementById('poemsReturn');
+      const view = document.querySelector('.view-poems');
+      if (!sky || !inner || !view) return;
+
+      const ctx = sky.getContext('2d');
+      let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+      // Background star field — many dim, slowly drifting.
+      const BG_COUNT = 220;
+      const bgStars = [];
+      // The featured poem star — bright, breathing, click target.
+      const poems = [
+        { title: 'Debt', x: 0, y: 0, baseR: 4.6, hue: 38 } // gold-warm
+      ];
+      // Faint nearby "future stars" so the central star feels like part of something.
+      const NEIGHBOR_COUNT = 6;
+      const neighbors = [];
+
+      // Camera / look state.
+      let camX = 0, camY = 0; // offset from drag
+      let tgtCamX = 0, tgtCamY = 0;
+      let dragging = false, dragLastX = 0, dragLastY = 0;
+      let mouseX = -1e6, mouseY = -1e6;
+      let zooming = false; // true once a star is clicked
+      let zoomT = 0; // 0..1 zoom-in progress
+      let revealed = false;
+
+      function resize() {
+        const r = sky.getBoundingClientRect();
+        W = r.width; H = r.height;
+        sky.width = W * DPR; sky.height = H * DPR;
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      }
+
+      function seed() {
+        bgStars.length = 0;
+        for (let i = 0; i < BG_COUNT; i++) {
+          bgStars.push({
+            x: (Math.random() - 0.5) * 2400,
+            y: (Math.random() - 0.5) * 2400,
+            r: Math.random() * 0.9 + 0.2,
+            tw: Math.random() * Math.PI * 2,
+            twS: 0.4 + Math.random() * 1.2,
+            depth: 0.3 + Math.random() * 0.7
+          });
+        }
+        neighbors.length = 0;
+        for (let i = 0; i < NEIGHBOR_COUNT; i++) {
+          const a = (i / NEIGHBOR_COUNT) * Math.PI * 2 + Math.random() * 0.6;
+          const d = 170 + Math.random() * 220;
+          neighbors.push({
+            x: Math.cos(a) * d + (Math.random() - 0.5) * 40,
+            y: Math.sin(a) * d + (Math.random() - 0.5) * 40,
+            r: 1 + Math.random() * 0.7,
+            tw: Math.random() * Math.PI * 2,
+            twS: 0.6 + Math.random() * 1.0
+          });
+        }
+      }
+
+      function poemScreenPos(p) {
+        return { x: W / 2 + p.x + camX, y: H / 2 + p.y + camY };
+      }
+
+      function nearestPoem(mx, my) {
+        let best = null, bestD = 9999;
+        for (const p of poems) {
+          const s = poemScreenPos(p);
+          const d = Math.hypot(mx - s.x, my - s.y);
+          if (d < bestD) { bestD = d; best = p; }
+        }
+        return { p: best, d: bestD };
+      }
+
+      let t0 = performance.now();
+      function frame(now) {
+        const t = (now - t0) / 1000;
+        // Ease camera.
+        camX += (tgtCamX - camX) * 0.08;
+        camY += (tgtCamY - camY) * 0.08;
+
+        if (zooming) zoomT = Math.min(1, zoomT + 0.012);
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Slight gradient haze.
+        const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
+        g.addColorStop(0, 'rgba(20,18,38,0.55)');
+        g.addColorStop(1, 'rgba(5,5,10,1)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+
+        // Background stars.
+        for (const s of bgStars) {
+          const px = W/2 + s.x * s.depth + camX * s.depth;
+          const py = H/2 + s.y * s.depth + camY * s.depth;
+          if (px < -10 || px > W + 10 || py < -10 || py > H + 10) continue;
+          const tw = 0.55 + Math.sin(t * s.twS + s.tw) * 0.35;
+          ctx.globalAlpha = tw * (0.4 + s.depth * 0.6);
+          ctx.fillStyle = '#cfd6ff';
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Faint connecting lines from featured star to neighbors.
+        const mainP = poems[0];
+        const main = poemScreenPos(mainP);
+        for (const n of neighbors) {
+          const nx = W/2 + n.x + camX;
+          const ny = H/2 + n.y + camY;
+          const lineA = 0.06 + Math.sin(t * 0.7 + n.tw) * 0.02;
+          ctx.strokeStyle = `rgba(180,160,220,${lineA})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(main.x, main.y);
+          ctx.lineTo(nx, ny);
+          ctx.stroke();
+
+          const ntw = 0.6 + Math.sin(t * n.twS + n.tw) * 0.4;
+          ctx.globalAlpha = ntw * 0.55;
+          ctx.fillStyle = '#b6b0d6';
+          ctx.beginPath();
+          ctx.arc(nx, ny, n.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // Featured star — fades out as poem reveals so it doesn't sit behind the text.
+        const hoverD = Math.hypot(mouseX - main.x, mouseY - main.y);
+        const hovering = !zooming && hoverD < 40;
+        const breathe = 0.85 + Math.sin(t * 1.4) * 0.15;
+        const hoverBoost = hovering ? 1.6 : 1;
+        const starFade = Math.max(0, 1 - Math.max(0, (zoomT - 0.45) / 0.25));
+        const R = mainP.baseR * breathe * hoverBoost * (1 + zoomT * 6);
+        const alpha = Math.min(1, 0.9 + zoomT * 0.1) * starFade;
+
+        if (starFade > 0.01) {
+          // Glow halo.
+          const halo = ctx.createRadialGradient(main.x, main.y, 0, main.x, main.y, R * 14);
+          halo.addColorStop(0, `rgba(255,235,190,${0.55 * alpha})`);
+          halo.addColorStop(0.3, `rgba(255,210,150,${0.18 * alpha})`);
+          halo.addColorStop(1, 'rgba(255,210,150,0)');
+          ctx.fillStyle = halo;
+          ctx.beginPath();
+          ctx.arc(main.x, main.y, R * 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Core.
+          ctx.fillStyle = `rgba(255,248,225,${alpha})`;
+          ctx.beginPath();
+          ctx.arc(main.x, main.y, R, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Hide bottom hint once a star is selected.
+        if (hint) hint.classList.toggle('hidden', zooming);
+
+        // Title label on hover.
+        if (hovering && !zooming) {
+          ctx.fillStyle = 'rgba(232,227,212,0.9)';
+          ctx.font = 'italic 500 1.4rem "Cormorant Garamond", serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(mainP.title, main.x, main.y - 36);
+          ctx.font = 'italic 400 0.7rem "Cormorant Garamond", serif';
+          ctx.fillStyle = 'rgba(155,127,184,0.85)';
+          ctx.fillText('A SONNET', main.x, main.y - 56);
+        }
+
+        // Reveal poem partway through the zoom — but keep the starfield visible.
+        if (zooming && zoomT > 0.55 && !revealed) {
+          revealed = true;
+          inner.classList.add('revealed');
+          returnBtn.classList.add('revealed');
+        }
+        // Subtle darkening for readability — never fully opaque, so stars keep showing through.
+        if (zooming) {
+          const v = Math.max(0, (zoomT - 0.4) / 0.6) * 0.55;
+          const vg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.15, W/2, H/2, Math.max(W,H)*0.75);
+          vg.addColorStop(0, `rgba(5,5,12,${v})`);
+          vg.addColorStop(1, `rgba(5,5,12,${v * 0.35})`);
+          ctx.fillStyle = vg;
+          ctx.fillRect(0, 0, W, H);
+        }
+
+        rafId = requestAnimationFrame(frame);
+      }
+
+      let rafId = 0;
+      function start() {
+        if (rafId) return;
+        resize();
+        seed();
+        t0 = performance.now();
+        rafId = requestAnimationFrame(frame);
+      }
+      function stop() {
+        if (!rafId) return;
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      function reset() {
+        zooming = false; zoomT = 0; revealed = false;
+        camX = camY = tgtCamX = tgtCamY = 0;
+        inner.classList.remove('revealed');
+        returnBtn.classList.remove('revealed');
+        sky.classList.remove('zooming');
+      }
+
+      // Pointer interactions.
+      sky.addEventListener('pointerdown', (e) => {
+        if (zooming) return;
+        dragging = true;
+        dragLastX = e.clientX; dragLastY = e.clientY;
+        sky.setPointerCapture(e.pointerId);
+      });
+      sky.addEventListener('pointermove', (e) => {
+        const r = sky.getBoundingClientRect();
+        mouseX = e.clientX - r.left;
+        mouseY = e.clientY - r.top;
+        if (dragging) {
+          tgtCamX += (e.clientX - dragLastX);
+          tgtCamY += (e.clientY - dragLastY);
+          // Clamp so the featured star doesn't drift offscreen.
+          const lim = 260;
+          tgtCamX = Math.max(-lim, Math.min(lim, tgtCamX));
+          tgtCamY = Math.max(-lim, Math.min(lim, tgtCamY));
+          dragLastX = e.clientX; dragLastY = e.clientY;
+        }
+      });
+      sky.addEventListener('pointerup', (e) => {
+        dragging = false;
+        // If barely moved, treat as click — check hit on featured star.
+        const { p, d } = nearestPoem(mouseX, mouseY);
+        if (p && d < 40 && !zooming) {
+          zooming = true;
+          sky.classList.add('zooming');
+          // Pull camera so star centers.
+          tgtCamX -= p.x;
+          tgtCamY -= p.y;
+        }
+      });
+      sky.addEventListener('pointerleave', () => {
+        dragging = false;
+        mouseX = mouseY = -1e6;
+      });
+
+      returnBtn.addEventListener('click', reset);
+
+      window.addEventListener('resize', () => { if (rafId) resize(); });
+
+      // Start/stop based on view visibility (observer pattern matching other views).
+      const obs = new MutationObserver(() => {
+        if (view.classList.contains('active')) start();
+        else { stop(); reset(); }
+      });
+      obs.observe(view, { attributes: true, attributeFilter: ['class'] });
+      if (view.classList.contains('active')) start();
+    })();
+  </script>
+
+  <script type="module">
+    // ===== BOOKSHELF SELECTOR =====
+    import * as THREE from 'three';
+
+    const selectorEl = document.getElementById('selector');
+    const shelfCanvas = document.getElementById('shelf3d');
+
+    const sections = [
+      { genre: 'essays',      title: 'Essays',        spine: '#1f1c16', text: '#f0ede4', font: 'italic 700 96px "Playfair Display", serif',  accent: '#7a6c50', T: 0.55, H: 2.50 },
+      { genre: 'poems',       title: 'Poems',         spine: '#1a142a', text: '#e8e0d0', font: 'italic 500 104px "Cormorant Garamond", serif', accent: '#9b7fb8', T: 0.42, H: 2.60 },
+      { genre: 'stories',     title: 'Short Stories', spine: '#ece7da', text: '#1a1a1a', font: '500 56px "IBM Plex Mono", monospace',          accent: '#3a2c1c', T: 0.58, H: 2.30, spaced: true },
+      { genre: 'murals',      title: 'Murals',        spine: '#0a0608', text: '#f0c8a0', font: '120px "Bebas Neue", sans-serif',               accent: '#c47d7d', T: 0.50, H: 2.70 },
+      { genre: 'photography', title: 'Photography',   spine: '#070707', text: '#f0ede8', font: '700 70px "Syne", sans-serif',                  accent: '#555',    T: 0.65, H: 2.45, spaced: true },
+      { genre: 'research',    title: 'Research',      spine: '#e8e2d2', text: '#1a1814', font: 'italic 500 96px "Cormorant Garamond", serif',  accent: '#8a7e6a', T: 0.62, H: 2.65 },
+    ];
+
+    let shelfScene, shelfCamera, shelfRenderer, shelfRaycaster;
+    const shelfPointer = new THREE.Vector2(-2, -2);
+    const books = [];
+    let shelfHover = null;
+    let shelfInit = false;
+    let shelfMX = 0, shelfMY = 0, shelfTMX = 0, shelfTMY = 0;
+
+    function makeSpineTexture(s) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 1024;
+      const x = c.getContext('2d');
+      // Base
+      x.fillStyle = s.spine;
+      x.fillRect(0, 0, 256, 1024);
+      // Subtle vertical grain
+      const grad = x.createLinearGradient(0, 0, 256, 0);
+      grad.addColorStop(0, 'rgba(0,0,0,0.35)');
+      grad.addColorStop(0.5, 'rgba(255,255,255,0.04)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.35)');
+      x.fillStyle = grad;
+      x.fillRect(0, 0, 256, 1024);
+      // Binding bands
+      x.fillStyle = s.accent;
+      x.globalAlpha = 0.7;
+      x.fillRect(0, 90, 256, 3);
+      x.fillRect(0, 1024 - 95, 256, 3);
+      x.globalAlpha = 1;
+      // Title — rotated 90° CW so it reads top→bottom
+      x.save();
+      x.translate(128, 512);
+      x.rotate(Math.PI / 2);
+      x.fillStyle = s.text;
+      x.font = s.font;
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      let title = s.title;
+      if (s.spaced) title = title.toUpperCase().split('').join(' ');
+      x.fillText(title, 0, 0);
+      x.restore();
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 8;
+      return tex;
+    }
+
+    function makeCoverTexture(s) {
+      const c = document.createElement('canvas');
+      c.width = 768; c.height = 1024;
+      const x = c.getContext('2d');
+      // Base cover color
+      x.fillStyle = s.spine;
+      x.fillRect(0, 0, 768, 1024);
+      // Subtle vignette
+      const vg = x.createRadialGradient(384, 512, 100, 384, 512, 700);
+      vg.addColorStop(0, 'rgba(255,255,255,0.05)');
+      vg.addColorStop(1, 'rgba(0,0,0,0.45)');
+      x.fillStyle = vg;
+      x.fillRect(0, 0, 768, 1024);
+      // Inner border (debossed frame)
+      x.strokeStyle = s.accent;
+      x.globalAlpha = 0.55;
+      x.lineWidth = 2;
+      x.strokeRect(56, 64, 768 - 112, 1024 - 128);
+      x.globalAlpha = 0.35;
+      x.lineWidth = 1;
+      x.strokeRect(72, 80, 768 - 144, 1024 - 160);
+      x.globalAlpha = 1;
+      // Author kicker
+      x.fillStyle = s.text;
+      x.globalAlpha = 0.7;
+      x.font = '500 28px "IBM Plex Mono", monospace';
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.fillText('LUCAS  HAINES', 384, 170);
+      x.globalAlpha = 1;
+      // Title — auto-fit
+      let title = s.title;
+      const titleFont = s.font.replace(/(\d+)px/, (m, n) => Math.round(parseInt(n) * 1.4) + 'px');
+      x.font = titleFont;
+      x.fillStyle = s.text;
+      let measured = x.measureText(title).width;
+      let scale = Math.min(1, 600 / measured);
+      x.save();
+      x.translate(384, 512);
+      x.scale(scale, scale);
+      x.fillText(title, 0, 0);
+      x.restore();
+      // Decorative rule
+      x.strokeStyle = s.accent;
+      x.lineWidth = 1.5;
+      x.beginPath();
+      x.moveTo(280, 620); x.lineTo(488, 620);
+      x.stroke();
+      // Footer mark
+      x.fillStyle = s.text;
+      x.globalAlpha = 0.55;
+      x.font = '500 22px "IBM Plex Mono", monospace';
+      x.fillText('NYC · 2026', 384, 880);
+      x.globalAlpha = 1;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 8;
+      return tex;
+    }
+
+    function makePagesTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 512;
+      const x = c.getContext('2d');
+      x.fillStyle = '#c8c5bf';
+      x.fillRect(0, 0, 256, 512);
+      x.strokeStyle = 'rgba(60,58,55,0.18)';
+      x.lineWidth = 1;
+      for (let i = 0; i < 60; i++) {
+        const y = (i / 60) * 512;
+        x.beginPath(); x.moveTo(0, y); x.lineTo(256, y); x.stroke();
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function initShelf() {
+      if (shelfInit) return;
+      shelfInit = true;
+      selectorEl.classList.add('shelf-active');
+
+      const w = selectorEl.clientWidth, h = selectorEl.clientHeight;
+      shelfRenderer = new THREE.WebGLRenderer({ canvas: shelfCanvas, antialias: true, alpha: true });
+      shelfRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      shelfRenderer.setSize(w, h, false);
+      shelfRenderer.setClearColor(0x000000, 0);
+
+      shelfScene = new THREE.Scene();
+      shelfCamera = new THREE.PerspectiveCamera(42, w / h, 0.1, 50);
+      shelfCamera.position.set(0, 1.3, 6.8);
+      shelfCamera.lookAt(0, 0.6, 0);
+
+      // Lighting
+      shelfScene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      const key = new THREE.DirectionalLight(0xffffff, 0.85);
+      key.position.set(2.5, 5, 4);
+      shelfScene.add(key);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.25);
+      rim.position.set(-3, 2, -2);
+      shelfScene.add(rim);
+
+      // Shelf plank
+      const totalGap = 0.04 * (sections.length - 1);
+      const totalT = sections.reduce((a, b) => a + b.T, 0) + totalGap;
+      const shelfWidth = totalT + 1.2;
+      const shelfDepth = 1.9;
+      const plankGeo = new THREE.BoxGeometry(shelfWidth, 0.12, shelfDepth);
+      const plankMat = new THREE.MeshStandardMaterial({ color: 0x2a1c12, roughness: 0.85, metalness: 0.05 });
+      const plank = new THREE.Mesh(plankGeo, plankMat);
+      plank.position.set(0, -0.06, 0);
+      shelfScene.add(plank);
+
+      // Back wall (subtle)
+      const wallGeo = new THREE.PlaneGeometry(shelfWidth + 2, 4);
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1.0 });
+      const wall = new THREE.Mesh(wallGeo, wallMat);
+      wall.position.set(0, 1.4, -shelfDepth / 2 - 0.02);
+      shelfScene.add(wall);
+
+      // Books
+      const pages = makePagesTexture();
+      const startX = -totalT / 2;
+      let cursor = startX;
+      sections.forEach((s, i) => {
+        const D = 1.7;
+        const spineTex = makeSpineTexture(s);
+        const coverTex = makeCoverTexture(s);
+        const spineMat = new THREE.MeshStandardMaterial({ map: spineTex, roughness: 0.65, metalness: 0.02 });
+        const coverMat = new THREE.MeshStandardMaterial({ map: coverTex, roughness: 0.55, metalness: 0.02 });
+        const pageMat = new THREE.MeshStandardMaterial({ map: pages, roughness: 0.95 });
+        // BoxGeometry face order: +x, -x, +y, -y, +z, -z
+        // Wide faces (±x) are the covers; +z is the spine facing viewer; -z and ±y are page edges
+        const mats = [coverMat, coverMat, pageMat, pageMat, spineMat, pageMat];
+        const geo = new THREE.BoxGeometry(s.T, s.H, D);
+        const book = new THREE.Mesh(geo, mats);
+        const x = cursor + s.T / 2;
+        cursor += s.T + 0.04;
+        const lean = (i % 3 === 1) ? -0.04 : (i === 4 ? 0.05 : 0);
+        book.position.set(x, s.H / 2, 0);
+        book.rotation.z = lean;
+        book.userData = {
+          section: s,
+          baseY: s.H / 2,
+          baseZ: 0,
+          baseRotX: 0,
+          baseRotY: 0,
+          baseRotZ: lean,
+          baseScale: 1
+        };
+        shelfScene.add(book);
+        books.push(book);
+      });
+
+      shelfRaycaster = new THREE.Raycaster();
+
+      window.addEventListener('resize', onShelfResize);
+      shelfCanvas.addEventListener('mousemove', onShelfMove);
+      shelfCanvas.addEventListener('mouseleave', () => { shelfTMX = 0; shelfTMY = 0; shelfPointer.set(-2, -2); });
+      shelfCanvas.addEventListener('click', onShelfClick);
+
+      animateShelf();
+    }
+
+    function onShelfResize() {
+      if (!shelfInit) return;
+      const w = selectorEl.clientWidth, h = selectorEl.clientHeight;
+      shelfRenderer.setSize(w, h, false);
+      shelfCamera.aspect = w / h;
+      shelfCamera.updateProjectionMatrix();
+    }
+
+    function onShelfMove(e) {
+      const r = shelfCanvas.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const ny = -((e.clientY - r.top) / r.height) * 2 + 1;
+      shelfPointer.set(nx, ny);
+      shelfTMX = nx; shelfTMY = ny;
+    }
+
+    function onShelfClick() {
+      if (shelfHover && typeof window.__openGenre === 'function') {
+        const genre = shelfHover.userData.section.genre;
+        shelfHover.userData.opening = true;
+        setTimeout(() => window.__openGenre(genre), 620);
+      }
+    }
+
+    function animateShelf() {
+      requestAnimationFrame(animateShelf);
+      if (selectorEl.classList.contains('hidden')) return;
+
+      shelfMX += (shelfTMX - shelfMX) * 0.06;
+      shelfMY += (shelfTMY - shelfMY) * 0.06;
+      shelfCamera.position.x = shelfMX * 0.6;
+      shelfCamera.position.y = 1.3 + shelfMY * 0.25;
+      shelfCamera.lookAt(0, 0.6, 0);
+
+      shelfRaycaster.setFromCamera(shelfPointer, shelfCamera);
+      const hits = shelfRaycaster.intersectObjects(books);
+      const newHover = hits.length ? hits[0].object : null;
+      if (newHover !== shelfHover) {
+        shelfHover = newHover;
+        shelfCanvas.style.cursor = shelfHover ? 'pointer' : 'grab';
+      }
+
+      for (const b of books) {
+        const d = b.userData;
+        const isHov = (b === shelfHover);
+        const isOpen = d.opening;
+        const tgtZ  = isOpen ? 1.6 : (isHov ? 0.55 : d.baseZ);
+        const tgtY  = isOpen ? d.baseY + 0.35 : (isHov ? d.baseY + 0.1 : d.baseY);
+        const tgtRX = isHov && !isOpen ? -0.18 : d.baseRotX;
+        const tgtRY = isOpen ? -Math.PI / 2 : d.baseRotY;
+        const tgtRZ = isOpen ? 0 : d.baseRotZ;
+        const tgtS  = isOpen ? 1.05 : 1;
+        const k = isOpen ? 0.12 : 0.18;
+        b.position.z += (tgtZ - b.position.z) * k;
+        b.position.y += (tgtY - b.position.y) * k;
+        b.rotation.x += (tgtRX - b.rotation.x) * k;
+        b.rotation.y += (tgtRY - b.rotation.y) * k;
+        b.rotation.z += (tgtRZ - b.rotation.z) * k;
+        b.scale.x += (tgtS - b.scale.x) * k;
+        b.scale.y = b.scale.x; b.scale.z = b.scale.x;
+      }
+
+      shelfRenderer.render(shelfScene, shelfCamera);
+    }
+
+    // Init when selector visible
+    if (!selectorEl.classList.contains('hidden')) initShelf();
+    const selObs = new MutationObserver(() => {
+      if (!selectorEl.classList.contains('hidden')) {
+        if (!shelfInit) initShelf();
+        else {
+          onShelfResize();
+          for (const b of books) b.userData.opening = false;
+          shelfHover = null;
+        }
+      }
+    });
+    selObs.observe(selectorEl, { attributes: true, attributeFilter: ['class'] });
+
+    // ===== PHOTOGRAPHY GALLERY (3D) =====
+    const view = document.querySelector('.view-photography');
+    const canvas = document.getElementById('gallery3d');
+
+    let scene, camera, renderer, raycaster;
+    const pointer = new THREE.Vector2(-2, -2);
+    const photoMeshes = [];
+    let targetScroll = 0, scroll = 0;
+    let targetMX = 0, targetMY = 0, mX = 0, mY = 0;
+    let hovered = null;
+    let initialized = false;
+    let fieldDepth = 30;
+    let fieldFar = -30;
+    const cameraStartZ = 8;
+    const recycleAhead = 6;
+
+    function seeded(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
+
+    function init() {
+      if (initialized) return;
+      initialized = true;
+
+      const w = view.clientWidth, h = view.clientHeight;
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h, false);
+      renderer.setClearColor(0x000000, 1);
+
+      scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x000000, 10, 42);
+
+      camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 100);
+      camera.position.set(0, 0, 8);
+
+      raycaster = new THREE.Raycaster();
+
+      const photos = window.__photos || [];
+      const bands = 5;
+      const perBand = Math.ceil(photos.length / bands);
+      const rnd = seeded(7);
+      const loader = new THREE.TextureLoader();
+
+      photos.forEach((p, i) => {
+        const band = Math.floor(i / perBand);
+        const zBase = -3 - band * 6;
+        const z = zBase + (rnd() - 0.5) * 3;
+        const spreadX = 6 + band * 1.4;
+        const spreadY = 4 + band * 0.6;
+        const x = (rnd() - 0.5) * 2 * spreadX;
+        const y = (rnd() - 0.5) * 2 * spreadY;
+
+        const mat = new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0 });
+        const geo = new THREE.PlaneGeometry(2.4, 1.6);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+        mesh.rotation.z = (rnd() - 0.5) * 0.18;
+        mesh.userData = { idx: i, baseScale: 1, fadeIn: false, floatPhase: rnd() * Math.PI * 2 };
+        scene.add(mesh);
+        photoMeshes.push(mesh);
+
+        loader.load(`photos/${p.file}`,
+          (tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.minFilter = THREE.LinearFilter;
+            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            const aspect = tex.image.width / tex.image.height;
+            const baseH = 1.9;
+            const baseW = baseH * aspect;
+            mesh.geometry.dispose();
+            mesh.geometry = new THREE.PlaneGeometry(baseW, baseH);
+            mesh.material.dispose();
+            mesh.material = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0 });
+            mesh.userData.fadeIn = true;
+          },
+          undefined,
+          () => { /* missing file — leave dark placeholder */ }
+        );
+      });
+
+      // Compute field extent for infinite loop wrap-around
+      let minZ = Infinity, maxZ = -Infinity;
+      for (const m of photoMeshes) {
+        if (m.position.z < minZ) minZ = m.position.z;
+        if (m.position.z > maxZ) maxZ = m.position.z;
+      }
+      fieldFar = minZ - 2;
+      fieldDepth = (maxZ + 2) - fieldFar;
+
+      window.addEventListener('resize', onResize);
+      canvas.addEventListener('wheel', onWheel, { passive: false });
+      canvas.addEventListener('mousemove', onMove);
+      canvas.addEventListener('mouseleave', () => { targetMX = 0; targetMY = 0; pointer.set(-2, -2); });
+      canvas.addEventListener('click', onClick);
+      canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+
+      animate();
+    }
+
+    function onResize() {
+      const w = view.clientWidth, h = view.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    function onWheel(e) {
+      e.preventDefault();
+      targetScroll += e.deltaY * 0.012;
+    }
+
+    function onMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      targetMX = nx;
+      targetMY = ny;
+      pointer.set(nx, ny);
+    }
+
+    let lastTouchY = null;
+    function onTouchStart(e) { if (e.touches[0]) lastTouchY = e.touches[0].clientY; }
+    function onTouchMove(e) {
+      if (!e.touches[0] || lastTouchY === null) return;
+      e.preventDefault();
+      const ty = e.touches[0].clientY;
+      targetScroll += (lastTouchY - ty) * 0.02;
+      lastTouchY = ty;
+    }
+
+    function onClick() {
+      if (hovered && typeof window.__openLightbox === 'function') {
+        window.__openLightbox(hovered.userData.idx);
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (!view.classList.contains('active')) return;
+
+      scroll += (targetScroll - scroll) * 0.07;
+      mX += (targetMX - mX) * 0.05;
+      mY += (targetMY - mY) * 0.05;
+
+      camera.position.z = cameraStartZ - scroll;
+      camera.position.x = mX * 0.9;
+      camera.position.y = mY * 0.55;
+      camera.lookAt(0, 0, camera.position.z - 10);
+
+      // Infinite loop: wrap photos that have passed the camera back to the far end
+      const wrapNear = camera.position.z + recycleAhead;
+      const wrapFar = wrapNear - fieldDepth;
+      for (const m of photoMeshes) {
+        if (m.position.z > wrapNear) m.position.z -= fieldDepth;
+        else if (m.position.z < wrapFar) m.position.z += fieldDepth;
+      }
+
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(photoMeshes);
+      const newHover = hits.length ? hits[0].object : null;
+      if (newHover !== hovered) {
+        hovered = newHover;
+        canvas.style.cursor = hovered ? 'pointer' : 'grab';
+      }
+
+      const now = performance.now() * 0.0004;
+      for (const m of photoMeshes) {
+        if (m.userData.fadeIn && m.material.opacity < 1) {
+          m.material.opacity = Math.min(1, m.material.opacity + 0.025);
+        }
+        const target = (m === hovered) ? 1.14 : 1;
+        const cur = m.scale.x + (target - m.scale.x) * 0.1;
+        m.scale.set(cur, cur, 1);
+        m.position.y += Math.sin(now + m.userData.floatPhase) * 0.0009;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    const mo = new MutationObserver(() => {
+      if (view.classList.contains('active')) {
+        if (!initialized) init();
+        else onResize();
+      }
+    });
+    mo.observe(view, { attributes: true, attributeFilter: ['class'] });
+    if (view.classList.contains('active')) init();
+  </script>
+
+  <script type="module">
+    // ===== ESSAYS: WAX-SEAL MEDALLIONS =====
+    import * as THREE from 'three';
+
+    const essaysView = document.querySelector('.view-essays');
+    const qCanvas = document.getElementById('quill3d');
+    const captionEl = document.getElementById('quillCaption');
+    const inkBleedEl = document.getElementById('inkBleed');
+
+    const essayTitles = [
+      { short: 'Paradise Lost', full: 'i. Examining the Integrity of Free Will in Paradise Lost', anchor: '#essay-paradise-lost', num: 'I' },
+      { short: 'The Mask',      full: 'ii. The Mask Is Who We Are',                                 anchor: '#essay-mask',          num: 'II' },
+      { short: 'Odysseus',      full: 'iii. Odysseus: The Master Weaver of Story and Self',         anchor: '#essay-odysseus',      num: 'III' },
+      { short: 'Antigone',      full: "iv. Antigone's Conservative Rebellion",                      anchor: '#essay-antigone',      num: 'IV' },
+    ];
+
+    let qScene, qCam, qRenderer, qRay;
+    const qPointer = new THREE.Vector2(-2, -2);
+    const seals = [];
+    let qHover = null;
+    let qInit = false;
+    let qMX = 0, qMY = 0, qTMX = 0, qTMY = 0;
+
+    function makeSealFace(numeral) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 1024;
+      const x = c.getContext('2d');
+      const cx = 512, cy = 512;
+
+      // Base wax color
+      x.fillStyle = '#7a1a16';
+      x.beginPath();
+      x.arc(cx, cy, 500, 0, Math.PI * 2);
+      x.fill();
+
+      // Radial highlight to fake the curvature of pressed wax
+      const radial = x.createRadialGradient(cx - 140, cy - 160, 30, cx, cy, 540);
+      radial.addColorStop(0,    'rgba(255,180,150,0.55)');
+      radial.addColorStop(0.25, 'rgba(180,40,30,0.25)');
+      radial.addColorStop(0.65, 'rgba(60,10,8,0.30)');
+      radial.addColorStop(1,    'rgba(20,4,3,0.55)');
+      x.fillStyle = radial;
+      x.beginPath();
+      x.arc(cx, cy, 500, 0, Math.PI * 2);
+      x.fill();
+
+      // Scalloped/decorative inner ring (dots)
+      x.save();
+      x.translate(cx, cy);
+      const dots = 36;
+      for (let i = 0; i < dots; i++) {
+        const a = (i / dots) * Math.PI * 2;
+        const r = 400;
+        const dx = Math.cos(a) * r;
+        const dy = Math.sin(a) * r;
+        x.beginPath();
+        x.arc(dx, dy, 8, 0, Math.PI * 2);
+        x.fillStyle = 'rgba(40,8,6,0.55)';
+        x.fill();
+        x.beginPath();
+        x.arc(dx - 2, dy - 2, 4, 0, Math.PI * 2);
+        x.fillStyle = 'rgba(255,180,150,0.35)';
+        x.fill();
+      }
+      x.restore();
+
+      // Inner thin ring
+      x.strokeStyle = 'rgba(30,6,4,0.5)';
+      x.lineWidth = 4;
+      x.beginPath();
+      x.arc(cx, cy, 340, 0, Math.PI * 2);
+      x.stroke();
+      x.strokeStyle = 'rgba(255,180,150,0.18)';
+      x.lineWidth = 2;
+      x.beginPath();
+      x.arc(cx, cy, 336, 0, Math.PI * 2);
+      x.stroke();
+
+      // Embossed numeral — drawn char-by-char with explicit spacing so I's don't blur together
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.font = '700 340px "Playfair Display", Georgia, serif';
+
+      const chars = numeral.split('');
+      const widths = chars.map(ch => x.measureText(ch).width);
+      const gap = 36;
+      const totalW = widths.reduce((a, b) => a + b, 0) + gap * (chars.length - 1);
+      let xPos = cx - totalW / 2;
+      const positions = chars.map((ch, i) => {
+        const cw = widths[i];
+        const center = xPos + cw / 2;
+        xPos += cw + gap;
+        return center;
+      });
+
+      const drawChars = (dx, dy, style) => {
+        x.fillStyle = style;
+        chars.forEach((ch, i) => x.fillText(ch, positions[i] + dx, cy + dy));
+      };
+
+      // Deep shadow (bottom-right of stroke)
+      drawChars(7, 9, 'rgba(15,3,2,0.85)');
+      // Mid tone fill
+      drawChars(0, 0, '#3a0808');
+      // Highlight rim (top-left of stroke)
+      drawChars(-5, -7, 'rgba(255,200,170,0.45)');
+
+      // Subtle grain (specks)
+      for (let i = 0; i < 220; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = Math.random() * 480;
+        const dx = cx + Math.cos(a) * r;
+        const dy = cy + Math.sin(a) * r;
+        x.fillStyle = `rgba(0,0,0,${(Math.random() * 0.08).toFixed(3)})`;
+        x.fillRect(dx, dy, 2, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 8;
+      return tex;
+    }
+
+    function makeSealEdge() {
+      // Side/edge texture for the cylinder — solid dark wax
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 64;
+      const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, 0, 64);
+      g.addColorStop(0,   '#4a0c0a');
+      g.addColorStop(0.5, '#7a1a16');
+      g.addColorStop(1,   '#3a0806');
+      x.fillStyle = g;
+      x.fillRect(0, 0, 512, 64);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function buildSeal(t, i) {
+      // Seal faces the camera (axis along +Z). Lathe is built around Y, then rotated.
+      const group = new THREE.Group();
+
+      const profile = [
+        new THREE.Vector2(0.0,  0.10),
+        new THREE.Vector2(0.78, 0.10),
+        new THREE.Vector2(0.92, 0.04),
+        new THREE.Vector2(0.96, -0.04),
+        new THREE.Vector2(0.86, -0.10),
+        new THREE.Vector2(0.0, -0.10),
+      ];
+      const lathe = new THREE.LatheGeometry(profile, 64);
+      const sideMat = new THREE.MeshStandardMaterial({
+        color: 0x5a0e0c,
+        roughness: 0.6,
+        metalness: 0.05,
+      });
+      const body = new THREE.Mesh(lathe, sideMat);
+      body.rotation.x = -Math.PI / 2; // axis now points along +Z (toward camera)
+      group.add(body);
+
+      // Embossed face — disk on the +Z side
+      const faceTex = makeSealFace(t.num);
+      const faceMat = new THREE.MeshStandardMaterial({
+        map: faceTex,
+        roughness: 0.55,
+        metalness: 0.08,
+        emissive: 0x000000,
+      });
+      const face = new THREE.Mesh(new THREE.CircleGeometry(0.78, 64), faceMat);
+      face.position.z = 0.101;
+      group.add(face);
+
+      // Slight static tilt — like the wax was pressed unevenly
+      const wiggleY = ((i * 13) % 7 - 3) * 0.018;
+      const wiggleX = ((i * 7) % 5 - 2) * 0.015;
+      group.rotation.y = wiggleY;
+      group.rotation.x = wiggleX;
+
+      group.userData = {
+        title: t,
+        baseRotX: wiggleX,
+        baseRotY: wiggleY,
+        targetRotX: wiggleX,
+        targetRotY: wiggleY,
+        targetZ: 0,
+        targetEmissive: 0,
+        faceMat,
+      };
+
+      return group;
+    }
+
+    function qInitScene() {
+      if (qInit) return;
+      qInit = true;
+
+      const w = qCanvas.clientWidth, h = qCanvas.clientHeight;
+      qRenderer = new THREE.WebGLRenderer({ canvas: qCanvas, antialias: true, alpha: true });
+      qRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      qRenderer.setSize(w, h, false);
+      qRenderer.setClearColor(0x000000, 0);
+
+      qScene = new THREE.Scene();
+      qCam = new THREE.PerspectiveCamera(40, w / h, 0.1, 50);
+      qCam.position.set(0, 0, 6.0);
+      qCam.lookAt(0, 0, 0);
+
+      qRay = new THREE.Raycaster();
+
+      // Lighting — soft warm key from upper-left, cool fill, rim from below for wax depth
+      qScene.add(new THREE.AmbientLight(0xfff0d8, 0.4));
+      const key = new THREE.DirectionalLight(0xfff2dc, 1.3);
+      key.position.set(-3, 4, 4);
+      qScene.add(key);
+      const fill = new THREE.DirectionalLight(0xffe0c0, 0.45);
+      fill.position.set(4, -1, 3);
+      qScene.add(fill);
+      const rim = new THREE.PointLight(0xffd0a8, 0.6, 8);
+      rim.position.set(0, 0, 3);
+      qScene.add(rim);
+
+      // 2x2 grid — seals face the camera, properly spaced so they don't touch
+      const sx = 1.35; // horizontal spacing
+      const sy = 1.15; // vertical spacing
+      const positions = [
+        [-sx,  sy],
+        [ sx,  sy],
+        [-sx, -sy],
+        [ sx, -sy],
+      ];
+
+      essayTitles.forEach((t, i) => {
+        const seal = buildSeal(t, i);
+        const [x, y] = positions[i];
+        seal.position.set(x, y, 0);
+        seal.userData.basePos = new THREE.Vector3(x, y, 0);
+        qScene.add(seal);
+        seals.push(seal);
+      });
+
+      window.addEventListener('resize', qOnResize);
+      qCanvas.addEventListener('mousemove', qOnMove);
+      qCanvas.addEventListener('mouseleave', () => { qTMX = 0; qTMY = 0; qPointer.set(-2, -2); });
+      qCanvas.addEventListener('click', qOnClick);
+      qCanvas.addEventListener('touchstart', qOnTouch, { passive: true });
+
+      qAnimate();
+    }
+
+    function qOnResize() {
+      const w = qCanvas.clientWidth, h = qCanvas.clientHeight;
+      if (!w || !h) return;
+      qRenderer.setSize(w, h, false);
+      qCam.aspect = w / h;
+      qCam.updateProjectionMatrix();
+    }
+
+    function qOnMove(e) {
+      const rect = qCanvas.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      qTMX = nx; qTMY = ny;
+      qPointer.set(nx, ny);
+    }
+
+    function qOnTouch(e) {
+      if (!e.touches.length) return;
+      const rect = qCanvas.getBoundingClientRect();
+      const t = e.touches[0];
+      const nx = ((t.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((t.clientY - rect.top) / rect.height) * 2 + 1;
+      qPointer.set(nx, ny);
+    }
+
+    function qOnClick(e) {
+      if (!qHover) return;
+      const t = qHover.userData.title;
+      const rect = qCanvas.getBoundingClientRect();
+      const cx = ((e.clientX - rect.left) / rect.width) * 100;
+      const cy = ((e.clientY - rect.top) / rect.height) * 100;
+      inkBleedEl.style.setProperty('--bx', cx + '%');
+      inkBleedEl.style.setProperty('--by', (cy + (rect.top / window.innerHeight) * 100) + '%');
+      // Press the seal down briefly
+      const pressed = qHover;
+      pressed.userData.pressing = performance.now();
+      inkBleedEl.classList.add('on');
+      setTimeout(() => {
+        document.querySelectorAll('.essays-inner .essay-piece').forEach(el => el.classList.remove('revealed'));
+        const target = document.querySelector(t.anchor);
+        if (target) {
+          target.classList.add('revealed');
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        setTimeout(() => inkBleedEl.classList.remove('on'), 250);
+      }, 420);
+    }
+
+    function qAnimate() {
+      requestAnimationFrame(qAnimate);
+
+      qMX += (qTMX - qMX) * 0.06;
+      qMY += (qTMY - qMY) * 0.06;
+
+      // Raycast against face meshes (children of seal groups)
+      qRay.setFromCamera(qPointer, qCam);
+      const targets = [];
+      for (const s of seals) targets.push(...s.children);
+      const hits = qRay.intersectObjects(targets);
+      let hoveredSeal = null;
+      if (hits.length) {
+        let o = hits[0].object;
+        while (o && !o.userData.title) o = o.parent;
+        hoveredSeal = o;
+      }
+
+      if (hoveredSeal !== qHover) {
+        if (qHover) {
+          qHover.userData.targetRotX = qHover.userData.baseRotX;
+          qHover.userData.targetRotY = qHover.userData.baseRotY;
+          qHover.userData.targetZ = 0;
+          qHover.userData.targetEmissive = 0;
+        }
+        qHover = hoveredSeal;
+        if (qHover) {
+          qHover.userData.targetRotX = qHover.userData.baseRotX - 0.08;
+          qHover.userData.targetRotY = qHover.userData.baseRotY;
+          qHover.userData.targetZ = 0.35;
+          qHover.userData.targetEmissive = 0.22;
+          captionEl.textContent = qHover.userData.title.full;
+          captionEl.classList.add('visible');
+        } else {
+          captionEl.classList.remove('visible');
+        }
+        qCanvas.classList.toggle('hovering', !!qHover);
+      }
+
+      const now = performance.now();
+
+      for (const s of seals) {
+        const u = s.userData;
+        // Smooth tilt + push toward camera on hover
+        s.rotation.x += (u.targetRotX - s.rotation.x) * 0.1;
+        s.rotation.y += (u.targetRotY - s.rotation.y) * 0.1;
+        s.position.z += (u.targetZ - s.position.z) * 0.1;
+
+        // Very subtle cursor parallax
+        s.position.x = u.basePos.x + qMX * 0.04;
+        s.position.y = u.basePos.y + qMY * 0.04;
+
+        // Emissive glow on hover
+        const curEm = u.faceMat.emissiveIntensity || 0;
+        const nextEm = curEm + (u.targetEmissive - curEm) * 0.08;
+        u.faceMat.emissive.setHex(0x3a0c08);
+        u.faceMat.emissiveIntensity = nextEm;
+
+        // Press-in animation — push along Z briefly
+        if (u.pressing) {
+          const dt = now - u.pressing;
+          if (dt < 380) {
+            const k = Math.sin(Math.min(1, dt / 380) * Math.PI);
+            s.position.z = u.basePos.z + u.targetZ - k * 0.5;
+            s.scale.set(1 + k * 0.03, 1 + k * 0.03, 1 - k * 0.25);
+          } else {
+            s.scale.set(1, 1, 1);
+            u.pressing = null;
+          }
+        }
+      }
+
+      qRenderer.render(qScene, qCam);
+    }
+
+    const qObs = new MutationObserver(() => {
+      if (essaysView.classList.contains('active')) {
+        if (!qInit) qInitScene();
+        else qOnResize();
+      }
+    });
+    qObs.observe(essaysView, { attributes: true, attributeFilter: ['class'] });
+    if (essaysView.classList.contains('active')) qInitScene();
+  </script>
+
+  <!-- ===== SHORT STORIES 3D SCENE ===== -->
+  <script>
+    const stories = [
+      {
+        id: 'character',
+        kicker: '// Short Story',
+        title: 'Character',
+        fragments: [
+          'third row from the back',
+          'the system speaks',
+          'a hole in the argument',
+          'I thought I was awake',
+          'the face people make',
+          'a clock running backward',
+          'every crosswalk',
+          'same routes, same signals',
+          'I walked at diagonals',
+          'a weed in the crack',
+          'no bottom',
+          'every layer was placed',
+          'I did not choose this',
+          'but I am here',
+          'the seed and the crack',
+          'the water that feeds it',
+          'God, or biology, or chain of cause',
+          'the way things are'
+        ],
+        body: [
+          "I was sitting in a classroom. Third row from the back. The teacher was drawing connections on the whiteboard, building an argument, and the argument had a hole in it. I said something but I didn't decide to say it. The words came out clean and specific, and a few kids turned around, and one of them gave a look of interest, and the moment passed the way it always passes. It happens every day. I used to think this was something I did. Now I think there is a system and I am inside of it, and the system is what speaks.",
+          "But I did not always think this way. For a long time I believed I was awake.",
+          "I looked at the government and saw a performance. I looked at pop culture and saw desire being manufactured and sold back. I said the sharp thing in every room I entered and watched the faces change. I know that face now. Everyone made the same one. It is the face people make when a clock starts running backward. Not anger. Discomfort. Like watching something break that they thought was working fine. I did not care. I liked it. I thought I was seeing things clearly and everyone else was asleep. I thought I had chosen to be this way. That the choosing was what made me different. For years this was the story I told about myself. I was the one who could see. And I believed that seeing was the same thing as being free.",
+          "I walk through the city every day. Every crosswalk and traffic signal and subway entrance was placed by someone who was not me. The placement decides where I walk and when I stop and which direction I turn. Everyone moves through it the same way. Same routes. Same signals. Same places at roughly the same times. No one seems to find this strange. I used to try to walk against it. I cut through blocks at diagonals. I ducked into alleys that led nowhere. I found an empty lot at the end of one of them where the concrete had cracked and a weed was pushing through and I told myself this was the place where things break down. The place the structure could not reach. But I got there by walking. On legs that were told the way. Because something in me needed to find the broken place, and that need was in me before I started walking. The alleys were still inside the grid. The diagonals still crossed streets someone else had paved. Every time I thought I was going off the path, the path was already there, waiting for me to think that. The system does not care if you walk straight or diagonal. It made both roads.",
+          "The thing that I cannot stop thinking about is not that the world runs like a machine. I already knew that. The thing is that I run like one too. I question everything. I always have. But I never chose to be this way any more than a stone chooses to fall. It is just what I do. It is what I have always done. A disruption that happens on schedule is not a disruption. It is just another part of how the system works. I cannot find the moment this started. The system was just there one day, fully formed, and I built everything around it the way you build walls around a foundation that was already in the ground when you got there. Every thought I have ever had came from the one before it. Follow the chain back far enough and you end up before I was born, in a room I have never seen, in a “choice” someone else made that I am still living out.",
+          "I tried to prove myself wrong. If the pattern was that I always question, I would stop. I sat in class and said nothing. The teacher made his argument and I let it stand. The silence felt like holding my breath underwater. The kid next to me looked over. He was used to me talking. The whole room was. And I knew as I sat there that the silence was its own kind of disruption. And I knew that knowing this was part of the pattern. And I knew that knowing that was part of it too, and it kept going down and I could not find the bottom. I tried other things. I ate what everyone ate. I watched what everyone watched. For three days straight I did nothing that was mine. On the third day I caught myself studying my own performance and I stopped trying. There is no bottom. There is no layer where you finally reach the part of you that you built yourself. Every layer was put there by something before it.",
+          "I went for a walk after that. I did not pick a direction. My legs moved and I followed them and when I stopped I was standing at the same lot. Same fence. Same crack in the concrete. The weed was still there. I stood there for a long time looking at it. The last time I came here I thought I had found the edge of the grid, the place where things fall apart. Now I saw something else. The weed did not decide to grow there. A seed landed in a crack and the crack held water and the water was enough. It did not choose the crack. The crack did not choose it. But there they were, together, and it looked right. It looked like it was supposed to be there. Everything looks like it belongs once it is already in place.",
+          "And I stood there and for the first time I did not want to fight it.",
+          "The weed was not free. It did not pick the crack. But it was the only thing growing there. It was doing what it was going to do regardless of whether it understood why. That was all it had. And standing in that lot I thought maybe that is all anyone has. Not a door out of the building. Just a window. You can see the whole thing from where you are standing. You can see the walls and the grid and the routes and the signals. You can see that you did not build any of it. You can see that you were placed here the same way the weed was placed in the crack. And seeing it does not get you out. But not seeing it does not get you out either. Nothing gets you out. So you might as well see it.",
+          "I am putting this down because something in me needs to put it down. That need did not come from nowhere. It came from every classroom and every sharp thing I said and every face that changed and every block I walked at a diagonal thinking I was going somewhere new. I sit at the desk and my hand moves and the words come out in an order I did not plan and I set them down because that is what comes next. I did not choose this. But I am here. The weed did not choose the crack. But it grew anyway.",
+          "I keep trying to put a name on it. The system. The thing that was here before me and will be here after. Some nights I think it is God, and then I think God is just a word people use when they can feel the edges of something they cannot see. Other times I think it is biology or chemistry or the long slow chain of every cause and every effect going back to the first thing that ever moved. And other times I think it is simpler than any of that, that there is no name for it because it is not a thing, it is just the way things are, the water that feeds the crack and the crack that holds the seed."
+        ]
+      }
+    ];
+
+    (function initStories3D() {
+      const storiesView = document.querySelector('.view-stories');
+      const scene = document.getElementById('storiesScene');
+      const world = document.getElementById('storiesWorld');
+      const reader = document.getElementById('storyReader');
+      const readerClose = document.getElementById('storyReaderClose');
+      const readerKicker = document.getElementById('storyReaderKicker');
+      const readerTitle = document.getElementById('storyReaderTitle');
+      const readerBody = document.getElementById('storyReaderBody');
+      if (!storiesView || !scene || !world) return;
+
+      // Build fragments
+      const items = []; // { el, baseX, baseY, baseZ, phase, speed }
+      const TAU = Math.PI * 2;
+
+      function seeded(seed) {
+        let s = seed;
+        return () => {
+          s = (s * 9301 + 49297) % 233280;
+          return s / 233280;
+        };
+      }
+
+      stories.forEach((story, sIdx) => {
+        // Distribute story clusters horizontally across the scene
+        const clusterCount = stories.length;
+        const clusterX = clusterCount === 1 ? 0 : (sIdx / (clusterCount - 1) - 0.5) * 1400;
+        const rand = seeded(sIdx * 1000 + 7);
+
+        // Title at the front of the cluster
+        const titleEl = document.createElement('div');
+        titleEl.className = 'story-frag is-title';
+        titleEl.textContent = story.title;
+        titleEl.dataset.storyId = story.id;
+        const titleX = clusterX;
+        const titleY = -30;
+        const titleZ = 0;
+        items.push({
+          el: titleEl, baseX: titleX, baseY: titleY, baseZ: titleZ,
+          phase: rand() * TAU, speed: 0, amp: 0
+        });
+        world.appendChild(titleEl);
+
+        // Kicker above title
+        const kickerEl = document.createElement('div');
+        kickerEl.className = 'story-frag is-kicker';
+        kickerEl.textContent = story.kicker;
+        items.push({
+          el: kickerEl, baseX: clusterX, baseY: -90, baseZ: 20,
+          phase: rand() * TAU, speed: 0.3 + rand() * 0.2, amp: 4
+        });
+        world.appendChild(kickerEl);
+
+        // Fragments orbit behind / around the title
+        story.fragments.forEach((frag, i) => {
+          const wordEl = document.createElement('div');
+          wordEl.className = 'story-frag is-word';
+          wordEl.textContent = frag;
+          // Distribute in 3D shell around cluster center
+          const angle = (i / story.fragments.length) * TAU + rand() * 0.5;
+          const radius = 220 + rand() * 280;
+          const x = clusterX + Math.cos(angle) * radius;
+          const y = (rand() - 0.5) * 360;
+          const z = Math.sin(angle) * radius - rand() * 200 - 100;
+          items.push({
+            el: wordEl, baseX: x, baseY: y, baseZ: z,
+            phase: rand() * TAU, speed: 0.2 + rand() * 0.5, amp: 8 + rand() * 12
+          });
+          world.appendChild(wordEl);
+        });
+      });
+
+      // Pointer / interaction state
+      let targetRotX = 0, targetRotY = 0;
+      let rotX = 0, rotY = 0;
+      let targetCamX = 0, targetCamZ = 0;
+      let camX = 0, camZ = 0;
+      let pointerInside = false;
+      let dragging = false;
+      let dragStartX = 0, dragStartY = 0;
+      let dragOriginCamX = 0;
+      let activeStoryIdx = 0;
+
+      function onMove(e) {
+        const rect = scene.getBoundingClientRect();
+        const cx = (e.clientX - rect.left) / rect.width;
+        const cy = (e.clientY - rect.top) / rect.height;
+        targetRotY = (cx - 0.5) * 6;   // degrees — small tilt so title stays put
+        targetRotX = -(cy - 0.5) * 4;
+        pointerInside = true;
+        if (dragging) {
+          const dx = e.clientX - dragStartX;
+          targetCamX = dragOriginCamX - dx * 1.2;
+        }
+      }
+      function onLeave() { pointerInside = false; targetRotX = 0; targetRotY = 0; }
+      function onDown(e) {
+        if (e.target.closest('.story-frag.is-title')) return;
+        dragging = true;
+        scene.classList.add('dragging');
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragOriginCamX = targetCamX;
+      }
+      function onUp() { dragging = false; scene.classList.remove('dragging'); }
+
+      scene.addEventListener('mousemove', onMove);
+      scene.addEventListener('mouseleave', onLeave);
+      scene.addEventListener('mousedown', onDown);
+      window.addEventListener('mouseup', onUp);
+
+      // Click title -> open reader
+      world.addEventListener('click', (e) => {
+        const t = e.target.closest('.story-frag.is-title');
+        if (!t) return;
+        const id = t.dataset.storyId;
+        const story = stories.find(s => s.id === id);
+        if (!story) return;
+        openReader(story);
+      });
+
+      function openReader(story) {
+        readerKicker.textContent = story.kicker;
+        readerTitle.textContent = story.title;
+        readerBody.innerHTML = story.body.map(p => `<p>${p}</p>`).join('');
+        reader.classList.add('active');
+        reader.scrollTop = 0;
+      }
+      function closeReader() { reader.classList.remove('active'); }
+      readerClose.addEventListener('click', closeReader);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && reader.classList.contains('active')) {
+          e.stopImmediatePropagation();
+          closeReader();
+        }
+      }, true);
+
+      // Animation loop — runs only when view is active
+      let running = false;
+      let t0 = performance.now();
+
+      function frame(now) {
+        if (!running) return;
+        const t = (now - t0) / 1000;
+
+        // Ease rotation
+        rotX += (targetRotX - rotX) * 0.06;
+        rotY += (targetRotY - rotY) * 0.06;
+        camX += (targetCamX - camX) * 0.08;
+        camZ += (targetCamZ - camZ) * 0.08;
+
+        world.style.transform = `translate3d(${-camX}px, 0, ${camZ}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+
+        // Per-fragment float
+        for (let i = 0; i < items.length; i++) {
+          const it = items[i];
+          const fx = Math.sin(t * it.speed + it.phase) * it.amp;
+          const fy = Math.cos(t * it.speed * 0.8 + it.phase) * it.amp * 0.6;
+          const fz = Math.sin(t * it.speed * 0.5 + it.phase * 1.3) * it.amp * 0.7;
+          // Depth-based opacity: closer = sharper
+          const z = it.baseZ + fz;
+          const depth = Math.max(0, Math.min(1, (z + 600) / 900));
+          const op = 0.25 + depth * 0.75;
+          it.el.style.transform = `translate3d(${it.baseX + fx - it.el.offsetWidth / 2}px, ${it.baseY + fy - it.el.offsetHeight / 2}px, ${z}px)`;
+          it.el.style.opacity = it.el.classList.contains('is-title') ? Math.max(0.85, op) : op;
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function start() {
+        if (running) return;
+        running = true;
+        t0 = performance.now();
+        requestAnimationFrame(frame);
+      }
+      function stop() { running = false; }
+
+      const obs = new MutationObserver(() => {
+        if (storiesView.classList.contains('active')) start();
+        else { stop(); closeReader(); }
+      });
+      obs.observe(storiesView, { attributes: true, attributeFilter: ['class'] });
+      if (storiesView.classList.contains('active')) start();
     })();
   </script>
 </body>
