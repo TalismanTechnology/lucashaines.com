@@ -285,6 +285,27 @@
       background-clip: text;
     }
 
+    /* Research */
+    .band-research { background: #e8e2d2; color: #1a1814; }
+    .band-research .band-bg {
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 28px), #e8e2d2;
+    }
+    .band-research .band-bg-overlay {
+      background: linear-gradient(90deg, rgba(232,226,210,0.4) 0%, rgba(232,226,210,0) 50%, rgba(232,226,210,0.4) 100%);
+    }
+    .band-research .band-name {
+      font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      font-weight: 500;
+      font-style: italic;
+      font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+      letter-spacing: 0.01em;
+      color: #1a1814;
+    }
+    .band-research .band-num,
+    .band-research .band-meta { color: rgba(0,0,0,0.5); }
+    .band-research:hover .band-num { color: rgba(0,0,0,0.75); }
+    .band-research .band-arrow { color: rgba(0,0,0,0.7); }
+
     /* Photography */
     .band-photography { background: #050505; color: #f0ede8; }
     .band-photography .band-bg {
@@ -324,6 +345,7 @@
       .band-stories .band-name,
       .band-photography .band-name { font-size: 0.85rem; letter-spacing: 4px; }
       .band-murals .band-name { font-size: 1.6rem; }
+      .band-research .band-name { font-size: 1.4rem; }
     }
 
     /* ===== IMMERSIVE PAGES (genre views) ===== */
@@ -700,6 +722,77 @@
       text-align: right;
     }
 
+    /* ----- RESEARCH view ----- */
+    .view-research {
+      background: #f4efe2;
+      color: #1a1814;
+    }
+    .view-research .back-btn { color: #777; font-family: 'IBM Plex Mono', monospace; }
+    .view-research .back-btn:hover { color: #1a1814; }
+    .research-inner {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 120px clamp(20px, 4vw, 60px) 100px;
+    }
+    .research-header {
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .research-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .research-title {
+      font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      margin: 0 0 18px;
+    }
+    .research-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #888;
+    }
+    .research-frame {
+      max-width: 1100px;
+      width: 100%;
+      aspect-ratio: 8.5 / 11;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.25);
+      background: #fff;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .research-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .research-download {
+      margin-top: 30px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #555;
+      text-decoration: none;
+      border-bottom: 1px solid #888;
+      padding-bottom: 3px;
+    }
+    .research-download:hover { color: #1a1814; border-color: #1a1814; }
+
     /* ----- PHOTOGRAPHY view ----- */
     .view-photography { background: var(--bg); }
     .photography-header {
@@ -946,6 +1039,16 @@
           <div class="band-arrow">&rarr;</div>
         </div>
       </a>
+      <a href="#" class="band band-research" data-genre="research" style="animation-delay: .50s;">
+        <div class="band-bg"></div>
+        <div class="band-bg-overlay"></div>
+        <div class="band-content">
+          <div class="band-num">vi.</div>
+          <div class="band-name">Research</div>
+          <div class="band-meta">Elliptical Model</div>
+          <div class="band-arrow">&rarr;</div>
+        </div>
+      </a>
       <a href="#" class="band band-about" data-genre="about" style="animation-delay: .58s;">
         <div class="band-bg"></div>
         <div class="band-bg-overlay"></div>
@@ -1118,6 +1221,22 @@ I gave myself before I knew the game.</div>
         <p>I am putting this down because something in me needs to put it down. That need did not come from nowhere. It came from every classroom and every sharp thing I said and every face that changed and every block I walked at a diagonal thinking I was going somewhere new. I sit at the desk and my hand moves and the words come out in an order I did not plan and I set them down because that is what comes next. I did not choose this. But I am here. The weed did not choose the crack. But it grew anyway.</p>
         <p>I keep trying to put a name on it. The system. The thing that was here before me and will be here after. Some nights I think it is God, and then I think God is just a word people use when they can feel the edges of something they cannot see. Other times I think it is biology or chemistry or the long slow chain of every cause and every effect going back to the first thing that ever moved. And other times I think it is simpler than any of that, that there is no name for it because it is not a thing, it is just the way things are, the water that feeds the crack and the crack that holds the seed.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== RESEARCH ===== -->
+  <section class="immersion view-research" data-view="research">
+    <button class="back-btn" data-back><span>&larr;</span> Back</button>
+    <div class="research-inner">
+      <header class="research-header">
+        <div class="research-kicker">Research</div>
+        <h1 class="research-title">The Elliptical Model</h1>
+        <div class="research-meta">Lucas Haines &middot; 2026</div>
+      </header>
+      <div class="research-frame">
+        <iframe src="works/elliptical-model.pdf#view=FitH" title="The Elliptical Model"></iframe>
+      </div>
+      <a class="research-download" href="works/elliptical-model.pdf" target="_blank" rel="noopener">Open PDF &rarr;</a>
     </div>
   </section>
 
