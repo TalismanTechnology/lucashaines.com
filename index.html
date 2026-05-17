@@ -25,12 +25,15 @@
     }
 
     html { scrollbar-width: thin; scrollbar-color: #222 transparent; }
+    html, body { max-width: 100vw; overflow-x: hidden; }
     body {
       background: var(--bg);
       color: var(--text);
       font-family: 'Space Grotesk', -apple-system, sans-serif;
       overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
     }
+    img, video, canvas, svg { max-width: 100%; }
 
     /* ===== GRAIN ===== */
     .grain {
@@ -405,7 +408,15 @@
     .back-btn:hover span { transform: translateX(-6px); }
 
     @media (max-width: 768px) {
-      .back-btn { top: 14px; left: 16px; cursor: pointer; font-size: 0.7rem; letter-spacing: 4px; }
+      .back-btn {
+        top: 10px; left: 10px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        letter-spacing: 4px;
+        padding: 12px 14px;
+        min-width: 44px; min-height: 44px;
+        display: inline-flex; align-items: center;
+      }
     }
 
     /* ----- ESSAYS view ----- */
@@ -512,7 +523,7 @@
       margin: 0 auto 40px;
       margin-left: 50%;
       transform: translateX(-50%);
-      height: clamp(540px, 78vh, 820px);
+      height: clamp(420px, 78vh, 820px);
       perspective: 1600px;
       perspective-origin: 50% 45%;
       user-select: none;
@@ -538,7 +549,8 @@
     /* === Manila folder (closed-state visual) === */
     .folder {
       position: relative;
-      width: clamp(460px, 64vw, 760px);
+      width: min(760px, clamp(300px, 64vw, 760px));
+      max-width: 92vw;
       aspect-ratio: 1.42 / 1;
       transform: rotate(-2.5deg);
       filter:
@@ -1304,9 +1316,44 @@
     .book-stage[data-state="essay"] .frontispiece:nth-child(4) { transform: translate( 60vw,  50vh) rotate( 18deg) scale(0.6); }
 
     @media (max-width: 720px) {
-      .book-stage { height: clamp(520px, 88vh, 720px); }
-      .frontispieces { grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
-      .book-stage[data-state="essay"] .frontispiece:nth-child(n) { transform: translate(0, 90vh) scale(0.6); }
+      .essays-inner { padding-top: 110px; }
+      /* Folder (closed) sits in a fixed-height area; once the user opens
+         the folder we switch the stage to auto so the stacked frontispieces
+         can grow it. */
+      .book-stage { height: clamp(380px, 70vh, 560px); margin-bottom: 24px; }
+      .book-stage[data-state="grid"],
+      .book-stage[data-state="essay"] { height: auto; min-height: 0; }
+      /* When the grid is showing, the frontispieces stack and contribute to
+         the stage's height; otherwise they stay absolute & invisible. */
+      .book-stage[data-state="grid"] .frontispieces,
+      .book-stage[data-state="essay"] .frontispieces {
+        position: relative;
+        inset: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 16px;
+        padding: 8px;
+      }
+      .book-stage[data-state="grid"] .frontispiece,
+      .book-stage[data-state="essay"] .frontispiece {
+        position: relative;
+        min-height: 220px;
+        padding: 26px 22px;
+        transform: none !important;
+      }
+      .frontispiece .fp-title { font-size: clamp(1.4rem, 5.2vw, 1.9rem); }
+      .frontispiece .fp-sub { font-size: 1rem; max-width: 92%; }
+      .frontispiece .fp-epigraph { display: none; }
+    }
+    @media (max-width: 480px) {
+      .essays-inner { padding-left: 14px; padding-right: 14px; }
+      .folder-stamp { font-size: 0.75rem; letter-spacing: 4px; padding: 6px 12px; }
+      .folder-label { padding: 10px 12px; right: 30%; }
+      .folder-label-title { font-size: clamp(1.2rem, 5vw, 1.6rem); }
+      .folder-label-sub { font-size: 0.92rem; }
+      .folder-label-meta { font-size: 0.6rem; letter-spacing: 2px; }
+      .folder-tab { font-size: 0.6rem; letter-spacing: 1.5px; }
+      .book-instruct { font-size: 0.7rem; letter-spacing: 2px; bottom: -28px; padding: 0 12px; }
     }
 
     /* Text index is replaced by the 3D quill scene */
@@ -1462,20 +1509,22 @@
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 500;
-      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-size: clamp(1.9rem, 7vw, 5.5rem);
       letter-spacing: 0.005em;
       margin-bottom: 70px;
-      line-height: 1;
+      line-height: 1.05;
       color: #fff7e1;
       text-shadow:
         0 0 24px rgba(255,232,180,0.55),
         0 0 60px rgba(255,210,150,0.25);
+      max-width: 100%;
+      overflow-wrap: break-word;
     }
     .poem-body {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 400;
-      font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+      font-size: clamp(1rem, 1.6vw, 1.5rem);
       line-height: 2.1;
       letter-spacing: 0.01em;
       color: #ece6d2;
@@ -1490,6 +1539,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      min-height: 100dvh;
       width: 100%;
       padding: 140px clamp(20px, 6vw, 80px) 100px;
       box-sizing: border-box;
@@ -3913,7 +3963,12 @@
 
     /* ===== Mobile ===== */
     @media (max-width: 760px) {
-      .typewriter { transform: scale(0.65); transform-origin: center; }
+      .desk-stage { overflow: hidden; }
+      /* desk-light is 1200px square — clip it so it doesn't paint outside */
+      .desk-light { width: 100vw; height: 100vw; max-width: 1200px; max-height: 1200px; }
+      /* Typewriter is 720×460 — scale to fit narrow viewports without
+         overflowing horizontally. */
+      .typewriter { transform: scale(min(0.65, calc((100vw - 32px) / 720))); transform-origin: center; }
       .desk-lamp { right: -2%; top: 1%; transform: scale(0.7); }
       .desk-notebook { left: -4%; top: 6%; transform: scale(0.7) rotate(-6deg); }
       .desk-draft { transform: scale(0.7); }
@@ -3921,6 +3976,11 @@
       .draft-2 { right: 2%; bottom: 8%; transform: scale(0.7) rotate(7deg); }
       .desk-ink { left: 16%; bottom: 14%; transform: scale(0.75); }
       .desk-pen { right: 8%; bottom: 18%; transform: scale(0.7) rotate(28deg); }
+    }
+    @media (max-width: 420px) {
+      .typewriter { margin-top: 80px; }
+      .desk-lamp, .desk-notebook, .desk-ink, .desk-pen { display: none; }
+      .draft-1, .draft-2 { opacity: 0.5; }
     }
 
     /* ----- Story reader overlay (styled as enlarged typewriter paper) ----- */
@@ -4132,6 +4192,7 @@
       width: 90vw;
       max-width: 1400px;
       height: 100vh;
+      height: 100dvh;
       background:
         radial-gradient(ellipse 38% 55% at 50% 48%, rgba(255,220,160,0.32) 0%, rgba(255,200,140,0.18) 25%, rgba(255,200,140,0.06) 50%, transparent 70%);
       pointer-events: none;
@@ -4267,6 +4328,7 @@
         0 4px 8px rgba(0,0,0,0.45);
       text-align: center;
       min-width: 360px;
+      max-width: 92vw;
     }
     .gallery-plaque::before {
       /* Brushed-brass micro grain */
@@ -4422,6 +4484,7 @@
     .view-research .back-btn:hover { color: #1a1814; }
     .research-inner {
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -4992,11 +5055,15 @@
     @media (max-width: 768px) {
       .gallery { grid-template-columns: repeat(2, 1fr); padding: 20px 12px; }
       .photo-item { padding: 6px !important; }
+      .photo-item img { max-height: none; }
     }
     @media (max-width: 480px) {
       .gallery { grid-template-columns: repeat(2, 1fr); padding: 12px 6px; }
       .photo-item { padding: 4px !important; }
       .photo-item img { transform: none !important; }
+    }
+    @media (max-width: 360px) {
+      .gallery { grid-template-columns: 1fr; padding: 12px 8px; }
     }
 
 
@@ -5095,8 +5162,7 @@
       .band-arrow { display: none; }
       .shelf-hint { font-size: 0.5rem; letter-spacing: 4px; bottom: 16px; padding: 0 20px; }
 
-      /* Back button: larger tap target */
-      .back-btn { padding: 8px 4px; }
+      /* (back-btn tap target sized in the .immersion block above) */
 
       /* Essays */
       .essays-inner { padding: 96px 18px 100px; }
@@ -5149,17 +5215,28 @@
       .research-manuscript { margin-top: 30px; }
 
       /* Photography */
-      .photography-header { padding: 64px 60px 0; }
+      .photography-header { padding: 64px 16px 0; }
       .photography-title { font-size: 1.8rem; padding: 0 16px; }
       .photography-kicker { font-size: 0.55rem; letter-spacing: 5px; margin-bottom: 12px; }
       .photography-hint { font-size: 0.5rem; letter-spacing: 4px; bottom: 18px; padding: 0 20px; }
 
-      /* Lightbox: bigger tap targets, edge-safe positions */
-      .lb-close { top: 14px; right: 14px; font-size: 1.8rem; padding: 8px 12px; }
-      .lb-nav { font-size: 2.2rem; padding: 16px 10px; }
+      /* Lightbox: bigger tap targets (44×44 minimum), edge-safe positions */
+      .lb-close {
+        top: 10px; right: 10px;
+        font-size: 1.6rem;
+        min-width: 44px; min-height: 44px;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0;
+      }
+      .lb-nav {
+        font-size: 2.4rem;
+        min-width: 48px; min-height: 64px;
+        padding: 0 12px;
+        display: flex; align-items: center; justify-content: center;
+      }
       .lb-prev { left: 0; } .lb-next { right: 0; }
-      .lb-info { bottom: 16px; padding: 0 16px; }
-      .lightbox img { max-width: 96vw; max-height: 80vh; }
+      .lb-info { bottom: 12px; padding: 0 16px; }
+      .lightbox img { max-width: 96vw; max-height: 78dvh; }
     }
 
     @media (max-width: 380px) {
@@ -9068,6 +9145,11 @@ The fire is mine.</div>
 
     function initShelf() {
       if (shelfInit) return;
+      // Skip the 3D bookshelf on touch-only / coarse-pointer devices — the
+      // canvas has no touch handlers, and hiding the bands behind it would
+      // leave mobile users with nothing tappable.
+      if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+      if (window.innerWidth < 720) return;
       shelfInit = true;
       selectorEl.classList.add('shelf-active');
 
