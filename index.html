@@ -34,6 +34,10 @@
       -webkit-text-size-adjust: 100%;
     }
     img, video, canvas, svg { max-width: 100%; }
+    /* Long words, URLs, em-dashes in body text shouldn't punch holes through
+       the right edge on narrow viewports. */
+    p, h1, h2, h3, h4, .essay-body, .poem-body, .story-body, .essay-piece-title,
+    .story-title, .poem-title, .fp-title, .fp-sub { overflow-wrap: break-word; }
 
     /* ===== GRAIN ===== */
     .grain {
@@ -1327,12 +1331,9 @@
          the folder we switch the stage to auto so the stacked frontispieces
          can grow it. */
       .book-stage { height: clamp(380px, 70vh, 560px); margin-bottom: 24px; }
-      .book-stage[data-state="grid"],
-      .book-stage[data-state="essay"] { height: auto; min-height: 0; }
-      /* When the grid is showing, the frontispieces stack and contribute to
-         the stage's height; otherwise they stay absolute & invisible. */
-      .book-stage[data-state="grid"] .frontispieces,
-      .book-stage[data-state="essay"] .frontispieces {
+      .book-stage[data-state="grid"] { height: auto; min-height: 0; }
+      /* Grid state: frontispieces stack and contribute to stage height. */
+      .book-stage[data-state="grid"] .frontispieces {
         position: relative;
         inset: auto;
         grid-template-columns: 1fr;
@@ -1340,13 +1341,24 @@
         gap: 16px;
         padding: 8px;
       }
-      .book-stage[data-state="grid"] .frontispiece,
-      .book-stage[data-state="essay"] .frontispiece {
+      .book-stage[data-state="grid"] .frontispiece {
         position: relative;
         min-height: 220px;
         padding: 26px 22px;
         transform: none !important;
       }
+      /* Essay state: an essay was selected. Collapse the entire stage —
+         folder + frontispieces — out of the document so the essay text
+         itself is what the reader sees, not 800px of empty space. */
+      .book-stage[data-state="essay"] {
+        height: 0;
+        min-height: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+      .book-stage[data-state="essay"] .book-closed,
+      .book-stage[data-state="essay"] .frontispieces,
+      .book-stage[data-state="essay"] .book-instruct { display: none; }
       .frontispiece .fp-title { font-size: clamp(1.4rem, 5.2vw, 1.9rem); }
       .frontispiece .fp-sub { font-size: 1rem; max-width: 92%; }
       .frontispiece .fp-epigraph { display: none; }
@@ -5182,10 +5194,11 @@
       /* Poems */
       .poems-return { top: 14px; right: 14px; font-size: 0.7rem; letter-spacing: 3px; padding: 8px; }
       .poems-sky-hint { font-size: 0.7rem; letter-spacing: 3px; bottom: 24px; padding: 0 20px; text-align: center; }
-      .poems-inner { padding: 100px 22px 80px; }
-      .poem-kicker { margin-bottom: 32px; font-size: 0.7rem; letter-spacing: 4px; }
-      .poem-title { margin-bottom: 40px; }
-      .poem-body { line-height: 1.9; }
+      .poems-inner { padding: 0; }
+      .poems-inner .poem-entry { padding: 80px 18px 60px; justify-content: flex-start; }
+      .poem-kicker { margin-bottom: 24px; font-size: 0.7rem; letter-spacing: 4px; }
+      .poem-title { margin-bottom: 28px; }
+      .poem-body { line-height: 1.85; }
 
       /* Stories */
       .stories-header { top: 70px; width: 100%; padding: 0 16px; }
