@@ -330,9 +330,9 @@
       cursor: grab;
     }
     .shelf-3d:active { cursor: grabbing; }
-    /* When the 3D shelf isn't active (e.g. on touch devices where we skip
-       its init), the empty canvas must not eat taps meant for the bands,
-       and the "drag · tap a spine" hint is misleading. */
+    /* Until the shelf actually initializes (JS may bail in some browsers),
+       the canvas is hidden so it doesn't intercept taps meant for the
+       fallback bands. */
     .shelf-3d { display: none; }
     .selector:not(.shelf-active) .shelf-hint { display: none; }
     .selector.shelf-active .shelf-3d { display: block; }
@@ -6743,6 +6743,7 @@ The fire is mine.</div>
     ];
 
     let shelfScene, shelfCamera, shelfRenderer, shelfRaycaster;
+    let shelfWidthVal = 0; // populated at init for responsive framing
     const shelfPointer = new THREE.Vector2(-2, -2);
     const books = [];
     let shelfHover = null;
@@ -9151,11 +9152,6 @@ The fire is mine.</div>
 
     function initShelf() {
       if (shelfInit) return;
-      // Skip the 3D bookshelf on touch-only / coarse-pointer devices — the
-      // canvas has no touch handlers, and hiding the bands behind it would
-      // leave mobile users with nothing tappable.
-      if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-      if (window.innerWidth < 720) return;
       shelfInit = true;
       selectorEl.classList.add('shelf-active');
 
@@ -9172,6 +9168,7 @@ The fire is mine.</div>
       shelfCamera = new THREE.PerspectiveCamera(42, w / h, 0.1, 50);
       shelfCamera.position.set(0, 3.6, 6.8);
       shelfCamera.lookAt(0, 2.9, 0);
+      // shelfWidth is set below once we know totalT; framing happens then.
 
       // Lighting — direct lights only, no env reflections (matte books)
       const hemi = new THREE.HemisphereLight(0xffe8c8, 0x1a1208, 0.65);
@@ -9191,8 +9188,10 @@ The fire is mine.</div>
       const totalGap = 0.04 * (sections.length - 1);
       const totalT = sections.reduce((a, b) => a + b.T, 0) + totalGap;
       const shelfWidth = totalT + 1.4;
+      shelfWidthVal = shelfWidth;
       const shelfDepth = 2.0;
       const plankH = 0.26;
+      shelfFitCamera();
 
       function makeWoodTexture(w, h, opts = {}) {
         const seed = opts.seed ?? 1;
@@ -9380,8 +9379,48 @@ The fire is mine.</div>
       shelfCanvas.addEventListener('mousemove', onShelfMove);
       shelfCanvas.addEventListener('mouseleave', () => { shelfTMX = 0; shelfTMY = 0; shelfPointer.set(-2, -2); });
       shelfCanvas.addEventListener('click', onShelfClick);
+      shelfCanvas.addEventListener('touchstart', onShelfTouchStart, { passive: false });
+      shelfCanvas.addEventListener('touchmove', onShelfTouchMove, { passive: false });
+      shelfCanvas.addEventListener('touchend', onShelfTouchEnd, { passive: false });
+      shelfCanvas.addEventListener('touchcancel', onShelfTouchEnd, { passive: false });
 
       animateShelf();
+    }
+
+    let shelfTouchStartX = 0, shelfTouchStartY = 0, shelfTouchMoved = 0;
+    function shelfSetPointerFromTouch(t) {
+      const r = shelfCanvas.getBoundingClientRect();
+      const nx = ((t.clientX - r.left) / r.width) * 2 - 1;
+      const ny = -((t.clientY - r.top) / r.height) * 2 + 1;
+      shelfPointer.set(nx, ny);
+      shelfTMX = nx; shelfTMY = ny;
+    }
+    function onShelfTouchStart(e) {
+      if (!e.touches[0]) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      shelfTouchStartX = t.clientX;
+      shelfTouchStartY = t.clientY;
+      shelfTouchMoved = 0;
+      shelfSetPointerFromTouch(t);
+    }
+    function onShelfTouchMove(e) {
+      if (!e.touches[0]) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      shelfTouchMoved = Math.max(
+        shelfTouchMoved,
+        Math.hypot(t.clientX - shelfTouchStartX, t.clientY - shelfTouchStartY)
+      );
+      shelfSetPointerFromTouch(t);
+    }
+    function onShelfTouchEnd(e) {
+      e.preventDefault();
+      // Treat near-stationary taps as a click on whatever book is under the finger.
+      if (shelfTouchMoved < 12) onShelfClick();
+      // Release the pointer so no book stays "hovered" after the finger lifts.
+      shelfTMX = 0; shelfTMY = 0;
+      setTimeout(() => shelfPointer.set(-2, -2), 100);
     }
 
     function onShelfResize() {
@@ -9390,6 +9429,24 @@ The fire is mine.</div>
       shelfRenderer.setSize(w, h, false);
       shelfCamera.aspect = w / h;
       shelfCamera.updateProjectionMatrix();
+      shelfFitCamera();
+    }
+
+    // Pull the camera back so the full shelf width is in frame. On wide
+    // desktops the original z=6.8 is fine; on narrow portrait phones we need
+    // significantly more distance, otherwise books on the ends get clipped.
+    function shelfFitCamera() {
+      if (!shelfCamera || !shelfWidthVal) return;
+      const fovRad = shelfCamera.fov * Math.PI / 180;
+      const aspect = shelfCamera.aspect;
+      // distance needed for the shelf width to fit horizontally, with margin
+      const fitForWidth = (shelfWidthVal * 1.05) / (2 * Math.tan(fovRad / 2) * aspect);
+      const z = Math.max(6.8, fitForWidth);
+      shelfCamera.position.z = z;
+      // Lift the camera a bit on portrait so the shelf isn't squished toward
+      // the top of the frame.
+      shelfCamera.position.y = aspect < 1 ? 4.4 : 3.6;
+      shelfCamera.lookAt(0, aspect < 1 ? 3.2 : 2.9, 0);
     }
 
     function onShelfMove(e) {
@@ -9414,9 +9471,13 @@ The fire is mine.</div>
 
       shelfMX += (shelfTMX - shelfMX) * 0.06;
       shelfMY += (shelfTMY - shelfMY) * 0.06;
-      shelfCamera.position.x = shelfMX * 0.6;
-      shelfCamera.position.y = 2.0 + shelfMY * 0.25;
-      shelfCamera.lookAt(0, 1.3, 0);
+      const portrait = shelfCamera.aspect < 1;
+      const baseY   = portrait ? 3.4 : 2.0;
+      const lookAtY = portrait ? 2.6 : 1.3;
+      const driftX  = portrait ? 0.25 : 0.6;
+      shelfCamera.position.x = shelfMX * driftX;
+      shelfCamera.position.y = baseY + shelfMY * 0.25;
+      shelfCamera.lookAt(0, lookAtY, 0);
 
       shelfRaycaster.setFromCamera(shelfPointer, shelfCamera);
       const hits = shelfRaycaster.intersectObjects(books);
