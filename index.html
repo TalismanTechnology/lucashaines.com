@@ -330,6 +330,10 @@
       cursor: grab;
     }
     .shelf-3d:active { cursor: grabbing; }
+    /* When the 3D shelf isn't active (e.g. on touch devices where we skip
+       its init), the empty canvas must not eat taps meant for the bands. */
+    .shelf-3d { display: none; }
+    .selector.shelf-active .shelf-3d { display: block; }
     .selector.shelf-active .selector-bands > .band { visibility: hidden; }
     .shelf-hint {
       position: absolute;
