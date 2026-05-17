@@ -6744,6 +6744,7 @@ The fire is mine.</div>
 
     let shelfScene, shelfCamera, shelfRenderer, shelfRaycaster;
     let shelfWidthVal = 0; // populated at init for responsive framing
+    let shelfPanX = 0;     // horizontal pan offset for portrait drag
     const shelfPointer = new THREE.Vector2(-2, -2);
     const books = [];
     let shelfHover = null;
@@ -9388,6 +9389,7 @@ The fire is mine.</div>
     }
 
     let shelfTouchStartX = 0, shelfTouchStartY = 0, shelfTouchMoved = 0;
+    let shelfTouchLastX = 0, shelfPanStart = 0;
     function shelfSetPointerFromTouch(t) {
       const r = shelfCanvas.getBoundingClientRect();
       const nx = ((t.clientX - r.left) / r.width) * 2 - 1;
@@ -9401,6 +9403,8 @@ The fire is mine.</div>
       const t = e.touches[0];
       shelfTouchStartX = t.clientX;
       shelfTouchStartY = t.clientY;
+      shelfTouchLastX = t.clientX;
+      shelfPanStart = shelfPanX;
       shelfTouchMoved = 0;
       shelfSetPointerFromTouch(t);
     }
@@ -9412,7 +9416,16 @@ The fire is mine.</div>
         shelfTouchMoved,
         Math.hypot(t.clientX - shelfTouchStartX, t.clientY - shelfTouchStartY)
       );
+      // In portrait, horizontal drag pans the camera along the shelf — convert
+      // pixel delta to world units using the visible camera width.
+      if (shelfCamera && shelfCamera.aspect < 1 && shelfCanvas.clientWidth) {
+        const fovRad = shelfCamera.fov * Math.PI / 180;
+        const visibleWidth = 2 * shelfCamera.position.z * Math.tan(fovRad / 2) * shelfCamera.aspect;
+        const worldPerPx = visibleWidth / shelfCanvas.clientWidth;
+        shelfPanX = shelfPanStart - (t.clientX - shelfTouchStartX) * worldPerPx;
+      }
       shelfSetPointerFromTouch(t);
+      shelfTouchLastX = t.clientX;
     }
     function onShelfTouchEnd(e) {
       e.preventDefault();
@@ -9432,21 +9445,23 @@ The fire is mine.</div>
       shelfFitCamera();
     }
 
-    // Pull the camera back so the full shelf width is in frame. On wide
-    // desktops the original z=6.8 is fine; on narrow portrait phones we need
-    // significantly more distance, otherwise books on the ends get clipped.
+    // Frame the camera so books are readable and vertically centered.
+    // - Desktop / landscape: keep distance set for the full shelf to fit.
+    // - Portrait / narrow: pull in closer (titles become legible) and let
+    //   the user drag horizontally to pan along the shelf.
     function shelfFitCamera() {
       if (!shelfCamera || !shelfWidthVal) return;
       const fovRad = shelfCamera.fov * Math.PI / 180;
       const aspect = shelfCamera.aspect;
-      // distance needed for the shelf width to fit horizontally, with margin
-      const fitForWidth = (shelfWidthVal * 1.05) / (2 * Math.tan(fovRad / 2) * aspect);
-      const z = Math.max(6.8, fitForWidth);
-      shelfCamera.position.z = z;
-      // Lift the camera a bit on portrait so the shelf isn't squished toward
-      // the top of the frame.
-      shelfCamera.position.y = aspect < 1 ? 4.4 : 3.6;
-      shelfCamera.lookAt(0, aspect < 1 ? 3.2 : 2.9, 0);
+      if (aspect >= 1) {
+        // Landscape: original behavior — fit whole shelf with margin.
+        const fitForWidth = (shelfWidthVal * 1.05) / (2 * Math.tan(fovRad / 2) * aspect);
+        shelfCamera.position.z = Math.max(6.8, fitForWidth);
+      } else {
+        // Portrait: show ~3 books at once so titles are readable.
+        const targetVisibleWidth = Math.min(shelfWidthVal, 2.6);
+        shelfCamera.position.z = targetVisibleWidth / (2 * Math.tan(fovRad / 2) * aspect);
+      }
     }
 
     function onShelfMove(e) {
@@ -9472,12 +9487,23 @@ The fire is mine.</div>
       shelfMX += (shelfTMX - shelfMX) * 0.06;
       shelfMY += (shelfTMY - shelfMY) * 0.06;
       const portrait = shelfCamera.aspect < 1;
-      const baseY   = portrait ? 3.4 : 2.0;
-      const lookAtY = portrait ? 2.6 : 1.3;
-      const driftX  = portrait ? 0.25 : 0.6;
-      shelfCamera.position.x = shelfMX * driftX;
-      shelfCamera.position.y = baseY + shelfMY * 0.25;
-      shelfCamera.lookAt(0, lookAtY, 0);
+      // Vertically center on the middle of the books (~1.3) regardless of
+      // orientation. Cameras sit a little above so we see a hint of the top.
+      const baseY   = portrait ? 1.55 : 2.0;
+      const lookAtY = portrait ? 1.3  : 1.3;
+      if (portrait) {
+        // Drag pans the camera horizontally along the shelf, clamped so we
+        // can't drift past the last book on either side.
+        const fovRad = shelfCamera.fov * Math.PI / 180;
+        const visibleHalf = shelfCamera.position.z * Math.tan(fovRad / 2) * shelfCamera.aspect;
+        const panLimit = Math.max(0, shelfWidthVal / 2 - visibleHalf);
+        shelfPanX = Math.max(-panLimit, Math.min(panLimit, shelfPanX));
+        shelfCamera.position.x = shelfPanX;
+      } else {
+        shelfCamera.position.x = shelfMX * 0.6;
+      }
+      shelfCamera.position.y = baseY + shelfMY * 0.18;
+      shelfCamera.lookAt(shelfCamera.position.x, lookAtY, 0);
 
       shelfRaycaster.setFromCamera(shelfPointer, shelfCamera);
       const hits = shelfRaycaster.intersectObjects(books);
