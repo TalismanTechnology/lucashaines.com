@@ -169,8 +169,10 @@
     .poems-inner .poem-entry {
       text-align: center;
       margin-bottom: 100px;
+      scroll-margin-top: 20px;
     }
     .poems-inner .poem-entry:last-child { margin-bottom: 0; }
+    .poems-inner > .essay-index { margin-bottom: 80px; }
     .poem-kicker { font-style: italic; color: #666; margin-bottom: 14px; }
     .poem-title {
       font-size: clamp(2rem, 5vw, 3rem);
@@ -428,7 +430,18 @@
   <section class="immersion view-poems" data-view="poems">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="poems-inner" id="poemsInner">
-      <div class="poem-entry" data-poem="Debt">
+      <header class="essays-header">
+        <div class="essays-kicker">Collected &middot; Vol. I</div>
+        <h1 class="essays-heading">Poems</h1>
+        <div class="essays-sub">A sonnet and a poem.</div>
+      </header>
+
+      <nav class="essay-index">
+        <a href="#poem-debt"><span class="essay-num">i.</span><span>Debt &mdash; a sonnet</span></a>
+        <a href="#poem-sleep"><span class="essay-num">ii.</span><span>Sleep &mdash; a poem</span></a>
+      </nav>
+
+      <div id="poem-debt" class="poem-entry" data-poem="Debt">
         <div class="poem-kicker">A Sonnet</div>
         <h1 class="poem-title">Debt</h1>
         <div class="poem-body">I have been paying since before I knew the debt,
@@ -450,7 +463,7 @@ Not to arrive. Just to become the name
 I gave myself before I knew the game.</div>
       </div>
 
-      <div class="poem-entry" data-poem="Sleep">
+      <div id="poem-sleep" class="poem-entry" data-poem="Sleep">
         <div class="poem-kicker">A Poem</div>
         <h1 class="poem-title">Sleep</h1>
         <div class="poem-body">I am sleeping when the morning starts.
