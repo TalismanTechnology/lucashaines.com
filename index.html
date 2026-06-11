@@ -122,6 +122,34 @@
       width: 30px;
       flex-shrink: 0;
     }
+    /* Single-piece reading mode: only the chosen essay/poem shows. */
+    .essays-inner .essay-piece,
+    .essays-inner .essay-rule { display: none; }
+    .essays-inner .essay-piece.revealed { display: block; }
+    .essays-inner.reading .essays-header,
+    .essays-inner.reading .essay-index { display: none; }
+
+    .poems-inner .poem-entry { display: none; }
+    .poems-inner .poem-entry.revealed { display: flex; flex-direction: column; align-items: center; }
+    .poems-inner.reading .essays-header,
+    .poems-inner.reading .essay-index { display: none; }
+
+    .piece-back {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 36px;
+      font-style: italic;
+      color: #666;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      text-decoration: underline;
+      padding: 6px 8px;
+    }
+    .piece-back:hover { color: #111; }
+
     .essay-piece {
       margin-bottom: 100px;
       scroll-margin-top: 20px;
@@ -361,6 +389,7 @@
       </nav>
 
       <article id="essay-paradise-lost" class="essay-piece">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="essay-piece-num">i.</div>
         <h2 class="essay-piece-title">Examining the Integrity of Free Will in <em>Paradise Lost</em></h2>
         <div class="essay-body">
@@ -375,6 +404,7 @@
       <div class="essay-rule"></div>
 
       <article id="essay-mask" class="essay-piece">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="essay-piece-num">ii.</div>
         <h2 class="essay-piece-title">The Mask Is Who We Are: A Poem Analysis</h2>
 
@@ -395,6 +425,7 @@
       <div class="essay-rule"></div>
 
       <article id="essay-odysseus" class="essay-piece">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="essay-piece-num">iii.</div>
         <h2 class="essay-piece-title">Odysseus: The Master Weaver of Story and Self</h2>
         <div class="essay-body">
@@ -411,6 +442,7 @@
       <div class="essay-rule"></div>
 
       <article id="essay-antigone" class="essay-piece">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="essay-piece-num">iv.</div>
         <h2 class="essay-piece-title">Antigone's Conservative Rebellion: Religious Duty Over Feminist Progress</h2>
         <div class="essay-body">
@@ -442,6 +474,7 @@
       </nav>
 
       <div id="poem-debt" class="poem-entry" data-poem="Debt">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="poem-kicker">A Sonnet</div>
         <h1 class="poem-title">Debt</h1>
         <div class="poem-body">I have been paying since before I knew the debt,
@@ -464,6 +497,7 @@ I gave myself before I knew the game.</div>
       </div>
 
       <div id="poem-sleep" class="poem-entry" data-poem="Sleep">
+  <button class="piece-back" type="button">&larr; Back to list</button>
         <div class="poem-kicker">A Poem</div>
         <h1 class="poem-title">Sleep</h1>
         <div class="poem-body">I am sleeping when the morning starts.
@@ -667,13 +701,45 @@ The fire is mine.</div>
     }
     function closeGenre() {
       views.forEach(v => v.classList.remove('active'));
+      // Reset any "reading single piece" state so revisits land on the index.
+      document.querySelectorAll('.essays-inner, .poems-inner').forEach(inner => {
+        inner.classList.remove('reading');
+        inner.querySelectorAll('.essay-piece, .poem-entry').forEach(el => el.classList.remove('revealed'));
+      });
       selector.classList.remove('hidden');
       window.scrollTo(0, 0);
       if (history.state && history.state.genre) history.pushState({}, '', '#');
     }
     window.__openGenre = openGenre;
 
+    // Reveal-one pattern for essays + poems: clicking a title in the index
+    // hides the index and shows only that piece.
+    function revealPiece(container, target) {
+      const inner = target.closest('.essays-inner, .poems-inner');
+      if (!inner) return;
+      const pieceSel = inner.matches('.essays-inner') ? '.essay-piece' : '.poem-entry';
+      inner.querySelectorAll(pieceSel).forEach(el => el.classList.remove('revealed'));
+      target.classList.add('revealed');
+      inner.classList.add('reading');
+      container.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function returnToList(inner) {
+      const pieceSel = inner.matches('.essays-inner') ? '.essay-piece' : '.poem-entry';
+      inner.querySelectorAll(pieceSel).forEach(el => el.classList.remove('revealed'));
+      inner.classList.remove('reading');
+      const container = inner.closest('.immersion');
+      if (container) container.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
     document.addEventListener('click', (e) => {
+      // Handle "back to list" buttons first.
+      const backBtn = e.target.closest('.piece-back');
+      if (backBtn) {
+        e.preventDefault();
+        const inner = backBtn.closest('.essays-inner, .poems-inner');
+        if (inner) returnToList(inner);
+        return;
+      }
       const link = e.target.closest('a[href^="#"]');
       if (!link) return;
       const container = link.closest('.immersion');
@@ -684,8 +750,13 @@ The fire is mine.</div>
       if (!target) return;
       e.preventDefault();
       e.stopPropagation();
-      const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 40;
-      container.scrollTo({ top, behavior: 'smooth' });
+      // Index → piece: reveal-one. Otherwise just smooth scroll.
+      if (target.matches('.essay-piece, .poem-entry')) {
+        revealPiece(container, target);
+      } else {
+        const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 40;
+        container.scrollTo({ top, behavior: 'smooth' });
+      }
     }, true);
 
     document.querySelectorAll('[data-genre]').forEach(link => {
