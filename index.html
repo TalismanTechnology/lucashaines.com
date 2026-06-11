@@ -133,6 +133,11 @@
     .poems-inner.reading .essays-header,
     .poems-inner.reading .essay-index { display: none; }
 
+    .stories-inner .story-entry { display: none; }
+    .stories-inner .story-entry.revealed { display: block; }
+    .stories-inner.reading .essays-header,
+    .stories-inner.reading .essay-index { display: none; }
+
     .piece-back {
       display: block;
       width: fit-content;
@@ -542,9 +547,21 @@ The fire is mine.</div>
   <section class="immersion view-stories" data-view="stories">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="stories-inner">
-      <div class="story-kicker">A Short Story</div>
-      <h1 class="story-title">Character</h1>
-      <div class="story-body">
+      <header class="essays-header">
+        <div class="essays-kicker">Collected &middot; Vol. I</div>
+        <h1 class="essays-heading">Short Stories</h1>
+        <div class="essays-sub">A short story.</div>
+      </header>
+
+      <nav class="essay-index">
+        <a href="#story-character"><span class="essay-num">i.</span><span>Character</span></a>
+      </nav>
+
+      <article id="story-character" class="story-entry">
+        <button class="piece-back" type="button">&larr; Back to list</button>
+        <div class="story-kicker">A Short Story</div>
+        <h1 class="story-title">Character</h1>
+        <div class="story-body">
         <p>I was sitting in a classroom. Third row from the back. The teacher was drawing connections on the whiteboard, building an argument, and the argument had a hole in it. I said something but I didn't decide to say it. The words came out clean and specific, and a few kids turned around, and one of them gave a look of interest, and the moment passed the way it always passes. It happens every day. I used to think this was something I did. Now I think there is a system and I am inside of it, and the system is what speaks.</p>
         <p>But I did not always think this way. For a long time I believed I was awake.</p>
         <p>I looked at the government and saw a performance. I looked at pop culture and saw desire being manufactured and sold back. I said the sharp thing in every room I entered and watched the faces change. I know that face now. Everyone made the same one. It is the face people make when a clock starts running backward. Not anger. Discomfort. Like watching something break that they thought was working fine. I did not care. I liked it. I thought I was seeing things clearly and everyone else was asleep. I thought I had chosen to be this way. That the choosing was what made me different. For years this was the story I told about myself. I was the one who could see. And I believed that seeing was the same thing as being free.</p>
@@ -556,7 +573,8 @@ The fire is mine.</div>
         <p>The weed was not free. It did not pick the crack. But it was the only thing growing there. It was doing what it was going to do regardless of whether it understood why. That was all it had. And standing in that lot I thought maybe that is all anyone has. Not a door out of the building. Just a window. You can see the whole thing from where you are standing. You can see the walls and the grid and the routes and the signals. You can see that you did not build any of it. You can see that you were placed here the same way the weed was placed in the crack. And seeing it does not get you out. But not seeing it does not get you out either. Nothing gets you out. So you might as well see it.</p>
         <p>I am putting this down because something in me needs to put it down. That need did not come from nowhere. It came from every classroom and every sharp thing I said and every face that changed and every block I walked at a diagonal thinking I was going somewhere new. I sit at the desk and my hand moves and the words come out in an order I did not plan and I set them down because that is what comes next. I did not choose this. But I am here. The weed did not choose the crack. But it grew anyway.</p>
         <p>I keep trying to put a name on it. The system. The thing that was here before me and will be here after. Some nights I think it is God, and then I think God is just a word people use when they can feel the edges of something they cannot see. Other times I think it is biology or chemistry or the long slow chain of every cause and every effect going back to the first thing that ever moved. And other times I think it is simpler than any of that, that there is no name for it because it is not a thing, it is just the way things are, the water that feeds the crack and the crack that holds the seed.</p>
-      </div>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -700,9 +718,9 @@ The fire is mine.</div>
     function closeGenre() {
       views.forEach(v => v.classList.remove('active'));
       // Reset any "reading single piece" state so revisits land on the index.
-      document.querySelectorAll('.essays-inner, .poems-inner').forEach(inner => {
+      document.querySelectorAll('.essays-inner, .poems-inner, .stories-inner').forEach(inner => {
         inner.classList.remove('reading');
-        inner.querySelectorAll('.essay-piece, .poem-entry').forEach(el => el.classList.remove('revealed'));
+        inner.querySelectorAll('.essay-piece, .poem-entry, .story-entry').forEach(el => el.classList.remove('revealed'));
       });
       selector.classList.remove('hidden');
       window.scrollTo(0, 0);
@@ -710,20 +728,26 @@ The fire is mine.</div>
     }
     window.__openGenre = openGenre;
 
-    // Reveal-one pattern for essays + poems: clicking a title in the index
-    // hides the index and shows only that piece.
+    // Reveal-one pattern for essays / poems / stories: clicking a title in
+    // the index hides the index and shows only that piece.
+    const READER_INNERS = '.essays-inner, .poems-inner, .stories-inner';
+    function pieceSelectorFor(inner) {
+      if (inner.matches('.essays-inner')) return '.essay-piece';
+      if (inner.matches('.poems-inner'))  return '.poem-entry';
+      return '.story-entry';
+    }
     function revealPiece(container, target) {
-      const inner = target.closest('.essays-inner, .poems-inner');
+      const inner = target.closest(READER_INNERS);
       if (!inner) return;
-      const pieceSel = inner.matches('.essays-inner') ? '.essay-piece' : '.poem-entry';
-      inner.querySelectorAll(pieceSel).forEach(el => el.classList.remove('revealed'));
+      const sel = pieceSelectorFor(inner);
+      inner.querySelectorAll(sel).forEach(el => el.classList.remove('revealed'));
       target.classList.add('revealed');
       inner.classList.add('reading');
       container.scrollTo({ top: 0, behavior: 'auto' });
     }
     function returnToList(inner) {
-      const pieceSel = inner.matches('.essays-inner') ? '.essay-piece' : '.poem-entry';
-      inner.querySelectorAll(pieceSel).forEach(el => el.classList.remove('revealed'));
+      const sel = pieceSelectorFor(inner);
+      inner.querySelectorAll(sel).forEach(el => el.classList.remove('revealed'));
       inner.classList.remove('reading');
       const container = inner.closest('.immersion');
       if (container) container.scrollTo({ top: 0, behavior: 'auto' });
@@ -734,7 +758,7 @@ The fire is mine.</div>
       const backBtn = e.target.closest('.piece-back');
       if (backBtn) {
         e.preventDefault();
-        const inner = backBtn.closest('.essays-inner, .poems-inner');
+        const inner = backBtn.closest(READER_INNERS);
         if (inner) returnToList(inner);
         return;
       }
@@ -749,7 +773,7 @@ The fire is mine.</div>
       e.preventDefault();
       e.stopPropagation();
       // Index → piece: reveal-one. Otherwise just smooth scroll.
-      if (target.matches('.essay-piece, .poem-entry')) {
+      if (target.matches('.essay-piece, .poem-entry, .story-entry')) {
         revealPiece(container, target);
       } else {
         const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 40;
