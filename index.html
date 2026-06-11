@@ -675,7 +675,7 @@ The fire is mine.</div>
       container.scrollTo({ top, behavior: 'smooth' });
     }, true);
 
-    document.querySelectorAll('.band').forEach(link => {
+    document.querySelectorAll('[data-genre]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         openGenre(link.dataset.genre);
