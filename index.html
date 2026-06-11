@@ -242,35 +242,108 @@
     }
     .story-body p:first-of-type { text-indent: 0; }
 
-    /* --- Research --- */
+    /* --- Research (now an HTML study reader, same shape as poems/essays) --- */
     .research-inner {
-      max-width: 900px;
+      max-width: 720px;
       margin: 0 auto;
       padding: 110px 24px 80px;
+    }
+
+    .study-entry { display: none; }
+    .study-entry.revealed { display: block; }
+    .research-inner.reading .essays-header,
+    .research-inner.reading .essay-index { display: none; }
+
+    .study-kicker {
+      font-style: italic;
+      color: #666;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .study-title {
+      font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+      font-weight: 400;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .study-subtitle {
+      font-style: italic;
+      text-align: center;
+      color: #444;
+      margin-bottom: 14px;
+    }
+    .study-byline {
+      text-align: center;
+      color: #666;
+      margin-bottom: 50px;
+    }
+    .study-body {
+      line-height: 1.7;
+    }
+    .study-body h2 {
+      font-weight: 400;
+      font-size: 1.4rem;
+      margin: 40px 0 16px;
       text-align: center;
     }
-    .research-header { margin-bottom: 36px; }
-    .research-kicker { font-style: italic; color: #666; margin-bottom: 12px; }
-    .research-paper-title {
-      font-size: clamp(2rem, 4.4vw, 2.6rem);
+    .study-body h3 {
       font-weight: 400;
-      margin-bottom: 8px;
+      font-style: italic;
+      font-size: 1.1rem;
+      margin: 28px 0 12px;
     }
-    .research-meta { font-style: italic; color: #666; }
-    .research-frame {
-      aspect-ratio: 8.5 / 11;
-      max-width: 800px;
+    .study-body p {
+      margin-bottom: 1.1em;
+      text-indent: 1.8em;
+    }
+    .study-body p:first-of-type,
+    .study-body h2 + p,
+    .study-body h3 + p,
+    .study-body figure + p,
+    .study-body .study-equation + p { text-indent: 0; }
+    .study-equation {
+      text-align: center;
+      font-style: italic;
+      font-size: 1.15rem;
+      margin: 24px 0 28px;
+    }
+    /* Figures: render at their natural aspect ratio so the chart can never be
+       squashed or stretched. */
+    .study-figure {
+      margin: 36px 0;
+      text-align: center;
+    }
+    .study-figure img {
+      width: 100%;
+      height: auto;
+      max-width: 560px;
+      display: block;
       margin: 0 auto;
-      border: 1px solid #ddd;
     }
-    .research-frame iframe {
-      width: 100%; height: 100%;
-      border: 0; display: block;
+    .study-figure figcaption {
+      font-style: italic;
+      color: #555;
+      font-size: 0.95rem;
+      margin-top: 10px;
+      line-height: 1.4;
     }
-    .research-download {
-      display: inline-block;
-      margin-top: 24px;
-      font-size: 1rem;
+    .study-refs {
+      list-style: decimal;
+      padding-left: 28px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+    .study-refs li { margin-bottom: 0.7em; text-indent: 0; }
+    .study-pdf-link {
+      text-align: center;
+      margin-top: 48px;
+      text-indent: 0;
+    }
+    .study-body sup {
+      font-size: 0.7em;
+      vertical-align: super;
+      line-height: 0;
     }
 
     /* --- Photography --- */
@@ -582,10 +655,133 @@ The fire is mine.</div>
   <section class="immersion view-research" data-view="research">
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="research-inner">
-      <div class="research-frame">
-        <iframe src="works/elliptical-model.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="The Elliptical Model"></iframe>
-      </div>
-      <a class="research-download" href="works/elliptical-model.pdf" target="_blank" rel="noopener">Open the full PDF &rarr;</a>
+      <header class="essays-header">
+        <div class="essays-kicker">Studies in Form &middot; I</div>
+        <h1 class="essays-heading">Research</h1>
+        <div class="essays-sub">A study on the geometry of digital consumption.</div>
+      </header>
+
+      <nav class="essay-index">
+        <a href="#study-elliptical"><span class="essay-num">i.</span><span>The Elliptical Model &mdash; the geometry of the doomscroll</span></a>
+      </nav>
+
+      <article id="study-elliptical" class="study-entry">
+        <button class="piece-back" type="button">&larr; Back to list</button>
+        <div class="study-kicker">A Study</div>
+        <h1 class="study-title">The Elliptical Model of Digital Consumption</h1>
+        <div class="study-subtitle">The geometry of the doomscroll</div>
+        <div class="study-byline">Lucas Haines</div>
+
+        <div class="study-body">
+          <h2>Introduction</h2>
+          <p>Apps like TikTok, Instagram, and YouTube are designed to keep users on them as long as possible. The longer you stay, the worse you feel. The first ten minutes are pleasurable. After two hours, your head is foggy and your mood has turned. The pattern repeats across users and platforms.</p>
+          <p>Large-scale epidemiological data is consistent with this. In a study of over half a million adolescents, Twenge and colleagues found that those reporting five or more hours of daily device use were 71% more likely than one-hour users to show clinical risk factors for depression and suicide.<sup>1</sup> The question is why.</p>
+          <p>This paper argues that a single scrolling session traces an ellipse. The shape divides into four parts, each corresponding to a distinct stage of the experience: pleasure, mindless continuation, the crash, and a period of numbness afterward. The geometry clarifies why stopping is hard, and why the apps are designed to push users past the peak rather than allow them to stop at it.</p>
+
+          <h2>1. The Map</h2>
+          <p>Picture a graph with two axes.</p>
+          <p>The vertical axis is Q, for Quality. Q measures the felt value of the experience. Q above zero is pleasure: the videos land, you feel connected. Q below zero is suffering: anxiety, brain fog, exhaustion.</p>
+          <p>The horizontal axis is P, for Phase. P marks position on the ellipse, ranging from &minus;a at the left to +a at the right. In the upper half (where Q &gt; 0), P below zero is the approach to the peak, P at zero is the peak itself, and P above zero is the descent. In the lower half (where Q &lt; 0), these same P values mark the return arc.</p>
+          <p>A scrolling session moves around this graph in the shape of an ellipse:</p>
+          <p class="study-equation">(P² / a²) + (Q² / b²) = 1</p>
+          <p>Two numbers control the shape. The number a sets the total length of the session. The number b sets the height of the peak.</p>
+          <p>Why an ellipse? The model requires a closed curve, one that returns to its starting point. The ellipse is the simplest such curve, and only two numbers are needed to specify it. Other shapes would also work, but they require more numbers without adding analytical value. The ellipse is best read as a stand-in for any smooth, closed shape that rises to a peak and falls back.</p>
+          <p>The defining property of the ellipse, is closure. Within a single session, once you have passed into the lower half of the curve, additional scrolling cannot return you to the upper half. The direction of travel along the curve is one-way. You can exit the trajectory at any point by disengaging, but more input cannot reverse the descent.</p>
+
+          <figure class="study-figure">
+            <img src="works/figures/elliptical-fig1.png" alt="Basic ellipse" loading="lazy">
+            <figcaption>Figure 1. The basic ellipse rises to a peak, falls past zero into the lower half, then loops back to the start.</figcaption>
+          </figure>
+
+          <h2>2. The Four Quadrants</h2>
+          <p>The elliptical trajectory divides into four quadrants. Each describes a distinct stage of the session.</p>
+
+          <h3>Quadrant II: The Approach</h3>
+          <p>The upper-left quadrant is the optimal portion of the session. P is negative (still rising), Q is positive (the experience feels good). This is the first ten or fifteen minutes. The videos feel fresh, the jokes land, stopping seems pointless. You are climbing the steep portion of the ellipse.</p>
+          <p>At the peak, the slope reaches zero. This is where the trick lies. With the slope at zero, the next swipe appears to cost nothing. But the curve has already begun to bend downward, and that next swipe is the start of the descent.</p>
+          <p>The neuroscientist Wolfram Schultz studied the behavior of dopamine neurons.<sup>2</sup> He found that with repeated exposure to a reward, dopamine begins to fire on the anticipation of the reward rather than on its delivery. At the peak of a scrolling session, the dopamine release is therefore not for the current video but for the expected next one. The brain has already shifted its attention forward. You have not yet felt the shift.</p>
+
+          <figure class="study-figure">
+            <img src="works/figures/elliptical-fig2.png" alt="The Approach arc" loading="lazy">
+            <figcaption>Figure 2. The Approach. Sessions that close out within this upper-left arc remain net positive.</figcaption>
+          </figure>
+
+          <h3>Quadrant I: Diminishing Returns</h3>
+          <p>Past the peak, you enter Quadrant I. P is positive, Q is still positive, but the videos no longer engage. You can sense this. You keep scrolling anyway.</p>
+          <p>B. F. Skinner described the initial mechanism for this trap: when a reward is unpredictable, animals and people continue to perform the action that occasionally produces it.<sup>3</sup> Slot machines and social media feeds exploit this directly. However, as the session deepens, the motivation shifts. Anthropologist Natasha Dow Schüll, in her landmark study of gambling addiction, termed this state the &ldquo;machine zone.&rdquo;<sup>4</sup> In the machine zone, the user's primary goal is no longer to win a reward (maximizing Q), but simply to maintain the hypnotic rhythm of the action itself (continuing along P) to insulate themselves from the physical world. The curve does not drop off a cliff; it bends downward gently, making the transition from active pleasure to zoned-out compulsion too smooth for conscious detection.</p>
+
+          <h3>Quadrant IV: The Crash</h3>
+          <p>Crossing the horizontal axis, you enter Quadrant IV. P is positive, Q is negative. This is the anxious, foggy state that follows a two-hour TikTok binge. Pleasure has been replaced by a low physical agitation and a need to escape it.</p>
+          <p>The psychiatrist Anna Lembke describes the chemistry of this transition.<sup>5</sup> Repeated, high-frequency dopamine release prompts the brain to compensate by lowering its baseline. The reward system, in restoring balance, overshoots into deficit. The result is a state of active dopamine debt.</p>
+
+          <figure class="study-figure">
+            <img src="works/figures/elliptical-fig3.png" alt="Full trajectory with dashed lower half" loading="lazy">
+            <figcaption>Figure 3. The full trajectory. The dashed arc marks the path most users follow into the lower half.</figcaption>
+          </figure>
+
+          <h3>Quadrant III: Numbness and Closure</h3>
+          <p>The final quadrant is the return arc. You have closed the app, but the session has not ended. Things that normally produce pleasure (a conversation, a sunset, a good book) feel muted. You are moving along the lower-left arc of the ellipse, heading back toward zero.</p>
+          <p>This is where the closure of the curve does its most important work. While you are in this arc, additional scrolling cannot return the system to pleasure. Effort yields no reward in this region. The way out is to leave, not to continue. Disengagement ends the cycle. Continued input only holds you in place.</p>
+          <p>This explains the experience captured by phrases like &ldquo;I scrolled for another hour and only felt worse.&rdquo; The additional hour does not restart the cycle. It holds you in the lower half. The way back to neutral is to step out of the trajectory entirely.</p>
+
+          <h2>3. Why It Is Hard to Stop</h2>
+          <p>If the peak is identifiable in principle, why do users not stop at it?</p>
+          <p>In ordinary settings, the slowdown is felt directly. When eating, the stomach signals fullness. In conversation, fatigue gradually settles in and the exchange winds down. The body sends signals that correspond to position on the curve, and the person acts on them.</p>
+          <p>Apps are designed to interrupt these signals.</p>
+          <p>Infinite scroll and autoplay eliminate the natural stopping point. The next item is always loading. As tech ethicist Tristan Harris and the Center for Humane Technology have documented, these &ldquo;frictionless&rdquo; features are deliberately engineered to hijack psychological vulnerabilities.<sup>6</sup> Small, low-grade rewards arrive often enough to mask underlying fatigue. The signal of satiety does not reach you.</p>
+          <p>James Gross, a psychologist at Stanford, has shown that suppressing an emotion, rather than acting on it, increases physiological stress.<sup>7</sup> When an app encourages you to ignore creeping fatigue, you are also paying the cost of the suppression itself.</p>
+          <p>The work of putting the phone down is not an exercise of heroic willpower. It is the discipline of remaining in contact with your actual position on the curve. Once the small dip in interest at the peak becomes noticeable, closing the app follows naturally. The difficulty lies in allowing yourself to feel it.</p>
+
+          <h2>4. Eccentricity: Short-Form vs. Long-Form Media</h2>
+          <p>The shape of the ellipse depends on the ratio of a to b. Call this ratio E, the eccentricity.</p>
+          <p>When a is smaller than b, the ellipse is tall and narrow. The peak is high but reached quickly, and the descent is steep. This profile corresponds to short-form video: TikTok, Reels, Shorts. The pleasure is sharp but the optimal zone is brief. The peak arrives within minutes, and the descent begins before the climb has fully registered. Neuroimaging studies of short-form platforms support this, showing that highly personalized, rapid-fire algorithms activate the brain's reward centers aggressively while suppressing prefrontal control networks.<sup>8</sup> Informatics researcher Gloria Mark has tracked a steady decline in screen attention, with the median duration of focus on a single screen falling from 2.5 minutes in 2004 to 47 seconds in recent measurements.<sup>9</sup> The phase window is narrowing.</p>
+          <p>When A is larger than B, the ellipse is wide and shallow. The peak is lower but sustained over time, and the decline is gradual. This profile corresponds to long-form media: a podcast, a documentary, a sustained conversation in a group chat. The optimal zone is wide. You can remain within it for an hour without entering the descent.</p>
+
+          <figure class="study-figure">
+            <img src="works/figures/elliptical-fig4.png" alt="Tall narrow and wide shallow ellipses" loading="lazy">
+            <figcaption>Figure 4a (left). A tall, narrow ellipse. Short-form video. Brief optimal zone, sharp crash. &nbsp; Figure 4b (right). A wide, shallow ellipse. Long-form media. Extended optimal zone, gradual decline.</figcaption>
+          </figure>
+
+          <p>The eccentricity decomposition gives the model empirical content. Two platforms with different E ratios should produce measurably different sessions. A short-form feed produces a sooner, sharper crash than a long-form one.</p>
+          <p>E also has a middle range. When a and b are approximately equal, the ellipse is roughly circular. The peak is moderate, reached at a measured pace, and the descent mirrors the climb. This profile corresponds to media that neither spikes nor sustains: a group text thread, a mid-length YouTube video, a social feed with mixed content types. The session ends without a sharp crash, but also without the extended engagement of long-form. For a user optimizing against post-session regret, a near-circular ellipse may be the target geometry.</p>
+
+          <h2>5. Compounding Across Sessions</h2>
+          <p>The model so far describes a single session in isolation. Each session begins at the leftmost point of the ellipse (P = &minus;a, Q = 0), traces the curve, and either completes or is exited by disengagement. The next session begins as a new ellipse.</p>
+          <p>In practice, sessions do not stay independent. With repeated, heavy use, two drifts appear.</p>
+          <p>The first drift runs along the P axis. The starting point of each new cycle moves forward on the curve. After enough sessions in a short period, the user no longer enters at the bottom of the climb. The first swipes already feel flat. The optimal zone has narrowed. The user is starting further into the cycle than they were a week ago.</p>
+          <p>The second drift runs along the Q axis. The entire ellipse sinks. The peak gets lower. The crash gets deeper. The baseline against which Q is measured has dropped. This long-term downward shift is known in neurobiology as &ldquo;allostatic load.&rdquo; As researchers George Koob and Michel Le Moal established, repeated heavy stimulation does not only cause temporary crashes; it persistently lowers the brain's hedonic set-point.<sup>10</sup> Eventually the starting Q is negative. The user opens the app already in suffering and scrolls to chase a peak that, in absolute terms, never crosses back above zero.</p>
+          <p>Together, the two drifts describe the trajectory of dependence. A user within ordinary use begins each session at (&minus;a, 0) and traces a normal ellipse. A user who has been heavy for some time begins later on the P axis and lower on the Q axis. The ellipse they trace is shifted down and pushed forward. The fun zone shrinks. In the limit, it disappears entirely.</p>
+          <p>This is not a separate model. It is the same elliptical structure with a moving origin. Recovery, extended periods of no use, allows both drifts to reverse: the starting P moves back toward &minus;a, and the baseline Q rises back toward zero. The geometry stays the same. What changes is where on the page the ellipse is drawn.</p>
+
+          <figure class="study-figure">
+            <img src="works/figures/elliptical-fig5.png" alt="Cumulative drift across sessions" loading="lazy">
+            <figcaption>Figure 5. Cumulative drift across sessions. As use accumulates, each new ellipse begins further along P and lower on Q. In severe cases, the entire curve sits below the Q = 0 line.</figcaption>
+          </figure>
+
+          <h2>Conclusion</h2>
+          <p>The doomscroll is not a sign of weakness or failed self-control. It is a journey along a closed curve, and the curve has been deliberately engineered to carry you past the peak and through the lower half.</p>
+          <p>The elliptical model makes three claims. First, the session has an ideal endpoint, the peak, that is invisible to the person inside it and actively obscured by the platform. Second, once the peak is crossed, no amount of continued input can return the experience to positive territory. In other words, the way out of the lower half is to exit, not to persist. Third, across sessions, the curve shifts: the fun zone narrows, the baseline drops, and recovery becomes the primary variable.</p>
+          <p>The model does not argue that digital consumption is inherently harmful. It argues that the current design prevents users from knowing where they are on the curve. A more honest interface would make that position legible: a small friction at the peak, a visible signal that the slope has reversed. The geometry of a better experience is the same. Only the information would change.</p>
+          <p>Across sessions, the picture compounds. Repeated heavy use shifts the entry point forward on the curve and lowers the baseline against which pleasure is measured. The fun zone narrows, and eventually, the peak itself can fall below zero. Recovery is the slow reversal of these drifts.</p>
+          <p>A more honest design would introduce friction at the peak. A small interruption at the right moment would restore your awareness of position and allow the session to end naturally. The technology already knows where you are on the curve. The remaining question is whether it is built to let you feel it.</p>
+
+          <h2>References</h2>
+          <ol class="study-refs">
+            <li>Twenge, J. M., Joiner, T. E., Rogers, M. L., &amp; Martin, G. W. (2018). Increases in depressive symptoms, suicide-related outcomes, and suicide rates among U.S. adolescents after 2010 and links to increased new media screen time. <em>Clinical Psychological Science</em>, 6(1), 3&ndash;17.</li>
+            <li>Schultz, W. (1998). Predictive reward signal of dopamine neurons. <em>Journal of Neurophysiology</em>, 80, 1&ndash;27.</li>
+            <li>Skinner, B. F. (1953). <em>Science and Human Behavior</em>. Macmillan.</li>
+            <li>Schüll, N. D. (2012). <em>Addiction by Design: Machine Gambling in Las Vegas</em>. Princeton University Press.</li>
+            <li>Lembke, A. (2021). <em>Dopamine Nation</em>. Dutton.</li>
+            <li>Harris, T. (2016). How technology is hijacking your mind. <em>Center for Humane Technology</em>.</li>
+            <li>Gross, J. J. (1998). Antecedent- and response-focused emotion regulation. <em>Journal of Personality and Social Psychology</em>, 74, 224&ndash;237.</li>
+            <li>Su, C., et al. (2021). Viewing personalized video clips recommended by TikTok activates default mode network and ventral tegmental area. <em>NeuroImage</em>, 237, 118136.</li>
+            <li>Mark, G. (2023). <em>Attention Span: A Groundbreaking Way to Restore Balance, Happiness and Productivity</em>. Hanover Square Press.</li>
+            <li>Koob, G. F., &amp; Le Moal, M. (2001). Drug addiction, dysregulation of reward, and allostasis. <em>Neuropsychopharmacology</em>, 24(2), 97&ndash;129.</li>
+          </ol>
+
+          <p class="study-pdf-link"><a href="works/elliptical-model.pdf" target="_blank" rel="noopener">Download as PDF &rarr;</a></p>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -713,9 +909,9 @@ The fire is mine.</div>
     function closeGenre() {
       views.forEach(v => v.classList.remove('active'));
       // Reset any "reading single piece" state so revisits land on the index.
-      document.querySelectorAll('.essays-inner, .poems-inner, .stories-inner').forEach(inner => {
+      document.querySelectorAll('.essays-inner, .poems-inner, .stories-inner, .research-inner').forEach(inner => {
         inner.classList.remove('reading');
-        inner.querySelectorAll('.essay-piece, .poem-entry, .story-entry').forEach(el => el.classList.remove('revealed'));
+        inner.querySelectorAll('.essay-piece, .poem-entry, .story-entry, .study-entry').forEach(el => el.classList.remove('revealed'));
       });
       selector.classList.remove('hidden');
       window.scrollTo(0, 0);
@@ -723,13 +919,14 @@ The fire is mine.</div>
     }
     window.__openGenre = openGenre;
 
-    // Reveal-one pattern for essays / poems / stories: clicking a title in
-    // the index hides the index and shows only that piece.
-    const READER_INNERS = '.essays-inner, .poems-inner, .stories-inner';
+    // Reveal-one pattern for essays / poems / stories / research: clicking a
+    // title in the index hides the index and shows only that piece.
+    const READER_INNERS = '.essays-inner, .poems-inner, .stories-inner, .research-inner';
     function pieceSelectorFor(inner) {
-      if (inner.matches('.essays-inner')) return '.essay-piece';
-      if (inner.matches('.poems-inner'))  return '.poem-entry';
-      return '.story-entry';
+      if (inner.matches('.essays-inner'))  return '.essay-piece';
+      if (inner.matches('.poems-inner'))   return '.poem-entry';
+      if (inner.matches('.stories-inner')) return '.story-entry';
+      return '.study-entry';
     }
     function revealPiece(container, target) {
       const inner = target.closest(READER_INNERS);
@@ -768,7 +965,7 @@ The fire is mine.</div>
       e.preventDefault();
       e.stopPropagation();
       // Index → piece: reveal-one. Otherwise just smooth scroll.
-      if (target.matches('.essay-piece, .poem-entry, .story-entry')) {
+      if (target.matches('.essay-piece, .poem-entry, .story-entry, .study-entry')) {
         revealPiece(container, target);
       } else {
         const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 40;
