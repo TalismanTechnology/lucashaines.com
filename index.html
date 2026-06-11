@@ -356,25 +356,31 @@
       font-size: clamp(2rem, 4vw, 2.4rem);
       font-weight: 400;
     }
+    /* Masonry-style layout: each photo keeps its native aspect ratio, columns
+       balance themselves, and photos sit flush against each other. */
     .photo-grid {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 12px 80px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 8px;
+      padding: 24px 8px 80px;
+      column-count: 4;
+      column-gap: 4px;
     }
     .photo-grid button {
       background: none; border: 0; padding: 0; cursor: pointer;
-      aspect-ratio: 1;
+      display: block;
+      width: 100%;
+      margin: 0 0 4px;
+      break-inside: avoid;
       overflow: hidden;
     }
     .photo-grid img {
-      width: 100%; height: 100%;
-      object-fit: cover;
+      width: 100%;
+      height: auto;
+      display: block;
       transition: opacity 0.2s ease;
     }
     .photo-grid button:hover img { opacity: 0.85; }
+    @media (max-width: 1100px) { .photo-grid { column-count: 3; } }
 
     /* --- Lightbox --- */
     .lightbox {
@@ -426,7 +432,8 @@
         padding: 90px 18px 60px;
       }
       .photography-header { padding: 90px 18px 16px; }
-      .photo-grid { grid-template-columns: repeat(2, 1fr); padding: 16px 8px 60px; gap: 6px; }
+      .photo-grid { column-count: 2; padding: 16px 6px 60px; column-gap: 3px; }
+      .photo-grid button { margin-bottom: 3px; }
       .essay-body p, .story-body p { text-indent: 1em; }
       .back-btn { top: 10px; left: 10px; font-size: 0.85rem; }
     }
