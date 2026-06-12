@@ -35,26 +35,20 @@
     }
     .selector.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .selector h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
       font-weight: 400;
       letter-spacing: 0.01em;
-      margin-bottom: 10px;
-    }
-    .selector .kicker {
-      font-style: italic;
-      color: #666;
-      margin-bottom: 56px;
+      margin-bottom: 64px;
     }
     .selector ol { list-style: none; }
-    .selector ol li { margin: 14px 0; }
+    .selector ol li { margin: 12px 0; }
     .selector ol a {
-      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+      font-size: clamp(1rem, 2vw, 1.2rem);
       text-decoration: none;
-      border-bottom: 1px solid transparent;
-      padding-bottom: 2px;
+      color: #111;
     }
-    .selector ol a:hover { border-bottom-color: #111; }
-    .selector ol .num { font-style: italic; color: #888; margin-right: 8px; }
+    .selector ol a:hover { color: #777; }
+    .selector ol .num { font-style: italic; color: #aaa; margin-right: 10px; }
 
     /* --- Immersive (genre) views --- */
     .immersion {
@@ -93,32 +87,30 @@
       margin: 0 auto;
       padding: 110px 24px 80px;
     }
-    .essays-header { text-align: center; margin-bottom: 50px; }
-    .essays-kicker { font-style: italic; color: #666; margin-bottom: 14px; }
+    .essays-header { text-align: center; margin-bottom: 64px; }
     .essays-heading {
-      font-size: clamp(2rem, 4vw, 2.6rem);
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
       font-weight: 400;
-      margin-bottom: 10px;
     }
-    .essays-sub { font-style: italic; color: #666; }
     .essay-index {
       display: flex; flex-direction: column;
-      max-width: 580px;
+      max-width: 540px;
       margin: 0 auto 80px;
     }
     .essay-index a {
       display: flex;
       align-items: baseline;
-      gap: 16px;
-      padding: 12px 0;
-      border-bottom: 1px solid #ddd;
+      gap: 14px;
+      padding: 14px 0;
       text-decoration: none;
+      color: #111;
     }
-    .essay-index a:hover { color: #555; }
+    .essay-index a + a { border-top: 1px solid #eee; }
+    .essay-index a:hover { color: #777; }
     .essay-index .essay-num {
       font-style: italic;
-      color: #888;
-      width: 30px;
+      color: #aaa;
+      width: 26px;
       flex-shrink: 0;
     }
     /* Single-piece reading mode: only the chosen essay/poem shows. */
@@ -157,18 +149,12 @@
       margin-bottom: 100px;
       scroll-margin-top: 20px;
     }
-    .essay-piece-num {
-      font-style: italic;
-      color: #888;
-      text-align: center;
-      margin-bottom: 12px;
-    }
     .essay-piece-title {
-      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-size: clamp(1.4rem, 2.4vw, 1.7rem);
       font-weight: 400;
       text-align: center;
-      margin-bottom: 36px;
-      line-height: 1.2;
+      margin-bottom: 48px;
+      line-height: 1.25;
     }
     .essay-body p {
       margin-bottom: 1.2em;
@@ -204,11 +190,10 @@
     }
     .poems-inner .poem-entry:last-child { margin-bottom: 0; }
     .poems-inner > .essay-index { margin-bottom: 80px; }
-    .poem-kicker { font-style: italic; color: #666; margin-bottom: 14px; }
     .poem-title {
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
       font-weight: 400;
-      margin-bottom: 36px;
+      margin-bottom: 48px;
     }
     .poem-body {
       font-style: italic;
@@ -224,17 +209,11 @@
       margin: 0 auto;
       padding: 110px 24px 80px;
     }
-    .story-kicker {
-      font-style: italic;
-      color: #666;
-      text-align: center;
-      margin-bottom: 12px;
-    }
     .story-title {
-      font-size: clamp(2rem, 4vw, 2.4rem);
+      font-size: clamp(1.5rem, 2.6vw, 1.9rem);
       font-weight: 400;
       text-align: center;
-      margin-bottom: 50px;
+      margin-bottom: 56px;
     }
     .story-body p {
       margin-bottom: 1.2em;
@@ -254,29 +233,18 @@
     .research-inner.reading .essays-header,
     .research-inner.reading .essay-index { display: none; }
 
-    .study-kicker {
-      font-style: italic;
-      color: #666;
-      text-align: center;
-      margin-bottom: 14px;
-    }
     .study-title {
-      font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+      font-size: clamp(1.5rem, 2.6vw, 1.9rem);
       font-weight: 400;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.25;
       margin-bottom: 10px;
     }
     .study-subtitle {
       font-style: italic;
       text-align: center;
-      color: #444;
-      margin-bottom: 14px;
-    }
-    .study-byline {
-      text-align: center;
-      color: #666;
-      margin-bottom: 50px;
+      color: #555;
+      margin-bottom: 56px;
     }
     .study-body {
       line-height: 1.7;
@@ -444,7 +412,6 @@
   <!-- ===== SELECTOR (LANDING) ===== -->
   <main class="selector" id="selector">
     <h1>Lucas Haines</h1>
-    <div class="kicker">Selected Works &middot; NYC &middot; 2026</div>
     <ol>
       <li><a href="#" data-genre="essays"><span class="num">i.</span>Essays</a></li>
       <li><a href="#" data-genre="poems"><span class="num">ii.</span>Poems</a></li>
@@ -459,9 +426,7 @@
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="essays-inner">
       <header class="essays-header">
-        <div class="essays-kicker">Collected &middot; Vol. I</div>
         <h1 class="essays-heading">Essays</h1>
-        <div class="essays-sub">Four pieces on free will, identity, narrative, and law.</div>
       </header>
 
       <nav class="essay-index">
@@ -473,7 +438,6 @@
 
       <article id="essay-paradise-lost" class="essay-piece">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="essay-piece-num">i.</div>
         <h2 class="essay-piece-title">Examining the Integrity of Free Will in <em>Paradise Lost</em></h2>
         <div class="essay-body">
         <p>From its opening line, John Milton's <em>Paradise Lost</em> presents the fall of man not as an open possibility but as a settled fact. "Of man's first disobedience, and the fruit / of that forbidden tree whose mortal taste / brought death into the world and all our woe" (1.1-3). The Fall is grammatically over before Satan has taken a single step. The poem does not begin at the start of the story but rather at the end of it. Milton reaches back to explain a catastrophe that has already happened. He invokes the muse not to explain what might happen but to illuminate what already did, framing the poem as an explanation rather than a story whose ending is in question. "Till one greater man / restore us and regain this blissful seat" (1.4-5). Even the "hope" of redemption is declared as a future certainty, not a possibility. Yet Milton insists throughout the poem that Adam and Eve are free agents who choose their fates. This contradiction sits at the heart of the poem: if the fall happens on line one, how is it ever a choice? Despite Milton's insistence that Adam and Eve possess genuine free will, the logic of God's omnipotence and omniscience reveals that the fall is predetermined from the moment of creation.</p>
@@ -488,7 +452,6 @@
 
       <article id="essay-mask" class="essay-piece">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="essay-piece-num">ii.</div>
         <h2 class="essay-piece-title">The Mask Is Who We Are: A Poem Analysis</h2>
 
         <blockquote class="essay-quote">I resemble everyone<br>but myself, and sometimes see<br>in shop windows,<br>despite the well-known laws<br>of optics,<br>the portrait of a stranger,<br>date unknown,<br>often signed in a corner<br>by my father.</blockquote>
@@ -509,7 +472,6 @@
 
       <article id="essay-odysseus" class="essay-piece">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="essay-piece-num">iii.</div>
         <h2 class="essay-piece-title">Odysseus: The Master Weaver of Story and Self</h2>
         <div class="essay-body">
           <p>When Odysseus finally reaches the court of the Phaeacians after years of wandering, he does something remarkable. Seated in King Alcinous' hall, he begins to skillfully recount his adventures: the Cyclops, the Sirens, and his descent into the Underworld. The Phaeacians are mesmerized by his tales. In this moment, Odysseus demonstrates that his greatest weapon is not his bow or his sword, but his voice. Odysseus's genius lies in his ability to adapt narratives to different audiences and purposes, thereby gaining renown, influencing his men, and creating strategic deception. Yet Odysseus operates on an even deeper level within Homer's epic. In books nine through twelve, Odysseus takes over as narrator and proceeds to manipulate his own image to both the Phaeacians and the reader in an attempt to acquire kleos. In Homer's <em>The Odyssey</em>, Odysseus demonstrates that weaving narrative is the ultimate tool not only for survival but also for achieving literary immortality.</p>
@@ -526,7 +488,6 @@
 
       <article id="essay-antigone" class="essay-piece">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="essay-piece-num">iv.</div>
         <h2 class="essay-piece-title">Antigone's Conservative Rebellion: Religious Duty Over Feminist Progress</h2>
         <div class="essay-body">
           <p>Sophocles' <em>Antigone</em> is often celebrated as a feminist tragedy, yet this interpretation fundamentally misreads the play's theological foundation. The play has a female protagonist who openly defies state authority, chooses death over submission, and articulates a moral vision that challenges the moral foundations of her ruler's edict. Yet reading <em>Antigone</em> as a feminist tragedy misses a critical point: the divine laws Antigone invokes to justify her rebellion are embedded in a religious framework that enforces rigid gender hierarchies in Greek society. Her defiance of Creon represents not female liberation but theocratic principles overriding secular power. The play is better understood as a defense of religious obligation against political authority than as a feminist tragedy.</p>
@@ -546,9 +507,7 @@
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="poems-inner" id="poemsInner">
       <header class="essays-header">
-        <div class="essays-kicker">Collected &middot; Vol. I</div>
         <h1 class="essays-heading">Poems</h1>
-        <div class="essays-sub">A sonnet and a poem.</div>
       </header>
 
       <nav class="essay-index">
@@ -558,7 +517,6 @@
 
       <div id="poem-debt" class="poem-entry" data-poem="Debt">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="poem-kicker">A Sonnet</div>
         <h1 class="poem-title">Debt</h1>
         <div class="poem-body">I have been paying since before I knew the debt,
 not to the world but to myself, a boy
@@ -581,7 +539,6 @@ I gave myself before I knew the game.</div>
 
       <div id="poem-sleep" class="poem-entry" data-poem="Sleep">
   <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="poem-kicker">A Poem</div>
         <h1 class="poem-title">Sleep</h1>
         <div class="poem-body">I am sleeping when the morning starts.
 I am sleeping at my desk in the third row.
@@ -628,9 +585,7 @@ The fire is mine.</div>
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="stories-inner">
       <header class="essays-header">
-        <div class="essays-kicker">Collected &middot; Vol. I</div>
         <h1 class="essays-heading">Short Stories</h1>
-        <div class="essays-sub">A short story.</div>
       </header>
 
       <nav class="essay-index">
@@ -639,7 +594,6 @@ The fire is mine.</div>
 
       <article id="story-character" class="story-entry">
         <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="story-kicker">A Short Story</div>
         <h1 class="story-title">Character</h1>
         <div class="story-body">
         <p>I was sitting in a classroom. Third row from the back. The teacher was drawing connections on the whiteboard, building an argument, and the argument had a hole in it. I said something but I didn't decide to say it. The words came out clean and specific, and a few kids turned around, and one of them gave a look of interest, and the moment passed the way it always passes. It happens every day. I used to think this was something I did. Now I think there is a system and I am inside of it, and the system is what speaks.</p>
@@ -663,9 +617,7 @@ The fire is mine.</div>
     <button class="back-btn" data-back><span>&larr;</span> Back</button>
     <div class="research-inner">
       <header class="essays-header">
-        <div class="essays-kicker">Studies in Form &middot; I</div>
         <h1 class="essays-heading">Research</h1>
-        <div class="essays-sub">A study on the geometry of digital consumption.</div>
       </header>
 
       <nav class="essay-index">
@@ -674,10 +626,8 @@ The fire is mine.</div>
 
       <article id="study-elliptical" class="study-entry">
         <button class="piece-back" type="button">&larr; Back to list</button>
-        <div class="study-kicker">A Study</div>
         <h1 class="study-title">The Elliptical Model of Digital Consumption</h1>
         <div class="study-subtitle">The geometry of the doomscroll</div>
-        <div class="study-byline">Lucas Haines</div>
 
         <div class="study-body">
           <h2>Introduction</h2>
