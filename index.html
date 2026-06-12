@@ -22,6 +22,21 @@
     a { color: #111; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
     a:hover { color: #555; }
 
+    /* Lowercase all UI text. Literal content (essay/poem/story/study bodies)
+       is excluded so the author's casing inside the prose stays intact. */
+    .selector h1,
+    .selector ol a,
+    .essays-heading,
+    .essay-index a,
+    .essay-piece-title,
+    .poem-title,
+    .story-title,
+    .study-title,
+    .study-subtitle,
+    .back-btn,
+    .piece-back,
+    .study-pdf-link a { text-transform: lowercase; }
+
     /* --- Landing selector --- */
     .selector {
       position: fixed; inset: 0;
@@ -413,11 +428,11 @@
   <main class="selector" id="selector">
     <h1>Lucas Haines</h1>
     <ol>
-      <li><a href="#" data-genre="essays"><span class="num">i.</span>Essays</a></li>
-      <li><a href="#" data-genre="poems"><span class="num">ii.</span>Poems</a></li>
-      <li><a href="#" data-genre="stories"><span class="num">iii.</span>Short Stories</a></li>
-      <li><a href="#" data-genre="photography"><span class="num">iv.</span>Photography</a></li>
-      <li><a href="#" data-genre="research"><span class="num">v.</span>Research</a></li>
+      <li><a href="#" data-genre="essays">Essays</a></li>
+      <li><a href="#" data-genre="poems">Poems</a></li>
+      <li><a href="#" data-genre="stories">Short Stories</a></li>
+      <li><a href="#" data-genre="photography">Photography</a></li>
+      <li><a href="#" data-genre="research">Research</a></li>
     </ol>
   </main>
 
@@ -430,10 +445,10 @@
       </header>
 
       <nav class="essay-index">
-        <a href="#essay-paradise-lost"><span class="essay-num">i.</span><span>Examining the Integrity of Free Will in <em>Paradise Lost</em></span></a>
-        <a href="#essay-mask"><span class="essay-num">ii.</span><span>The Mask Is Who We Are</span></a>
-        <a href="#essay-odysseus"><span class="essay-num">iii.</span><span>Odysseus: The Master Weaver of Story and Self</span></a>
-        <a href="#essay-antigone"><span class="essay-num">iv.</span><span>Antigone's Conservative Rebellion</span></a>
+        <a href="#essay-paradise-lost"><span>Examining the Integrity of Free Will in <em>Paradise Lost</em></span></a>
+        <a href="#essay-mask"><span>The Mask Is Who We Are</span></a>
+        <a href="#essay-odysseus"><span>Odysseus: The Master Weaver of Story and Self</span></a>
+        <a href="#essay-antigone"><span>Antigone's Conservative Rebellion</span></a>
       </nav>
 
       <article id="essay-paradise-lost" class="essay-piece">
@@ -511,8 +526,8 @@
       </header>
 
       <nav class="essay-index">
-        <a href="#poem-debt"><span class="essay-num">i.</span><span>Debt &mdash; a sonnet</span></a>
-        <a href="#poem-sleep"><span class="essay-num">ii.</span><span>Sleep &mdash; a poem</span></a>
+        <a href="#poem-debt"><span>Debt &mdash; a sonnet</span></a>
+        <a href="#poem-sleep"><span>Sleep &mdash; a poem</span></a>
       </nav>
 
       <div id="poem-debt" class="poem-entry" data-poem="Debt">
@@ -589,7 +604,7 @@ The fire is mine.</div>
       </header>
 
       <nav class="essay-index">
-        <a href="#story-character"><span class="essay-num">i.</span><span>Character</span></a>
+        <a href="#story-character"><span>Character</span></a>
       </nav>
 
       <article id="story-character" class="story-entry">
@@ -621,7 +636,7 @@ The fire is mine.</div>
       </header>
 
       <nav class="essay-index">
-        <a href="#study-elliptical"><span class="essay-num">i.</span><span>The Elliptical Model &mdash; the geometry of the doomscroll</span></a>
+        <a href="#study-elliptical"><span>The Elliptical Model &mdash; the geometry of the doomscroll</span></a>
       </nav>
 
       <article id="study-elliptical" class="study-entry">
