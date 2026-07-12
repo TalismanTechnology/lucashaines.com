@@ -34,7 +34,7 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
                 : 'opacity-0 translate-y-20'
             }`}
           >
-            <h1 className="text-[200px] leading-[81%] tracking-[-6px] font-medium uppercase md-tablet:text-[129.6px] md-tablet:leading-[113.4px] md-tablet:tracking-[-7.7px] mobile:text-hero-mobile mobile:leading-[96px] mobile:tracking-[-4.8px]">
+            <h1 className="text-[240px] leading-[0.78] tracking-[-8px] font-medium uppercase md-tablet:text-[180px] md-tablet:tracking-[-7px] mobile:text-[clamp(96px,26vw,132px)] mobile:tracking-[-5px]">
               Lucas
               <span style={{ color: textColor }} className="transition-colors duration-300">
                 .
