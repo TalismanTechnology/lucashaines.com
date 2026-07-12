@@ -22,9 +22,9 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
       <VideoBackground activeIndex={activeVideoIndex} />
 
       {/* Hero Content */}
-      <main className="relative z-[2] max-w-[1340px] mx-auto h-full flex flex-col justify-end items-end gap-[150px] pt-[190px] px-[15px] md-tablet:gap-28 md-tablet:pt-auto md-tablet:pb-52 md-tablet:pl-24 mobile:justify-end mobile:items-start mobile:gap-[72px] mobile:pt-[140px] mobile:px-[18px]">
+      <main className="relative z-[2] w-full h-full flex flex-col justify-end items-end gap-[150px] pt-[190px] px-2 md-tablet:gap-28 md-tablet:pt-auto mobile:justify-end mobile:items-start mobile:gap-[72px] mobile:pt-[140px] mobile:px-1.5">
         {/* Hero Name + Bio */}
-        <section className="w-full flex items-end pb-[60px] mobile:pb-11 md-tablet:pb-0">
+        <section className="w-full flex items-end pb-2 mobile:pb-1.5">
           {/* Name */}
           <div
             ref={nameRef}
