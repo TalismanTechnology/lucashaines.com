@@ -1,0 +1,81 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  html {
+    font-family: 'Figtree', sans-serif;
+    background-color: #000;
+    color: #fff;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .nav-link-underline {
+    @apply relative inline-block;
+  }
+
+  .nav-link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-px bg-white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .nav-link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .role-link {
+    @apply transition-transform duration-300;
+  }
+
+  .role-link:hover {
+    transform: translateX(4px);
+  }
+
+  .dot-glow {
+    @apply rounded-full;
+    box-shadow: 0 0 20px currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
