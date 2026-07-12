@@ -79,3 +79,100 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.photo-columns {
+  column-count: 4;
+  column-gap: 6px;
+}
+
+.photo-tile {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 6px;
+  border: 0;
+  break-inside: avoid;
+  background: #111;
+  cursor: zoom-in;
+}
+
+.writing-body {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+  line-height: 1.82;
+}
+
+.writing-body p {
+  margin: 0 0 1.35em;
+}
+
+.writing-body h2 {
+  margin: 2.6em 0 0.8em;
+  font-family: 'Figtree', sans-serif;
+  font-size: 1.55rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.writing-body h3 {
+  margin: 2em 0 0.65em;
+  font-family: 'Figtree', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.writing-body blockquote {
+  margin: 0 0 3rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(0, 0, 0, 0.35);
+  font-style: italic;
+}
+
+.writing-body ol {
+  margin: 1rem 0 2rem;
+  padding-left: 1.4rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.writing-body li {
+  margin-bottom: 0.75rem;
+}
+
+.writing-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.writing-body .study-subtitle {
+  margin: -2rem 0 3rem;
+  color: rgba(0, 0, 0, 0.5);
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.writing-body .study-equation {
+  margin: 2.5rem 0;
+  text-align: center;
+  font-size: 1.35rem;
+}
+
+.writing-body--poem .poem-body {
+  white-space: pre-line;
+  font-size: 1.2rem;
+  line-height: 1.9;
+}
+
+@media (max-width: 900px) {
+  .photo-columns { column-count: 3; }
+}
+
+@media (max-width: 600px) {
+  .photo-columns { column-count: 2; column-gap: 3px; padding: 0 3px; }
+  .photo-tile { margin-bottom: 3px; }
+  .writing-body { font-size: 1.05rem; line-height: 1.75; }
+}

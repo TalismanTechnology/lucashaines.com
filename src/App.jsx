@@ -1,13 +1,10 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import Essays from './pages/Essays'
-import Poems from './pages/Poems'
-import ShortStories from './pages/ShortStories'
 import Photography from './pages/Photography'
-import Research from './pages/Research'
-import About from './pages/About'
+import Writing from './pages/Writing'
+import WritingDetail from './pages/WritingDetail'
 
 function App() {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0)
@@ -20,12 +17,13 @@ function App() {
           path="/"
           element={<Home activeVideoIndex={activeVideoIndex} onVideoChange={setActiveVideoIndex} />}
         />
-        <Route path="/essays" element={<Essays />} />
-        <Route path="/poems" element={<Poems />} />
-        <Route path="/short-stories" element={<ShortStories />} />
+        <Route path="/writing" element={<Writing />} />
+        <Route path="/writing/:slug" element={<WritingDetail />} />
         <Route path="/photography" element={<Photography />} />
-        <Route path="/research" element={<Research />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/essays" element={<Navigate to="/writing" replace />} />
+        <Route path="/poems" element={<Navigate to="/writing" replace />} />
+        <Route path="/short-stories" element={<Navigate to="/writing" replace />} />
+        <Route path="/research" element={<Navigate to="/writing" replace />} />
       </Routes>
     </Router>
   )
