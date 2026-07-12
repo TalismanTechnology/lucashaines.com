@@ -21,6 +21,9 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
       {/* Video Background */}
       <VideoBackground activeIndex={activeVideoIndex} />
 
+      {/* Contrast gradient behind the hero title */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[42%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+
       {/* Hero Content */}
       <main className="relative z-[2] w-full h-full flex flex-col justify-end items-end gap-[150px] pt-[190px] px-2 md-tablet:gap-28 md-tablet:pt-auto mobile:justify-end mobile:items-start mobile:gap-[72px] mobile:pt-[140px] mobile:px-1.5">
         {/* Hero Name + Bio */}
@@ -34,7 +37,7 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
                 : 'opacity-0 translate-y-20'
             }`}
           >
-            <h1 className="text-[240px] leading-[0.78] tracking-[-8px] font-medium uppercase md-tablet:text-[180px] md-tablet:tracking-[-7px] mobile:text-[clamp(96px,26vw,132px)] mobile:tracking-[-5px]">
+            <h1 className="hero-title text-[240px] leading-[0.78] tracking-[-8px] font-medium uppercase md-tablet:text-[180px] md-tablet:tracking-[-7px] mobile:text-[clamp(96px,26vw,132px)] mobile:tracking-[-5px]">
               Lucas
               <span style={{ color: textColor }} className="transition-colors duration-300">
                 .
