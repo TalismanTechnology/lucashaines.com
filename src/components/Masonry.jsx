@@ -128,6 +128,7 @@ export default function Masonry({
     grid.forEach((item, index) => {
       const selector = `[data-masonry-key="${item.id}"]`
       const animationProps = {
+        opacity: 1,
         x: item.x,
         y: item.y,
         width: item.w,

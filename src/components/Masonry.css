@@ -10,6 +10,7 @@
   padding: 5px;
   border: 0;
   background: transparent;
+  opacity: 1;
   cursor: zoom-in;
   will-change: transform, width, height, opacity;
 }
@@ -25,7 +26,7 @@
   background-size: cover;
   box-shadow: 0 12px 42px -14px rgba(0, 0, 0, 0.42);
   filter: grayscale(1) saturate(0) brightness(1.14) contrast(0.72);
-  opacity: 0.8;
+  opacity: 1;
   outline: 1px solid rgba(255, 255, 255, 0.18);
   outline-offset: -1px;
   transition-property: filter, opacity, box-shadow;

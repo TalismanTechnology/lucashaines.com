@@ -58,6 +58,66 @@
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
 }
 
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: #050505;
+  color: #fff;
+}
+
+.site-preloader__mark {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.site-preloader__track {
+  width: min(220px, 52vw);
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.site-preloader__bar {
+  display: block;
+  width: 45%;
+  height: 100%;
+  background: #fff;
+  animation: preloader-sweep 1.05s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+}
+
+.site-preloader__label {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@keyframes preloader-sweep {
+  from {
+    transform: translateX(-120%);
+  }
+
+  to {
+    transform: translateX(225%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-preloader__bar {
+    animation-duration: 2.5s;
+  }
+}
+
 .site-header {
   background: linear-gradient(
     to bottom,
@@ -72,11 +132,17 @@
 .sky-page {
   background-color: #07131f;
   background-image:
-    linear-gradient(to bottom, rgba(2, 8, 15, 0.2), rgba(2, 8, 15, 0.14)),
+    linear-gradient(
+      to bottom,
+      rgba(2, 8, 15, 0.32) 0%,
+      rgba(2, 8, 15, 0.24) 52%,
+      rgba(2, 8, 15, 0.52) 100%
+    ),
     url('/assets/sky-clouds-bg.png');
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
 }
 
 .home-nav-link {
