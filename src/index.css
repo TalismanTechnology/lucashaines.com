@@ -69,6 +69,53 @@
   filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.28));
 }
 
+.sky-page {
+  background-color: #07131f;
+  background-image:
+    linear-gradient(to bottom, rgba(2, 8, 15, 0.78), rgba(2, 8, 15, 0.7)),
+    url('/assets/sky-clouds-bg.png');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.home-nav-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 2px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition-property: color, transform;
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+
+.home-nav-link:hover {
+  color: #fff;
+  transform: translateX(-2px);
+}
+
+.home-nav-link:active {
+  transform: translateX(0);
+}
+
+.home-nav-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  .sky-page {
+    background-attachment: scroll;
+  }
+}
+
 .editorial-nav-link {
   position: relative;
   display: inline-flex;

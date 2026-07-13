@@ -1,0 +1,576 @@
+[
+  {
+    "file": "001.jpg",
+    "source": "IMG_0186 (2).jpeg",
+    "hue": 0.0601,
+    "luminance": 0.0601,
+    "saturation": 0.0
+  },
+  {
+    "file": "002.jpg",
+    "source": "DAA7DC1C-EEF3-4529-BDAA-630EF8AE5D9C.jpeg",
+    "hue": 0.0659,
+    "luminance": 0.0659,
+    "saturation": 0.0654
+  },
+  {
+    "file": "003.jpg",
+    "source": "IMG_0743.jpeg",
+    "hue": 0.0725,
+    "luminance": 0.0725,
+    "saturation": 0.0
+  },
+  {
+    "file": "004.jpg",
+    "source": "IMG_2145.jpeg",
+    "hue": 0.0745,
+    "luminance": 0.0745,
+    "saturation": 0.142
+  },
+  {
+    "file": "005.jpg",
+    "source": "IMG_1890.jpeg",
+    "hue": 0.0914,
+    "luminance": 0.0914,
+    "saturation": 0.2602
+  },
+  {
+    "file": "006.jpg",
+    "source": "IMG_0670.jpeg",
+    "hue": 0.0959,
+    "luminance": 0.0959,
+    "saturation": 0.0
+  },
+  {
+    "file": "007.jpg",
+    "source": "258FEEB3-4663-40E2-9FC8-402844511E15.jpeg",
+    "hue": 0.1057,
+    "luminance": 0.1057,
+    "saturation": 0.0
+  },
+  {
+    "file": "008.jpg",
+    "source": "IMG_1947.jpeg",
+    "hue": 0.1139,
+    "luminance": 0.1139,
+    "saturation": 0.0
+  },
+  {
+    "file": "009.jpg",
+    "source": "IMG_0395.jpeg",
+    "hue": 0.1216,
+    "luminance": 0.1216,
+    "saturation": 0.0
+  },
+  {
+    "file": "010.jpg",
+    "source": "ADB667A7-E3C2-4EEA-BA28-7B3E2A342C92.jpeg",
+    "hue": 0.1422,
+    "luminance": 0.1422,
+    "saturation": 0.0978
+  },
+  {
+    "file": "011.jpg",
+    "source": "IMG_2443.jpeg",
+    "hue": 0.1556,
+    "luminance": 0.1556,
+    "saturation": 0.0
+  },
+  {
+    "file": "012.jpg",
+    "source": "IMG_0814.jpeg",
+    "hue": 0.1595,
+    "luminance": 0.1595,
+    "saturation": 0.0407
+  },
+  {
+    "file": "013.jpg",
+    "source": "IMG_2265.jpeg",
+    "hue": 0.1682,
+    "luminance": 0.1682,
+    "saturation": 0.0
+  },
+  {
+    "file": "014.jpg",
+    "source": "IMG_0392.jpeg",
+    "hue": 0.1911,
+    "luminance": 0.1911,
+    "saturation": 0.0
+  },
+  {
+    "file": "015.jpg",
+    "source": "IMG_2490.jpeg",
+    "hue": 0.2128,
+    "luminance": 0.2128,
+    "saturation": 0.0
+  },
+  {
+    "file": "016.jpg",
+    "source": "IMG_1583.jpeg",
+    "hue": 0.2237,
+    "luminance": 0.2237,
+    "saturation": 0.2127
+  },
+  {
+    "file": "017.jpg",
+    "source": "IMG_2084.jpeg",
+    "hue": 0.2468,
+    "luminance": 0.2468,
+    "saturation": 0.0
+  },
+  {
+    "file": "018.jpg",
+    "source": "IMG_2100.jpeg",
+    "hue": 0.2553,
+    "luminance": 0.2553,
+    "saturation": 0.0
+  },
+  {
+    "file": "019.jpg",
+    "source": "IMG_0240.jpeg",
+    "hue": 0.2575,
+    "luminance": 0.2575,
+    "saturation": 0.0
+  },
+  {
+    "file": "020.jpg",
+    "source": "IMG_1764.jpeg",
+    "hue": 0.2779,
+    "luminance": 0.2779,
+    "saturation": 0.0
+  },
+  {
+    "file": "021.jpg",
+    "source": "IMG_2239.jpeg",
+    "hue": 0.2822,
+    "luminance": 0.2822,
+    "saturation": 0.0041
+  },
+  {
+    "file": "022.jpg",
+    "source": "IMG_0382.jpeg",
+    "hue": 0.2898,
+    "luminance": 0.2898,
+    "saturation": 0.0
+  },
+  {
+    "file": "023.jpg",
+    "source": "IMG_0634.jpeg",
+    "hue": 0.2927,
+    "luminance": 0.2927,
+    "saturation": 0.0
+  },
+  {
+    "file": "024.jpg",
+    "source": "IMG_2357.jpeg",
+    "hue": 0.3211,
+    "luminance": 0.3211,
+    "saturation": 0.0
+  },
+  {
+    "file": "025.jpg",
+    "source": "IMG_2359.jpeg",
+    "hue": 0.3261,
+    "luminance": 0.3261,
+    "saturation": 0.0
+  },
+  {
+    "file": "026.jpg",
+    "source": "IMG_2280.jpeg",
+    "hue": 0.3602,
+    "luminance": 0.3602,
+    "saturation": 0.0
+  },
+  {
+    "file": "027.jpg",
+    "source": "IMG_2358.jpeg",
+    "hue": 0.3867,
+    "luminance": 0.3867,
+    "saturation": 0.0
+  },
+  {
+    "file": "028.jpg",
+    "source": "IMG_2156.jpeg",
+    "hue": 0.3956,
+    "luminance": 0.3956,
+    "saturation": 0.0
+  },
+  {
+    "file": "029.jpg",
+    "source": "IMG_1133 Copy.jpeg",
+    "hue": 0.4249,
+    "luminance": 0.4249,
+    "saturation": 0.122
+  },
+  {
+    "file": "030.jpg",
+    "source": "IMG_0484.jpeg",
+    "hue": 0.4398,
+    "luminance": 0.4398,
+    "saturation": 0.0
+  },
+  {
+    "file": "031.jpg",
+    "source": "IMG_1113.jpeg",
+    "hue": 0.4782,
+    "luminance": 0.4782,
+    "saturation": 0.0
+  },
+  {
+    "file": "032.jpg",
+    "source": "0D9271AE-AC94-4313-9286-B534B5FC888F.jpeg",
+    "hue": 0.0011,
+    "luminance": 0.0426,
+    "saturation": 0.3556
+  },
+  {
+    "file": "033.jpg",
+    "source": "IMG_1014.jpeg",
+    "hue": 0.0054,
+    "luminance": 0.1558,
+    "saturation": 0.1658
+  },
+  {
+    "file": "034.jpg",
+    "source": "IMG_0459.jpeg",
+    "hue": 0.0139,
+    "luminance": 0.3714,
+    "saturation": 0.3871
+  },
+  {
+    "file": "035.jpg",
+    "source": "IMG_2008.jpeg",
+    "hue": 0.0417,
+    "luminance": 0.1025,
+    "saturation": 0.1143
+  },
+  {
+    "file": "036.jpg",
+    "source": "IMG_1612.jpeg",
+    "hue": 0.0469,
+    "luminance": 0.5452,
+    "saturation": 0.3759
+  },
+  {
+    "file": "037.jpg",
+    "source": "IMG_0469.jpeg",
+    "hue": 0.0476,
+    "luminance": 0.3552,
+    "saturation": 0.3105
+  },
+  {
+    "file": "038.jpg",
+    "source": "IMG_0602.jpeg",
+    "hue": 0.05,
+    "luminance": 0.1913,
+    "saturation": 0.1361
+  },
+  {
+    "file": "039.jpg",
+    "source": "0C45E398-EEAA-424D-92FB-06D51C15F429.jpeg",
+    "hue": 0.0521,
+    "luminance": 0.2396,
+    "saturation": 0.6424
+  },
+  {
+    "file": "040.jpg",
+    "source": "IMG_1199.jpeg",
+    "hue": 0.0608,
+    "luminance": 0.3176,
+    "saturation": 0.6845
+  },
+  {
+    "file": "041.jpg",
+    "source": "IMG_1198.jpeg",
+    "hue": 0.0623,
+    "luminance": 0.2703,
+    "saturation": 0.2203
+  },
+  {
+    "file": "042.jpg",
+    "source": "IMG_0584.jpeg",
+    "hue": 0.0667,
+    "luminance": 0.2359,
+    "saturation": 0.2604
+  },
+  {
+    "file": "043.jpg",
+    "source": "IMG_2361.jpeg",
+    "hue": 0.0758,
+    "luminance": 0.2021,
+    "saturation": 0.6663
+  },
+  {
+    "file": "044.jpg",
+    "source": "4FE265B2-DB33-4243-B382-C670B087E510.jpeg",
+    "hue": 0.0758,
+    "luminance": 0.5559,
+    "saturation": 0.3799
+  },
+  {
+    "file": "045.jpg",
+    "source": "A1B76978-1961-486A-9D27-35ABC95849D6.jpeg",
+    "hue": 0.0884,
+    "luminance": 0.4904,
+    "saturation": 0.2529
+  },
+  {
+    "file": "046.jpg",
+    "source": "IMG_2331 Copy.jpeg",
+    "hue": 0.0909,
+    "luminance": 0.5218,
+    "saturation": 0.4545
+  },
+  {
+    "file": "047.jpg",
+    "source": "IMG_2350.jpeg",
+    "hue": 0.099,
+    "luminance": 0.3131,
+    "saturation": 0.4168
+  },
+  {
+    "file": "048.jpg",
+    "source": "IMG_2452.jpeg",
+    "hue": 0.1111,
+    "luminance": 0.1485,
+    "saturation": 0.3497
+  },
+  {
+    "file": "049.jpg",
+    "source": "IMG_2449.jpeg",
+    "hue": 0.1111,
+    "luminance": 0.181,
+    "saturation": 0.319
+  },
+  {
+    "file": "050.jpg",
+    "source": "IMG_1782.jpeg",
+    "hue": 0.1154,
+    "luminance": 0.2886,
+    "saturation": 0.239
+  },
+  {
+    "file": "051.jpg",
+    "source": "IMG_1469.jpeg",
+    "hue": 0.1667,
+    "luminance": 0.2346,
+    "saturation": 0.2509
+  },
+  {
+    "file": "052.jpg",
+    "source": "IMG_0419 (4).jpeg",
+    "hue": 0.2202,
+    "luminance": 0.2943,
+    "saturation": 0.288
+  },
+  {
+    "file": "053.jpg",
+    "source": "Image 1-23-26 at 12.13\u202fPM.jpeg",
+    "hue": 0.2879,
+    "luminance": 0.5257,
+    "saturation": 0.1598
+  },
+  {
+    "file": "054.jpg",
+    "source": "IMG_1916.jpeg",
+    "hue": 0.5278,
+    "luminance": 0.2615,
+    "saturation": 0.1741
+  },
+  {
+    "file": "055.jpg",
+    "source": "IMG_2141.jpeg",
+    "hue": 0.5324,
+    "luminance": 0.3639,
+    "saturation": 0.367
+  },
+  {
+    "file": "056.jpg",
+    "source": "IMG_0961.jpeg",
+    "hue": 0.5385,
+    "luminance": 0.1761,
+    "saturation": 0.3693
+  },
+  {
+    "file": "057.jpg",
+    "source": "IMG_0997.jpeg",
+    "hue": 0.5385,
+    "luminance": 0.1761,
+    "saturation": 0.41
+  },
+  {
+    "file": "058.jpg",
+    "source": "IMG_0114.jpeg",
+    "hue": 0.546,
+    "luminance": 0.5096,
+    "saturation": 0.7987
+  },
+  {
+    "file": "059.jpg",
+    "source": "IMG_2135.jpeg",
+    "hue": 0.5544,
+    "luminance": 0.372,
+    "saturation": 0.3086
+  },
+  {
+    "file": "060.jpg",
+    "source": "IMG_0154.jpeg",
+    "hue": 0.5595,
+    "luminance": 0.4112,
+    "saturation": 0.1603
+  },
+  {
+    "file": "061.jpg",
+    "source": "IMG_1508.jpeg",
+    "hue": 0.5625,
+    "luminance": 0.1993,
+    "saturation": 0.2128
+  },
+  {
+    "file": "062.jpg",
+    "source": "IMG_1138.jpeg",
+    "hue": 0.5741,
+    "luminance": 0.3483,
+    "saturation": 0.5465
+  },
+  {
+    "file": "063.jpg",
+    "source": "IMG_2017.jpeg",
+    "hue": 0.5764,
+    "luminance": 0.4162,
+    "saturation": 0.4119
+  },
+  {
+    "file": "064.jpg",
+    "source": "IMG_2262.jpeg",
+    "hue": 0.5794,
+    "luminance": 0.4151,
+    "saturation": 0.3829
+  },
+  {
+    "file": "065.jpg",
+    "source": "IMG_1022.jpeg",
+    "hue": 0.5833,
+    "luminance": 0.1875,
+    "saturation": 0.0747
+  },
+  {
+    "file": "066.jpg",
+    "source": "IMG_0959.jpeg",
+    "hue": 0.5976,
+    "luminance": 0.3349,
+    "saturation": 0.6024
+  },
+  {
+    "file": "067.jpg",
+    "source": "IMG_2240.jpeg",
+    "hue": 0.6009,
+    "luminance": 0.2624,
+    "saturation": 0.5833
+  },
+  {
+    "file": "068.jpg",
+    "source": "IMG_1861.jpeg",
+    "hue": 0.6146,
+    "luminance": 0.299,
+    "saturation": 0.6237
+  },
+  {
+    "file": "069.jpg",
+    "source": "IMG_2218.jpeg",
+    "hue": 0.6151,
+    "luminance": 0.2194,
+    "saturation": 0.6619
+  },
+  {
+    "file": "070.jpg",
+    "source": "IMG_2343.jpeg",
+    "hue": 0.6167,
+    "luminance": 0.3472,
+    "saturation": 0.3156
+  },
+  {
+    "file": "071.jpg",
+    "source": "IMG_1148.jpeg",
+    "hue": 0.625,
+    "luminance": 0.4005,
+    "saturation": 0.386
+  },
+  {
+    "file": "072.jpg",
+    "source": "IMG_1359 Copy.jpeg",
+    "hue": 0.6429,
+    "luminance": 0.1752,
+    "saturation": 0.4532
+  },
+  {
+    "file": "073.jpg",
+    "source": "IMG_1222.jpeg",
+    "hue": 0.9825,
+    "luminance": 0.2151,
+    "saturation": 0.2649
+  },
+  {
+    "file": "074.jpg",
+    "source": "IMG_0832.jpeg",
+    "hue": 0.9878,
+    "luminance": 0.2377,
+    "saturation": 0.4863
+  },
+  {
+    "file": "075.jpg",
+    "source": "AAB7B2F3-0FEF-4DAB-B320-16E793B77087.jpeg",
+    "hue": 0.9988,
+    "luminance": 0.3616,
+    "saturation": 0.2046
+  },
+  {
+    "file": "076.jpg",
+    "source": "IMG_0485.jpeg",
+    "hue": 0.5064,
+    "luminance": 0.5064,
+    "saturation": 0.0
+  },
+  {
+    "file": "077.jpg",
+    "source": "IMG_1161.jpeg",
+    "hue": 0.5136,
+    "luminance": 0.5136,
+    "saturation": 0.0
+  },
+  {
+    "file": "078.jpg",
+    "source": "IMG_2107.jpeg",
+    "hue": 0.5246,
+    "luminance": 0.5246,
+    "saturation": 0.0
+  },
+  {
+    "file": "079.jpg",
+    "source": "IMG_1633.jpeg",
+    "hue": 0.5651,
+    "luminance": 0.5651,
+    "saturation": 0.0
+  },
+  {
+    "file": "080.jpg",
+    "source": "IMG_1727.jpeg",
+    "hue": 0.6106,
+    "luminance": 0.6106,
+    "saturation": 0.0
+  },
+  {
+    "file": "081.jpg",
+    "source": "IMG_0483.jpeg",
+    "hue": 0.6542,
+    "luminance": 0.6542,
+    "saturation": 0.0
+  },
+  {
+    "file": "082.jpg",
+    "source": "IMG_2441.jpeg",
+    "hue": 0.8135,
+    "luminance": 0.8135,
+    "saturation": 0.0
+  }
+]

@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 
 const NAV_ITEMS = [
   { number: '01', label: 'Writing', path: '/writing' },
@@ -6,10 +6,20 @@ const NAV_ITEMS = [
 ]
 
 export default function Navbar() {
+  const location = useLocation()
+  const showHome = location.pathname !== '/'
+
   return (
     <header className="site-header fixed top-0 left-0 right-0 z-10">
       <nav className="relative z-[1] max-w-[1340px] mx-auto px-[15px] pt-5 pb-14 md-tablet:px-[18px] mobile:px-[12px] mobile:pt-3 mobile:pb-10">
-        <div className="flex items-center justify-end gap-7 mobile:gap-5">
+        <div className={`flex items-center ${showHome ? 'justify-between' : 'justify-end'}`}>
+          {showHome && (
+            <Link to="/" className="home-nav-link">
+              <span aria-hidden="true">←</span>
+              <span>Home</span>
+            </Link>
+          )}
+          <div className="flex items-center gap-7 mobile:gap-5">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.path}
@@ -24,6 +34,7 @@ export default function Navbar() {
                 <span>{item.label}</span>
               </NavLink>
             ))}
+          </div>
         </div>
       </nav>
     </header>

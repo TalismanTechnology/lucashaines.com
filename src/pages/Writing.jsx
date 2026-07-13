@@ -6,7 +6,7 @@ const CATEGORY_ORDER = ['Essay', 'Poem', 'Short story', 'Research']
 
 export default function Writing() {
   return (
-    <div className="min-h-screen bg-black flex flex-col pt-28 pb-16 px-[15px] md-tablet:px-[18px] mobile:pt-24 mobile:px-[18px]">
+    <div className="sky-page min-h-screen flex flex-col pt-28 pb-16 px-[15px] md-tablet:px-[18px] mobile:pt-24 mobile:px-[18px]">
       <main className="w-full max-w-[1120px] mx-auto flex-1">
         <header className="mb-12 mobile:mb-10">
           <p className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3">Selected work</p>
