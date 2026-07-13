@@ -129,6 +129,7 @@ export default function Masonry({
       const selector = `[data-masonry-key="${item.id}"]`
       const animationProps = {
         opacity: 1,
+        filter: 'blur(0px)',
         x: item.x,
         y: item.y,
         width: item.w,

@@ -6,6 +6,7 @@ const MIN_DISPLAY_MS = 1400
 const MAX_WAIT_MS = 7000
 
 let assetPreloadPromise
+let heroVideoReadyPromise
 
 const preloadImage = (src) =>
   new Promise((resolve) => {
@@ -32,6 +33,34 @@ const preloadVideo = (src) =>
     video.load()
   })
 
+const waitForHeroVideo = () => {
+  if (heroVideoReadyPromise) return heroVideoReadyPromise
+
+  const heroVideo = document.querySelector('video')
+  if (!heroVideo) {
+    heroVideoReadyPromise = preloadVideo(VIDEO_URLS[0])
+    return heroVideoReadyPromise
+  }
+
+  if (heroVideo.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+    heroVideoReadyPromise = Promise.resolve()
+    return heroVideoReadyPromise
+  }
+
+  heroVideoReadyPromise = new Promise((resolve) => {
+    const finish = () => {
+      heroVideo.removeEventListener('canplay', finish)
+      heroVideo.removeEventListener('error', finish)
+      resolve()
+    }
+
+    heroVideo.addEventListener('canplay', finish, { once: true })
+    heroVideo.addEventListener('error', finish, { once: true })
+  })
+
+  return heroVideoReadyPromise
+}
+
 const preloadSiteAssets = () => {
   if (!assetPreloadPromise) {
     const thumbnailLoads = GALLERY_ITEMS.map((photo) =>
@@ -39,7 +68,7 @@ const preloadSiteAssets = () => {
     )
 
     assetPreloadPromise = Promise.allSettled([
-      preloadVideo(VIDEO_URLS[0]),
+      waitForHeroVideo(),
       ...thumbnailLoads,
     ])
   }
@@ -75,17 +104,18 @@ export default function SitePreloader({ children }) {
     }
   }, [])
 
-  if (!isReady) {
-    return (
-      <div className="site-preloader" role="status" aria-live="polite" aria-label="Loading site">
-        <div className="site-preloader__mark" aria-hidden="true">Lucas.</div>
-        <div className="site-preloader__track" aria-hidden="true">
-          <span className="site-preloader__bar" />
+  return (
+    <>
+      {children}
+      {!isReady && (
+        <div className="site-preloader" role="status" aria-live="polite" aria-label="Loading site">
+          <div className="site-preloader__mark" aria-hidden="true">Lucas.</div>
+          <div className="site-preloader__track" aria-hidden="true">
+            <span className="site-preloader__bar" />
+          </div>
+          <span className="site-preloader__label">Loading</span>
         </div>
-        <span className="site-preloader__label">Loading</span>
-      </div>
-    )
-  }
-
-  return children
+      )}
+    </>
+  )
 }

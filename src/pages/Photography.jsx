@@ -58,7 +58,7 @@ export default function Photography() {
             animateFrom="bottom"
             scaleOnHover
             hoverScale={0.98}
-            blurToFocus
+            blurToFocus={false}
           />
         </div>
       </main>

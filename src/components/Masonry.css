@@ -11,6 +11,7 @@
   border: 0;
   background: transparent;
   opacity: 1;
+  filter: blur(0);
   cursor: zoom-in;
   will-change: transform, width, height, opacity;
 }
@@ -47,6 +48,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .masonry-item-wrapper {
+    filter: none !important;
+  }
+
   .masonry-item-img {
     transition-duration: 0.01ms;
   }
