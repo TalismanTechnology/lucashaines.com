@@ -72,7 +72,7 @@
 .sky-page {
   background-color: #07131f;
   background-image:
-    linear-gradient(to bottom, rgba(2, 8, 15, 0.78), rgba(2, 8, 15, 0.7)),
+    linear-gradient(to bottom, rgba(2, 8, 15, 0.5), rgba(2, 8, 15, 0.42)),
     url('/assets/sky-clouds-bg.png');
   background-position: center;
   background-size: cover;
@@ -211,22 +211,6 @@
   background: #555;
 }
 
-.photo-columns {
-  column-count: 4;
-  column-gap: 6px;
-}
-
-.photo-tile {
-  display: block;
-  width: 100%;
-  padding: 0;
-  margin: 0 0 6px;
-  border: 0;
-  break-inside: avoid;
-  background: #111;
-  cursor: zoom-in;
-}
-
 .writing-body {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.125rem;
@@ -298,12 +282,6 @@
   line-height: 1.9;
 }
 
-@media (max-width: 900px) {
-  .photo-columns { column-count: 3; }
-}
-
 @media (max-width: 600px) {
-  .photo-columns { column-count: 2; column-gap: 3px; padding: 0 3px; }
-  .photo-tile { margin-bottom: 3px; }
   .writing-body { font-size: 1.05rem; line-height: 1.75; }
 }

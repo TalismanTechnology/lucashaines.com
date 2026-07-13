@@ -1,17 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Footer from '../components/Footer'
-
-// Generated from the updated W PHOTOS folder and ordered by a true-color spectrum.
-const PHOTOS = Array.from({ length: 82 }, (_, index) => `${String(index + 1).padStart(3, '0')}.jpg`)
-
-const thumbnailFor = (file) => `/gallery/thumbs/${file}`
+import Masonry from '../components/Masonry'
+import { GALLERY_ITEMS } from '../data/gallery'
 
 export default function Photography() {
   const [activeIndex, setActiveIndex] = useState(null)
-  const activePhoto = activeIndex === null ? null : PHOTOS[activeIndex]
+  const activePhoto = activeIndex === null ? null : GALLERY_ITEMS[activeIndex]?.file
+  const masonryItems = useMemo(
+    () =>
+      GALLERY_ITEMS.map((photo, index) => ({
+        ...photo,
+        img: `/gallery/thumbs/${photo.file}`,
+        index,
+        label: `Open photograph ${index + 1} of ${GALLERY_ITEMS.length}`,
+      })),
+    [],
+  )
 
   const move = (direction) => {
-    setActiveIndex((current) => (current + direction + PHOTOS.length) % PHOTOS.length)
+    setActiveIndex((current) => (current + direction + GALLERY_ITEMS.length) % GALLERY_ITEMS.length)
   }
 
   useEffect(() => {
@@ -41,23 +48,18 @@ export default function Photography() {
           </h1>
         </header>
 
-        <div className="photo-columns px-1.5" aria-label="Photography gallery">
-          {PHOTOS.map((file, index) => (
-            <button
-              key={file}
-              type="button"
-              className="photo-tile group"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`Open photograph ${index + 1} of ${PHOTOS.length}`}
-            >
-              <img
-                src={thumbnailFor(file)}
-                alt=""
-                loading="lazy"
-                className="w-full h-auto block transition-opacity duration-300 group-hover:opacity-75"
-              />
-            </button>
-          ))}
+        <div className="px-1" aria-label="Photography gallery">
+          <Masonry
+            items={masonryItems}
+            onItemClick={(item) => setActiveIndex(item.index)}
+            ease="power3.out"
+            duration={0.6}
+            stagger={0.018}
+            animateFrom="bottom"
+            scaleOnHover
+            hoverScale={0.98}
+            blurToFocus
+          />
         </div>
       </main>
       <Footer />
@@ -69,7 +71,7 @@ export default function Photography() {
           <img src={`/gallery/full/${activePhoto}`} alt={`Photograph ${activeIndex + 1}`} className="max-w-full max-h-[90vh] object-contain" />
           <button type="button" onClick={() => move(1)} className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-12 h-16 text-4xl text-white/65 hover:text-white" aria-label="Next photograph">›</button>
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs tracking-[0.16em] text-white/50">
-            {String(activeIndex + 1).padStart(2, '0')} / {String(PHOTOS.length).padStart(2, '0')}
+            {String(activeIndex + 1).padStart(2, '0')} / {String(GALLERY_ITEMS.length).padStart(2, '0')}
           </div>
         </div>
       )}
