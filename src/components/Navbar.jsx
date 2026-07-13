@@ -1,26 +1,28 @@
 import { NavLink } from 'react-router-dom'
 
 const NAV_ITEMS = [
-  { label: 'Writing', path: '/writing' },
-  { label: 'Photography', path: '/photography' },
+  { number: '01', label: 'Writing', path: '/writing' },
+  { number: '02', label: 'Photography', path: '/photography' },
 ]
 
 export default function Navbar() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm">
-      <nav className="max-w-[1340px] mx-auto px-[15px] py-9 md-tablet:py-[30px] md-tablet:px-[18px] mobile:py-6 mobile:px-[18px]">
-        <div className="flex items-center justify-end gap-8 mobile:gap-5">
+    <header className="site-header fixed top-0 left-0 right-0 z-10">
+      <nav className="relative z-[1] max-w-[1340px] mx-auto px-[15px] pt-5 pb-14 md-tablet:px-[18px] mobile:px-[12px] mobile:pt-3 mobile:pb-10">
+        <div className="flex items-center justify-end gap-2.5 mobile:gap-2">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `nav-link-underline text-xs leading-4 tracking-[-0.12px] font-medium uppercase ${
-                    isActive ? 'text-white' : 'text-white/70 hover:text-white'
+                  `editorial-nav-button ${
+                    isActive ? 'editorial-nav-button--active' : ''
                   }`
                 }
               >
-                {item.label}
+                <span className="editorial-nav-number">{item.number}</span>
+                <span>{item.label}</span>
+                <span className="editorial-nav-arrow" aria-hidden="true">↗</span>
               </NavLink>
             ))}
         </div>
