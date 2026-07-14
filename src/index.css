@@ -138,7 +138,7 @@
       rgba(2, 8, 15, 0.24) 52%,
       rgba(2, 8, 15, 0.52) 100%
     ),
-    url('/assets/sky-clouds-bg.png');
+    url('/assets/sky-clouds-bg-painterly.png');
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
