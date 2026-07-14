@@ -277,77 +277,432 @@
   background: #555;
 }
 
+.writing-detail {
+  position: relative;
+  min-height: 100vh;
+  overflow: clip;
+  color: #fff;
+  isolation: isolate;
+}
+
+.writing-detail::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(1, 5, 10, 0.36) 0%, rgba(1, 5, 10, 0.08) 45%, rgba(1, 5, 10, 0.72) 100%),
+    radial-gradient(circle at 74% 30%, transparent 0%, rgba(0, 0, 0, 0.18) 70%);
+}
+
+.writing-detail__progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 40;
+  height: 2px;
+  background: #ffd84a;
+  box-shadow: 0 0 16px rgba(255, 216, 74, 0.55);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: writing-progress linear;
+  animation-timeline: scroll();
+}
+
+@keyframes writing-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.writing-detail__hero {
+  min-height: 100svh;
+  display: flex;
+  padding: clamp(8.5rem, 17vh, 12rem) clamp(1.5rem, 4vw, 4.5rem) clamp(2.25rem, 5vh, 4.5rem);
+}
+
+.writing-detail__hero-inner {
+  width: 100%;
+  max-width: 1340px;
+  min-height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.writing-detail__back {
+  align-self: flex-start;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.7rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.writing-detail__back:hover {
+  color: #fff;
+  transform: translateX(-3px);
+}
+
+.writing-detail__back:focus-visible,
+.writing-detail__scroll-cue:focus-visible,
+.writing-detail__next:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 5px;
+}
+
+.writing-detail__title-block {
+  width: min(100%, 1200px);
+  margin-top: auto;
+  padding-top: clamp(5rem, 16vh, 11rem);
+}
+
+.writing-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: clamp(1.4rem, 3vw, 2.25rem);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.writing-detail__meta-rule {
+  width: clamp(2rem, 5vw, 5rem);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.writing-detail__title-block h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(4rem, 8.7vw, 9.25rem);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+  text-wrap: balance;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.46);
+}
+
+.writing-detail--long-title .writing-detail__title-block h1 {
+  max-width: 15ch;
+  font-size: clamp(3.4rem, 6.25vw, 6.75rem);
+  line-height: 0.93;
+}
+
+.writing-detail__scroll-cue {
+  align-self: flex-end;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 1rem;
+  margin-top: clamp(2.5rem, 6vh, 5rem);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.writing-detail__scroll-cue:hover {
+  color: #fff;
+  transform: translateY(3px);
+}
+
+.writing-detail__article {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: minmax(135px, 210px) minmax(0, 800px) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 7rem);
+  width: min(100%, 1340px);
+  margin: 0 auto;
+  padding: clamp(5.5rem, 10vw, 9rem) clamp(1.5rem, 4vw, 4.5rem) clamp(6.5rem, 12vw, 11rem);
+  scroll-margin-top: 5rem;
+}
+
+.writing-detail__article::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: -1;
+  width: 100vw;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(115deg, rgba(3, 11, 18, 0.94) 0%, rgba(5, 18, 28, 0.88) 52%, rgba(9, 28, 40, 0.84) 100%);
+  box-shadow: 0 -32px 80px rgba(0, 0, 0, 0.24);
+  transform: translateX(-50%);
+  backdrop-filter: blur(18px) saturate(0.86);
+}
+
+.writing-detail__rail {
+  position: sticky;
+  top: 8rem;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.writing-detail__rail::before {
+  content: '';
+  width: 2.75rem;
+  height: 1px;
+  margin-bottom: 0.35rem;
+  background: #ffd84a;
+}
+
 .writing-body {
+  max-width: 800px;
+  color: rgba(255, 255, 255, 0.9);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.125rem;
-  line-height: 1.82;
+  font-size: clamp(1.1rem, 1.3vw, 1.24rem);
+  line-height: 1.86;
+  text-shadow: none;
 }
 
 .writing-body p {
-  margin: 0 0 1.35em;
+  margin: 0 0 1.5em;
 }
 
 .writing-body h2 {
-  margin: 2.6em 0 0.8em;
+  margin: 2.8em 0 0.9em;
+  color: #fff;
   font-family: 'Figtree', sans-serif;
-  font-size: 1.55rem;
-  line-height: 1.2;
+  font-size: clamp(1.7rem, 2.5vw, 2.25rem);
+  line-height: 1.08;
   font-weight: 500;
+  letter-spacing: -0.035em;
 }
 
 .writing-body h3 {
-  margin: 2em 0 0.65em;
+  margin: 2.2em 0 0.7em;
+  color: rgba(255, 255, 255, 0.96);
   font-family: 'Figtree', sans-serif;
-  font-size: 1.2rem;
-  line-height: 1.25;
+  font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+  line-height: 1.2;
   font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .writing-body blockquote {
-  margin: 0 0 3rem;
-  padding-left: 1.5rem;
-  border-left: 1px solid rgba(0, 0, 0, 0.35);
+  margin: 0 0 clamp(3rem, 7vw, 5rem);
+  padding: 0 0 0 clamp(1.25rem, 3vw, 2.25rem);
+  border-left: 2px solid #ffd84a;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 1.1em;
   font-style: italic;
 }
 
 .writing-body ol {
-  margin: 1rem 0 2rem;
+  margin: 1.25rem 0 2.5rem;
   padding-left: 1.4rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.65;
 }
 
 .writing-body li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .writing-body a {
-  color: inherit;
+  color: #ffe47c;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
 .writing-body .study-subtitle {
-  margin: -2rem 0 3rem;
-  color: rgba(0, 0, 0, 0.5);
+  margin: 0 0 clamp(3.5rem, 8vw, 6rem);
+  color: rgba(255, 255, 255, 0.52);
   font-family: 'Figtree', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
 }
 
 .writing-body .study-equation {
-  margin: 2.5rem 0;
+  margin: 3rem 0;
+  padding: 2rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
   text-align: center;
-  font-size: 1.35rem;
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
 }
 
 .writing-body--poem .poem-body {
+  max-width: 700px;
   white-space: pre-line;
-  font-size: 1.2rem;
-  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  line-height: 1.95;
+}
+
+.writing-detail:not(.writing-detail--poem) :is(.essay-body, .story-body, .study-body) > p:first-of-type::first-letter {
+  float: left;
+  margin: 0.12em 0.13em 0 0;
+  color: #ffd84a;
+  font-family: 'Figtree', sans-serif;
+  font-size: 4.8em;
+  font-weight: 500;
+  line-height: 0.72;
+}
+
+.writing-detail__next {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: min(100%, 1340px);
+  margin: 0 auto;
+  padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 4vw, 4.5rem);
+  color: #fff;
+  overflow: hidden;
+  transition: color 180ms ease;
+}
+
+.writing-detail__next::before {
+  content: '';
+  position: absolute;
+  inset: 0 50%;
+  z-index: -1;
+  width: 100vw;
+  background: rgba(2, 9, 15, 0.42);
+  transform: translateX(-50%);
+  transition: background 240ms ease;
+}
+
+.writing-detail__next:hover::before {
+  background: rgba(2, 9, 15, 0.62);
+}
+
+.writing-detail__next-label {
+  grid-column: 1 / -1;
+  margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.writing-detail__next-title {
+  max-width: 18ch;
+  font-size: clamp(2.5rem, 5vw, 5.5rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+  text-wrap: balance;
+  transition: transform 240ms ease;
+}
+
+.writing-detail__next-arrow {
+  align-self: end;
+  padding: 0 0.2rem 0.25rem 2rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: clamp(2rem, 4vw, 4rem);
+  transition: transform 240ms ease, color 240ms ease;
+}
+
+.writing-detail__next:hover .writing-detail__next-title {
+  transform: translateX(6px);
+}
+
+.writing-detail__next:hover .writing-detail__next-arrow {
+  color: #ffd84a;
+  transform: translate(5px, -5px);
+}
+
+@media (max-width: 900px) {
+  .writing-detail__article {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 2.5rem;
+  }
 }
 
 @media (max-width: 600px) {
-  .writing-body { font-size: 1.05rem; line-height: 1.75; }
+  .writing-detail__hero {
+    min-height: 92svh;
+    padding: 7.5rem 1.125rem 1.75rem;
+  }
+
+  .writing-detail__title-block {
+    padding-top: 4rem;
+  }
+
+  .writing-detail__title-block h1 {
+    max-width: none;
+    font-size: clamp(3.25rem, 15vw, 5.25rem);
+    letter-spacing: -0.06em;
+  }
+
+  .writing-detail--long-title .writing-detail__title-block h1 {
+    max-width: none;
+    font-size: clamp(2.8rem, 11.5vw, 4.2rem);
+    line-height: 0.95;
+  }
+
+  .writing-detail__scroll-cue {
+    align-self: flex-start;
+    margin-top: 2.5rem;
+  }
+
+  .writing-detail__article {
+    display: block;
+    padding: 4.5rem 1.125rem 6rem;
+  }
+
+  .writing-detail__rail {
+    position: static;
+    flex-flow: row wrap;
+    gap: 0.6rem 1.1rem;
+    margin-bottom: 3.5rem;
+    padding: 0 0 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .writing-detail__rail::before {
+    flex-basis: 100%;
+  }
+
+  .writing-body {
+    font-size: 1.06rem;
+    line-height: 1.78;
+  }
+
+  .writing-body--poem .poem-body {
+    font-size: 1.18rem;
+    line-height: 1.85;
+  }
+
+  .writing-detail__next {
+    padding: 4.5rem 1.125rem 5rem;
+  }
+
+  .writing-detail__next-title {
+    font-size: clamp(2.35rem, 11vw, 3.5rem);
+  }
 }
