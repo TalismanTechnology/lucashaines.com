@@ -3,6 +3,63 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import Footer from '../components/Footer'
 import { getWriting, WRITINGS } from '../data/writings'
 
+const STUDY_FIGURES = [
+  {
+    after: 'more input cannot reverse the descent.',
+    src: '/works/figures/elliptical-fig1.png',
+    alt: 'The basic elliptical path plotted across Quality and Phase axes.',
+    number: 'Figure 1',
+    caption: 'The basic ellipse rises to a peak, falls past zero into the lower half, then loops back to the start.',
+  },
+  {
+    after: 'You have not yet felt the shift.',
+    src: '/works/figures/elliptical-fig2.png',
+    alt: 'The upper-left approach arc highlighted on the elliptical model.',
+    number: 'Figure 2',
+    caption: 'The Approach. Sessions that close out within this upper-left arc remain net positive.',
+  },
+  {
+    after: 'active dopamine debt.',
+    src: '/works/figures/elliptical-fig3.png',
+    alt: 'The full elliptical trajectory with the lower crash arc highlighted.',
+    number: 'Figure 3',
+    caption: 'The full trajectory. The dashed arc marks the path most users follow into the lower half.',
+  },
+  {
+    after: 'remain within it for an hour without entering the descent.',
+    src: '/works/figures/elliptical-fig4.png',
+    alt: 'A tall narrow ellipse beside a wide shallow ellipse, comparing short-form and long-form media.',
+    number: 'Figure 4a-b',
+    caption: 'Short-form video creates a brief optimal zone and sharp crash; long-form media creates an extended optimal zone and gradual decline.',
+  },
+  {
+    after: 'What changes is where on the page the ellipse is drawn.',
+    src: '/works/figures/elliptical-fig5.png',
+    alt: 'Three overlapping ellipses drifting forward and downward across successive sessions.',
+    number: 'Figure 5',
+    caption: 'Cumulative drift across sessions. Each new ellipse begins further along P and lower on Q.',
+  },
+]
+
+function getRenderedHtml(writing) {
+  let html = writing.html.replaceAll('href="works/', 'href="/works/')
+
+  if (writing.slug !== 'study-elliptical') return html
+
+  STUDY_FIGURES.forEach((figure) => {
+    const marker = `${figure.after}</p>`
+    const figureHtml = `
+      <figure class="study-figure">
+        <img src="${figure.src}" alt="${figure.alt}" width="1148" height="600" loading="lazy" decoding="async">
+        <figcaption><span>${figure.number}</span>${figure.caption}</figcaption>
+      </figure>`
+
+    html = html.replace(marker, `${marker}${figureHtml}`)
+  })
+
+  return html
+}
+
 function getReadingTime(html) {
   const wordCount = html
     .replace(/<[^>]*>/g, ' ')
@@ -29,6 +86,7 @@ export default function WritingDetail() {
   const readingTime = getReadingTime(writing.html)
   const categoryClass = writing.category.toLowerCase().replace(/\s+/g, '-')
   const titleClass = writing.title.length > 52 ? 'writing-detail--long-title' : ''
+  const renderedHtml = getRenderedHtml(writing)
 
   return (
     <div className={`writing-detail sky-page writing-detail--${categoryClass} ${titleClass}`}>
@@ -67,7 +125,7 @@ export default function WritingDetail() {
 
           <div
             className={`writing-body ${writing.category === 'Poem' ? 'writing-body--poem' : ''}`}
-            dangerouslySetInnerHTML={{ __html: writing.html.replaceAll('href="works/', 'href="/works/') }}
+            dangerouslySetInnerHTML={{ __html: renderedHtml }}
           />
         </article>
 
