@@ -87,9 +87,13 @@ export default function WritingDetail() {
   const categoryClass = writing.category.toLowerCase().replace(/\s+/g, '-')
   const titleClass = writing.title.length > 52 ? 'writing-detail--long-title' : ''
   const renderedHtml = getRenderedHtml(writing)
+  const backgroundImage = `/assets/writing/${writing.slug}.png`
 
   return (
-    <div className={`writing-detail sky-page writing-detail--${categoryClass} ${titleClass}`}>
+    <div
+      className={`writing-detail sky-page writing-detail--${categoryClass} ${titleClass}`}
+      style={{ '--writing-detail-background': `url("${backgroundImage}")` }}
+    >
       <div className="writing-detail__progress" aria-hidden="true" />
 
       <main>

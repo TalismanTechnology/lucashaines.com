@@ -306,6 +306,7 @@
   overflow: clip;
   color: #fff;
   isolation: isolate;
+  background-image: var(--writing-detail-background);
 }
 
 .writing-detail::before {
