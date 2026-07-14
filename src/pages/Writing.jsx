@@ -23,12 +23,12 @@ export default function Writing() {
             return (
               <section key={category}>
                 <h2 className="text-[10px] uppercase tracking-[0.18em] text-white/75 pb-3 border-b border-white/45">{category}</h2>
-                <div className="divide-y divide-white/25">
+                <div className="writing-index-list divide-y divide-white/30">
                   {entries.map((item, index) => (
                     <Link
                       key={item.slug}
                       to={`/writing/${item.slug}`}
-                      className="group grid min-h-[52px] grid-cols-[24px_1fr_auto] items-center gap-3 py-3 text-white/95 hover:text-white transition-colors"
+                      className="writing-index-link group grid min-h-[52px] grid-cols-[24px_1fr_auto] items-center gap-3 py-3 text-white hover:text-white"
                     >
                       <span className="text-[9px] tabular-nums text-white/60">{String(index + 1).padStart(2, '0')}</span>
                       <h3 className="text-[15px] mobile:text-sm leading-snug tracking-[-0.01em] text-pretty">
