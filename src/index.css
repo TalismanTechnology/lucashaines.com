@@ -3,6 +3,12 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
+  :root {
+    /* Sun-amber from the golden-hour hero; matches the dot after LUCAS. */
+    --accent: #f7a541;
+    --accent-light: #ffc27a;
+  }
+
   html {
     font-family: 'Figtree', sans-serif;
     background-color: #000;
@@ -130,19 +136,27 @@
 }
 
 .sky-page {
-  background-color: #07131f;
+  background-color: #120a05;
   background-image:
     linear-gradient(
       to bottom,
-      rgba(2, 8, 15, 0.32) 0%,
-      rgba(2, 8, 15, 0.24) 52%,
-      rgba(2, 8, 15, 0.52) 100%
+      rgba(14, 8, 4, 0.32) 0%,
+      rgba(14, 8, 4, 0.24) 52%,
+      rgba(14, 8, 4, 0.52) 100%
     ),
-    url('/assets/sky-clouds-bg-painterly.png');
+    url('/assets/sky-golden-hour.jpg');
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Photography: the same coast after dark, so the photographs carry the page */
+.sky-page--dusk {
+  background-color: #0b0705;
+  background-image:
+    linear-gradient(to bottom, rgba(8, 5, 3, 0.25) 0%, rgba(8, 5, 3, 0.1) 50%, rgba(8, 5, 3, 0.45) 100%),
+    url('/assets/sky-dusk.jpg');
 }
 
 .home-nav-link {
@@ -277,27 +291,238 @@
   background: #555;
 }
 
-.writing-index-list {
-  background: linear-gradient(90deg, rgba(2, 10, 18, 0.34), rgba(2, 10, 18, 0.16));
-  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.08);
+/* --- Writing contents page --- */
+.writing-contents {
+  position: relative;
+  isolation: isolate;
+  background: #120a05;
 }
 
-.writing-index-link {
-  padding-right: 0.75rem;
-  padding-left: 0.75rem;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.58);
-  transition: background-color 180ms ease, transform 180ms ease;
+.writing-contents__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
 }
 
-.writing-index-link:hover {
-  background: rgba(2, 9, 16, 0.42);
-  transform: translateX(3px);
+.writing-contents__layer {
+  position: absolute;
+  inset: 0;
+  background-position: 70% center;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.writing-index-link:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-  background: rgba(2, 9, 16, 0.5);
+.writing-contents__layer.is-visible {
+  opacity: 1;
+}
+
+.writing-contents__layer--sky {
+  background-image: url('/assets/sky-golden-hour.jpg');
+  background-position: center 70%;
+}
+
+/* Heavy on the left where the type sits, opening to the image on the right */
+.writing-contents__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10, 6, 3, 0.92) 0%, rgba(10, 6, 3, 0.8) 45%, rgba(10, 6, 3, 0.35) 100%),
+    linear-gradient(180deg, rgba(10, 6, 3, 0.55) 0%, transparent 30%, rgba(10, 6, 3, 0.6) 100%);
+}
+
+/* The whole contents fits one viewport: spacing scales with screen height */
+.writing-contents__grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 7rem);
+  width: min(100%, 1340px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(5.5rem, 12vh, 7.5rem) clamp(1.25rem, 4vw, 4.5rem) clamp(1.5rem, 5vh, 3.5rem);
+}
+
+.writing-contents__eyebrow,
+.writing-contents__section-label {
+  color: var(--accent);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.writing-contents__title {
+  margin: 0.9rem 0 1.4rem;
+  font-size: clamp(3rem, min(6.5vw, 11vh), 6rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+
+.writing-contents__lede {
+  max-width: 26ch;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.writing-contents__section + .writing-contents__section {
+  margin-top: clamp(1rem, 3.2vh, 2.25rem);
+}
+
+.writing-contents__section-label {
+  padding-bottom: clamp(0.45rem, 1.2vh, 0.75rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.writing-contents__row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: clamp(0.5rem, 1.5vh, 0.95rem) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.writing-contents__number {
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  transition: color 200ms ease;
+}
+
+.writing-contents__entry-title {
+  font-size: clamp(1.05rem, min(1.55vw, 2.9vh), 1.45rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-wrap: balance;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.writing-contents__meta {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.writing-contents__arrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1.1rem;
+  transition: color 200ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.writing-contents__row:hover .writing-contents__number,
+.writing-contents__row:focus-visible .writing-contents__number,
+.writing-contents__row:hover .writing-contents__arrow,
+.writing-contents__row:focus-visible .writing-contents__arrow {
+  color: var(--accent);
+}
+
+.writing-contents__row:hover .writing-contents__entry-title,
+.writing-contents__row:focus-visible .writing-contents__entry-title {
+  transform: translateX(6px);
+}
+
+.writing-contents__row:hover .writing-contents__arrow,
+.writing-contents__row:focus-visible .writing-contents__arrow {
+  transform: translateX(4px);
+}
+
+.writing-contents__row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 899.98px) {
+  .writing-contents__grid {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: clamp(1.25rem, 3.5vh, 2.25rem);
+    padding-top: clamp(4.75rem, 11vh, 6rem);
+  }
+
+  .writing-contents__title {
+    margin: 0.5rem 0 0;
+    font-size: clamp(2.5rem, 7vh, 3.5rem);
+  }
+
+  .writing-contents__lede {
+    display: none;
+  }
+
+  .writing-contents__scrim {
+    background: linear-gradient(180deg, rgba(10, 6, 3, 0.6) 0%, rgba(10, 6, 3, 0.84) 35%, rgba(10, 6, 3, 0.9) 100%);
+  }
+
+  .writing-contents__row {
+    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    padding: clamp(0.45rem, 1.3vh, 0.7rem) 0;
+  }
+
+  .writing-contents__entry-title {
+    font-size: 0.98rem;
+    line-height: 1.3;
+  }
+
+  .writing-contents__arrow {
+    display: none;
+  }
+}
+
+/* Short phones (iPhone SE and similar): tighten further so all eight still fit */
+@media (max-width: 899.98px) and (max-height: 720px) {
+  .writing-contents__grid {
+    gap: 0.9rem;
+    padding-top: 4.25rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .writing-contents__eyebrow {
+    display: none;
+  }
+
+  .writing-contents__title {
+    margin: 0;
+    font-size: 2.25rem;
+  }
+
+  .writing-contents__section + .writing-contents__section {
+    margin-top: 0.7rem;
+  }
+
+  .writing-contents__section-label {
+    padding-bottom: 0.3rem;
+    font-size: 0.6rem;
+  }
+
+  .writing-contents__row {
+    padding: 0.32rem 0;
+  }
+
+  .writing-contents__entry-title {
+    font-size: 0.9rem;
+    line-height: 1.22;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-contents__layer,
+  .writing-contents__entry-title,
+  .writing-contents__arrow {
+    transition: none;
+  }
 }
 
 .writing-detail {
@@ -306,9 +531,11 @@
   overflow: clip;
   color: #fff;
   isolation: isolate;
-  background-image: var(--writing-detail-background);
 }
 
+/* The piece's photograph lives on a viewport-pinned layer so it stays
+   framed on phones, where background-attachment: fixed is ignored and a
+   cover image would otherwise stretch over the whole article height. */
 .writing-detail::before {
   content: '';
   position: fixed;
@@ -316,8 +543,9 @@
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(1, 5, 10, 0.36) 0%, rgba(1, 5, 10, 0.08) 45%, rgba(1, 5, 10, 0.72) 100%),
-    radial-gradient(circle at 74% 30%, transparent 0%, rgba(0, 0, 0, 0.18) 70%);
+    linear-gradient(180deg, rgba(10, 6, 3, 0.36) 0%, rgba(10, 6, 3, 0.08) 45%, rgba(10, 6, 3, 0.72) 100%),
+    radial-gradient(circle at 74% 30%, transparent 0%, rgba(0, 0, 0, 0.18) 70%),
+    var(--writing-detail-background) center / cover no-repeat;
 }
 
 .writing-detail__progress {
@@ -327,8 +555,8 @@
   left: 0;
   z-index: 40;
   height: 2px;
-  background: #ffd84a;
-  box-shadow: 0 0 16px rgba(255, 216, 74, 0.55);
+  background: var(--accent);
+  box-shadow: 0 0 16px rgba(247, 165, 65, 0.55);
   transform: scaleX(0);
   transform-origin: left center;
   animation: writing-progress linear;
@@ -466,7 +694,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.24);
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   background:
-    linear-gradient(115deg, rgba(3, 11, 18, 0.94) 0%, rgba(5, 18, 28, 0.88) 52%, rgba(9, 28, 40, 0.84) 100%);
+    linear-gradient(115deg, rgba(14, 9, 5, 0.94) 0%, rgba(22, 13, 7, 0.88) 52%, rgba(30, 18, 9, 0.84) 100%);
   box-shadow: 0 -32px 80px rgba(0, 0, 0, 0.24);
   transform: translateX(-50%);
   backdrop-filter: blur(18px) saturate(0.86);
@@ -493,7 +721,7 @@
   width: 2.75rem;
   height: 1px;
   margin-bottom: 0.35rem;
-  background: #ffd84a;
+  background: var(--accent);
 }
 
 .writing-body {
@@ -532,7 +760,7 @@
 .writing-body blockquote {
   margin: 0 0 clamp(3rem, 7vw, 5rem);
   padding: 0 0 0 clamp(1.25rem, 3vw, 2.25rem);
-  border-left: 2px solid #ffd84a;
+  border-left: 2px solid var(--accent);
   color: rgba(255, 255, 255, 0.76);
   font-size: 1.1em;
   font-style: italic;
@@ -552,7 +780,7 @@
 }
 
 .writing-body a {
-  color: #ffe47c;
+  color: var(--accent-light);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -603,7 +831,7 @@
 }
 
 .writing-body .study-figure figcaption span {
-  color: #ffd84a;
+  color: var(--accent);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -620,7 +848,7 @@
 .writing-detail:not(.writing-detail--poem) :is(.essay-body, .story-body, .study-body) > p:first-of-type::first-letter {
   float: left;
   margin: 0.12em 0.13em 0 0;
-  color: #ffd84a;
+  color: var(--accent);
   font-family: 'Figtree', sans-serif;
   font-size: 4.8em;
   font-weight: 500;
@@ -645,13 +873,13 @@
   inset: 0 50%;
   z-index: -1;
   width: 100vw;
-  background: rgba(2, 9, 15, 0.42);
+  background: rgba(14, 8, 4, 0.42);
   transform: translateX(-50%);
   transition: background 240ms ease;
 }
 
 .writing-detail__next:hover::before {
-  background: rgba(2, 9, 15, 0.62);
+  background: rgba(14, 8, 4, 0.62);
 }
 
 .writing-detail__next-label {
@@ -687,7 +915,7 @@
 }
 
 .writing-detail__next:hover .writing-detail__next-arrow {
-  color: #ffd84a;
+  color: var(--accent);
   transform: translate(5px, -5px);
 }
 
@@ -699,6 +927,11 @@
 }
 
 @media (max-width: 600px) {
+  /* Each photograph's subject sits on its right third */
+  .writing-detail::before {
+    background-position: center, center, 70% center;
+  }
+
   .writing-detail__hero {
     min-height: 92svh;
     padding: 7.5rem 1.125rem 1.75rem;

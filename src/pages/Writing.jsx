@@ -1,48 +1,110 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 import { WRITINGS } from '../data/writings'
+import { getReadingTime } from '../lib/readingTime'
 
-const CATEGORY_ORDER = ['Essay', 'Poem', 'Short story', 'Research']
+const SECTIONS = [
+  { category: 'Essay', label: 'Essays' },
+  { category: 'Poem', label: 'Poems' },
+  { category: 'Short story', label: 'Short story' },
+  { category: 'Research', label: 'Research' },
+]
+
+const pad = (n) => String(n).padStart(2, '0')
+const sectionId = (label) => `section-${label.toLowerCase().replace(/\s+/g, '-')}`
+
+// One running number through the whole contents, in section order
+const GROUPS = (() => {
+  let running = 0
+  return SECTIONS.map(({ category, label }) => ({
+    label,
+    entries: WRITINGS.filter((item) => item.category === category).map((item) => ({
+      ...item,
+      number: pad(++running),
+      minutes: getReadingTime(item.html),
+    })),
+  })).filter((group) => group.entries.length)
+})()
+
+/**
+ * Fixed backdrop: the golden-hour sky by default, crossfading to the
+ * hovered piece's photograph. Layers mount on first hover so the page
+ * doesn't download every image up front.
+ */
+function Backdrop({ activeSlug, seenSlugs }) {
+  return (
+    <div className="writing-contents__backdrop" aria-hidden="true">
+      <div className="writing-contents__layer writing-contents__layer--sky is-visible" />
+      {seenSlugs.map((slug) => (
+        <div
+          key={slug}
+          className={`writing-contents__layer ${activeSlug === slug ? 'is-visible' : ''}`}
+          style={{ backgroundImage: `url("/assets/writing/${slug}.jpg")` }}
+        />
+      ))}
+      <div className="writing-contents__scrim" />
+    </div>
+  )
+}
 
 export default function Writing() {
+  const [activeSlug, setActiveSlug] = useState(null)
+  const [seenSlugs, setSeenSlugs] = useState([])
+
+  const preview = (slug) => {
+    setActiveSlug(slug)
+    setSeenSlugs((seen) => (seen.includes(slug) ? seen : [...seen, slug]))
+  }
+
   return (
-    <div className="sky-page min-h-screen flex flex-col pt-28 pb-16 px-[15px] md-tablet:px-[18px] mobile:pt-24 mobile:px-[18px]">
-      <main className="w-full max-w-[1120px] mx-auto flex-1">
-        <header className="mb-12 mobile:mb-10">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-white/75 mb-3">Selected work</p>
-          <h1 className="text-[64px] md-tablet:text-[54px] mobile:text-[44px] leading-[0.9] tracking-[-2px] font-medium uppercase">
-            Writing
-          </h1>
+    <div className="writing-contents min-h-screen flex flex-col">
+      <Backdrop activeSlug={activeSlug} seenSlugs={seenSlugs} />
+
+      <main className="writing-contents__grid">
+        <header>
+          <p className="writing-contents__eyebrow">Selected work</p>
+          <h1 className="writing-contents__title">Writing</h1>
+          <p className="writing-contents__lede">
+            Essays on literature, a pair of poems, a short story, and an original study of how we scroll.
+          </p>
         </header>
 
-        <div className="grid md-tablet:grid-cols-2 lg:grid-cols-2 gap-x-14 gap-y-10 mobile:gap-y-8">
-          {CATEGORY_ORDER.map((category) => {
-            const entries = WRITINGS.filter((item) => item.category === category)
-            if (!entries.length) return null
+        <div className="writing-contents__list" onMouseLeave={() => setActiveSlug(null)}>
+          {GROUPS.map((group) => (
+            <section
+              key={group.label}
+              id={sectionId(group.label)}
+              className="writing-contents__section"
+              aria-labelledby={`${sectionId(group.label)}-heading`}
+            >
+              <h2 id={`${sectionId(group.label)}-heading`} className="writing-contents__section-label">
+                {group.label}
+              </h2>
 
-            return (
-              <section key={category}>
-                <h2 className="text-[10px] uppercase tracking-[0.18em] text-white/75 pb-3 border-b border-white/45">{category}</h2>
-                <div className="writing-index-list divide-y divide-white/30">
-                  {entries.map((item, index) => (
+              <ol>
+                {group.entries.map((item) => (
+                  <li key={item.slug}>
                     <Link
-                      key={item.slug}
                       to={`/writing/${item.slug}`}
-                      className="writing-index-link group grid min-h-[52px] grid-cols-[24px_1fr_auto] items-center gap-3 py-3 text-white hover:text-white"
+                      className="writing-contents__row"
+                      onMouseEnter={() => preview(item.slug)}
+                      onFocus={() => preview(item.slug)}
+                      onBlur={() => setActiveSlug(null)}
                     >
-                      <span className="text-[9px] tabular-nums text-white/60">{String(index + 1).padStart(2, '0')}</span>
-                      <h3 className="text-[15px] mobile:text-sm leading-snug tracking-[-0.01em] text-pretty">
-                        {item.title}
-                      </h3>
-                      <span className="text-sm text-white/65 group-hover:text-white transition-colors" aria-hidden="true">↗</span>
+                      <span className="writing-contents__number">{item.number}</span>
+                      <span className="writing-contents__entry-title">{item.title}</span>
+                      <span className="writing-contents__meta">{item.minutes} min</span>
+                      <span className="writing-contents__arrow" aria-hidden="true">→</span>
                     </Link>
-                  ))}
-                </div>
-              </section>
-            )
-          })}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))}
         </div>
       </main>
+
       <Footer />
     </div>
   )

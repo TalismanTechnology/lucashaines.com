@@ -1,25 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import VideoBackground from '../components/VideoBackground'
-import { useReveal } from '../hooks/useReveal'
 
-export default function Home({ activeVideoIndex, onVideoChange }) {
-  const { ref: nameRef, isVisible: nameVisible } = useReveal()
+// Sun-amber, pulled from the golden-hour hero footage
+const DOT_COLOR = '#F7A541'
 
-  // Auto-rotate videos every 5 seconds
+export default function Home() {
+  // The hero name is always above the fold, so reveal on mount. An
+  // IntersectionObserver never fired on phones: the pre-reveal translate
+  // pushed the title below the viewport.
+  const [nameVisible, setNameVisible] = useState(false)
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      onVideoChange((prev) => (prev + 1) % 3)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [onVideoChange])
-
-  const isDotPink = activeVideoIndex === 0
-  const textColor = isDotPink ? '#F598F2' : '#FFFFFF'
+    const frame = requestAnimationFrame(() => setNameVisible(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
       {/* Video Background */}
-      <VideoBackground activeIndex={activeVideoIndex} />
+      <VideoBackground />
 
       {/* Contrast gradient behind the hero title */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[42%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
@@ -30,7 +29,6 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
         <section className="w-full flex items-end pb-2 mobile:pb-1.5">
           {/* Name */}
           <div
-            ref={nameRef}
             className={`flex-[2] transition-all duration-[900ms] cubic-bezier(0.16, 1, 0.3, 1) ${
               nameVisible
                 ? 'opacity-100'
@@ -39,7 +37,7 @@ export default function Home({ activeVideoIndex, onVideoChange }) {
           >
             <h1 className="hero-title text-[240px] leading-[0.78] tracking-[-8px] font-medium uppercase md-tablet:text-[180px] md-tablet:tracking-[-7px] mobile:text-[clamp(96px,26vw,132px)] mobile:tracking-[-5px]">
               Lucas
-              <span style={{ color: textColor }} className="transition-colors duration-300">
+              <span style={{ color: DOT_COLOR }}>
                 .
               </span>
             </h1>

@@ -39,7 +39,7 @@ export default function Photography() {
   }, [activeIndex])
 
   return (
-    <div className="sky-page min-h-screen flex flex-col pt-32 pb-20 mobile:pt-24">
+    <div className="sky-page sky-page--dusk min-h-screen flex flex-col pt-32 pb-20 mobile:pt-24">
       <main className="w-full flex-1">
         <header className="max-w-[1340px] mx-auto px-[15px] md-tablet:px-[18px] mb-16 mobile:mb-10">
           <p className="text-xs uppercase tracking-[0.18em] text-white/75 mb-5">Selected frames</p>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { GALLERY_ITEMS } from '../data/gallery'
-import { VIDEO_URLS } from './VideoBackground'
+import { HERO_VIDEO_URL } from './VideoBackground'
 
 const MIN_DISPLAY_MS = 1400
 const MAX_WAIT_MS = 7000
@@ -38,7 +38,7 @@ const waitForHeroVideo = () => {
 
   const heroVideo = document.querySelector('video')
   if (!heroVideo) {
-    heroVideoReadyPromise = preloadVideo(VIDEO_URLS[0])
+    heroVideoReadyPromise = preloadVideo(HERO_VIDEO_URL)
     return heroVideoReadyPromise
   }
 

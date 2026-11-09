@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import Footer from '../components/Footer'
 import { getWriting, WRITINGS } from '../data/writings'
+import { getReadingTime } from '../lib/readingTime'
 
 const STUDY_FIGURES = [
   {
@@ -60,17 +61,6 @@ function getRenderedHtml(writing) {
   return html
 }
 
-function getReadingTime(html) {
-  const wordCount = html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&[^;]+;/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length
-
-  return Math.max(1, Math.ceil(wordCount / 220))
-}
-
 export default function WritingDetail() {
   const { slug } = useParams()
   const writing = getWriting(slug)
@@ -87,7 +77,7 @@ export default function WritingDetail() {
   const categoryClass = writing.category.toLowerCase().replace(/\s+/g, '-')
   const titleClass = writing.title.length > 52 ? 'writing-detail--long-title' : ''
   const renderedHtml = getRenderedHtml(writing)
-  const backgroundImage = `/assets/writing/${writing.slug}.png`
+  const backgroundImage = `/assets/writing/${writing.slug}.jpg`
 
   return (
     <div

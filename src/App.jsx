@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import SitePreloader from './components/SitePreloader'
@@ -8,17 +7,12 @@ import Writing from './pages/Writing'
 import WritingDetail from './pages/WritingDetail'
 
 function App() {
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0)
-
   return (
     <SitePreloader>
       <Router>
-        <Navbar activeVideoIndex={activeVideoIndex} />
+        <Navbar />
         <Routes>
-          <Route
-            path="/"
-            element={<Home activeVideoIndex={activeVideoIndex} onVideoChange={setActiveVideoIndex} />}
-          />
+          <Route path="/" element={<Home />} />
           <Route path="/writing" element={<Writing />} />
           <Route path="/writing/:slug" element={<WritingDetail />} />
           <Route path="/photography" element={<Photography />} />
